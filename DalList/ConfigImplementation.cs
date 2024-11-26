@@ -1,6 +1,8 @@
 ﻿namespace Dal;
+using DalApi;
+using DO;
 
-public class ConfigImplementation : Iconfig
+public class ConfigImplementation : IConfig
 {
     public DateTime Clock
     {
