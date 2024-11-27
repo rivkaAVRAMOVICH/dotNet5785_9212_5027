@@ -7,8 +7,8 @@ public record Assignment
    int VolunteerId,
    DateTime EnteryTimeTreatment,
    DateTime? FinushTimeTreatment = null,
-   Enum? finishTreatmentType = null
+   Enums.finishTreatmentTypeEnum? FinishTreatmentType = 0
 )
 {
-    public Assignment() : this(0) { }
+    public Assignment() : this(0, 0, 0, new DateTime()) { }
 }

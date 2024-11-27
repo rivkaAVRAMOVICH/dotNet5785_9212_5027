@@ -1,4 +1,6 @@
-﻿namespace DO;
+﻿using Microsoft.VisualBasic;
+
+namespace DO;
 
 public record Call
 (
@@ -7,10 +9,10 @@ public record Call
     double Latitude,
     double Longitude,
     DateTime openTime,
-    Enum CallType,
+    Enums.CallTypeEnum CallType,
     string? VerbalDescription = null,
     DateTime? MaxTimeFinish = null
 )
 {
-    public Call() : this(0) { }
+    public Call() : this(0, "", 0, 0, new DateTime(), 0) { }
 }

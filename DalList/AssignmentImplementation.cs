@@ -4,33 +4,55 @@ using DO;
 
 public class AssignmentImplementation : IAssignment
 {
-    public void Create(Assignment item)
-    {
-        throw new NotImplementedException();
-    }
-
     public void Delete(int id)
     {
-        throw new NotImplementedException();
+        Assignment item = Read(id);
+        if (item == null)
+        {
+            throw new Exception($"Assignment with ID={id} does not exist and cannot be deleted.");
+        }
+
+        else
+        {
+            DataSource.Assignments.Remove(item);
+        }
     }
 
     public void DeleteAll()
     {
-        throw new NotImplementedException();
+        DataSource.Assignments.Clear();
     }
 
     public Assignment? Read(int id)
     {
-        throw new NotImplementedException();
+        return DataSource.Assignments.FirstOrDefault(v => v.Id == id);
+
     }
 
     public List<Assignment> ReadAll()
     {
-        throw new NotImplementedException();
+        return new List<Assignment>(DataSource.Assignments);
     }
 
     public void Update(Assignment item)
     {
-        throw new NotImplementedException();
+        if (Read(item.Id) == null)
+        {
+            throw new Exception($"Assignment with ID={item.Id} does not exist and cannot be updated.");
+        }
+        else
+        {
+            Delete(item.Id);
+            DataSource.Assignments.Add(item);
+        }
+
+    }
+
+
+    public void Create(Assignment item)
+    {
+        int nextAssignmentId = Config.NextAssignmentId;
+        Assignment news = item with { Id = nextAssignmentId };
+        DataSource.Assignments.Add(news);
     }
 }

@@ -4,33 +4,53 @@ using DO;
 
 public class CallImplementation : ICall
 {
-    public void Create(Call item)
-    {
-        throw new NotImplementedException();
-    }
-
     public void Delete(int id)
     {
-        throw new NotImplementedException();
+        Call item = Read(id);
+        if (item == null)
+        {
+            throw new Exception($"Call with ID={id} does not exist and cannot be deleted.");
+        }
+
+        else
+        {
+            DataSource.Calls.Remove(item);
+        }
     }
 
     public void DeleteAll()
     {
-        throw new NotImplementedException();
+        DataSource.Calls.Clear();
     }
 
     public Call? Read(int id)
     {
-        throw new NotImplementedException();
+        return DataSource.Calls.FirstOrDefault(v => v.Id == id);
+
     }
 
     public List<Call> ReadAll()
     {
-        throw new NotImplementedException();
+        return new List<Call>(DataSource.Calls);
     }
 
     public void Update(Call item)
     {
-        throw new NotImplementedException();
+        if (Read(item.Id) == null)
+        {
+            throw new Exception($"Call with ID={item.Id} does not exist and cannot be updated.");
+        }
+        else
+        {
+            Delete(item.Id);
+            DataSource.Calls.Add(item);
+        }
+    }
+
+    void ICall.Create(Call item)
+    {
+        int nextCallId = Config.NextCallNum;
+        Call newItem = item with { Id = nextCallId };
+        DataSource.Calls.Add(newItem);
     }
 }
