@@ -66,7 +66,7 @@ public static class Initialization
 
         for (int i = 0; i < 10; i++)
         {
-            int id = 0;//ConfigImplementation.NextAssignmentId;
+            int id = 0;//ConfigImplementation.NextAssignmentId
             int callId = callIds[s_rand.Next(callIds.Count)];
             int volunteerId = volunteerIds[s_rand.Next(volunteerIds.Count)];
             DateTime assignmentStart = s_dalConfig.Clock.AddMinutes(-s_rand.Next(1, 60)); // Random start within the last hour
