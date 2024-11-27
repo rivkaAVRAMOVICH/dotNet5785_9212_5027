@@ -8,10 +8,10 @@ using static DO.Enums;
 
 public static class Initialization
 {
-    private static ICall? s_dalCall; //stage 1
-    private static IAssignment? s_dalAssignment; //stage 1
-    private static IVolunteer? s_dalVolunteer; //stage 1
-    private static IConfig? s_dalConfig;
+    private static ICall? s_dalCall=new CallImplementation(); //stage 1
+    private static IAssignment? s_dalAssignment= new AssignmentImplementation(); //stage 1
+    private static IVolunteer? s_dalVolunteer=new VolunteerImplementation(); //stage 1
+    private static IConfig? s_dalConfig=new ConfigImplementation();
     private static readonly Random s_rand = new();
     private static void createCalls()
     {

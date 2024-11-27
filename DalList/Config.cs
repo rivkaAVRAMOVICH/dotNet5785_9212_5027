@@ -10,7 +10,7 @@ internal static class Config
     internal static int NextAssignmentId { get => nextAssignmentId++; }
     internal static DateTime Clock { get; set; } = DateTime.Now;
     internal static TimeSpan RiskRange { get; set; } = TimeSpan.Zero;
-    
+
     internal static void Reset()
     {
         nextCallId = startCallId;
