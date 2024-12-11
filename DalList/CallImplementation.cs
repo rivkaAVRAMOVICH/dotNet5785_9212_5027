@@ -4,6 +4,13 @@ using DO;
 
 public class CallImplementation : ICall
 {
+    public void Create(Call item)
+    {
+        int nextCallId = Config.NextCallNum;
+        Call newItem = item with { Id = nextCallId };
+        DataSource.Calls.Add(newItem);
+    }
+    
     public void Delete(int id)
     {
         Call item = Read(id);
@@ -47,10 +54,4 @@ public class CallImplementation : ICall
         }
     }
 
-    void ICall.Create(Call item)
-    {
-        int nextCallId = Config.NextCallNum;
-        Call newItem = item with { Id = nextCallId };
-        DataSource.Calls.Add(newItem);
-    }
 }
