@@ -9,7 +9,7 @@ public class AssignmentImplementation : IAssignment
         Assignment item = Read(id);
         if (item == null)
         {
-            throw new Exception($"Assignment with ID={id} does not exist and cannot be deleted.");
+            throw new DalDeletionImpossible($"Assignment with ID={id} does not exist and cannot be deleted.");
         }
 
         else
@@ -22,23 +22,27 @@ public class AssignmentImplementation : IAssignment
     {
         DataSource.Assignments.Clear();
     }
-
     public Assignment? Read(int id)
     {
         return DataSource.Assignments.FirstOrDefault(v => v.Id == id);
 
     }
-
-    public List<Assignment> ReadAll()
+    public Assignment? Read(Func<Assignment, bool> filter)
     {
-        return new List<Assignment>(DataSource.Assignments);
+        return DataSource.Assignments.FirstOrDefault(filter);
     }
+
+    public IEnumerable<Assignment> ReadAll(Func<Assignment, bool>? filter = null) //stage 2
+       => filter == null
+           ? DataSource.Assignments.Select(item => item)
+            : DataSource.Assignments.Where(filter);
+
 
     public void Update(Assignment item)
     {
         if (Read(item.Id) == null)
         {
-            throw new Exception($"Assignment with ID={item.Id} does not exist and cannot be updated.");
+            throw new DalDoesNotExistException($"Assignment with ID={item.Id} does not exist and cannot be updated.");
         }
         else
         {

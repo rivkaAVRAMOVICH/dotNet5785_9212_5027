@@ -10,7 +10,8 @@ public class VolunteerImplementation : IVolunteer
     {
         if (Read(item.Id) != null)
         {
-            throw new Exception($"Volunteer with ID={item.Id} already exists. Cannot create a new volunteer with the same ID.");
+            throw new DalAlreadyExistsException($"Student with ID={item.Id} already exists");
+
         }
         else
         {
@@ -24,7 +25,7 @@ public class VolunteerImplementation : IVolunteer
         Volunteer item = Read(id);
         if (item == null)
         {
-            throw new Exception($"Volunteer with ID={id} does not exist and cannot be deleted.");
+            throw new DalDeletionImpossible($"Volunteer with ID={id} does not exist and cannot be deleted.");
         }
 
         else
@@ -44,16 +45,22 @@ public class VolunteerImplementation : IVolunteer
         return DataSource.Volunteers.FirstOrDefault(v => v.Id == id);
     }
 
-    public List<Volunteer> ReadAll()
+    public Volunteer? Read(Func<Volunteer, bool> filter)
     {
-        return new List<Volunteer>(DataSource.Volunteers);
+        return DataSource.Volunteers.FirstOrDefault(filter);
     }
+
+    public IEnumerable<Volunteer> ReadAll(Func<Volunteer, bool>? filter = null) //stage 2
+      => filter == null
+          ? DataSource.Volunteers.Select(item => item)
+            : DataSource.Volunteers.Where(filter);
+
 
     public void Update(Volunteer item)
     {
         if (Read(item.Id) == null)
         {
-            throw new Exception($"Volunteer with ID={item.Id} does not exist and cannot be updated.");
+            throw new DalDoesNotExistException($"Volunteer with ID={item.Id} does not exist and cannot be updated.");
         }
         else
         {

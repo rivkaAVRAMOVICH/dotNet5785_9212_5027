@@ -16,7 +16,7 @@ public class CallImplementation : ICall
         Call item = Read(id);
         if (item == null)
         {
-            throw new Exception($"Call with ID={id} does not exist and cannot be deleted.");
+            throw new DalDeletionImpossible($"Call with ID={id} does not exist and cannot be deleted.");
         }
 
         else
@@ -36,16 +36,22 @@ public class CallImplementation : ICall
 
     }
 
-    public List<Call> ReadAll()
+    public Call? Read(Func<Call, bool> filter)
     {
-        return new List<Call>(DataSource.Calls);
+        return DataSource.Calls.FirstOrDefault(filter);
     }
+
+    public IEnumerable<Call> ReadAll(Func<Call, bool>? filter = null) //stage 2
+       => filter == null
+           ? DataSource.Calls.Select(item => item)
+            : DataSource.Calls.Where(filter);
+
 
     public void Update(Call item)
     {
         if (Read(item.Id) == null)
         {
-            throw new Exception($"Call with ID={item.Id} does not exist and cannot be updated.");
+            throw new DalDoesNotExistException($"Call with ID={item.Id} does not exist and cannot be updated.");
         }
         else
         {

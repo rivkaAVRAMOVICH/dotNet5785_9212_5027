@@ -8,10 +8,7 @@ using static DO.Enums;
 
 public static class Initialization
 {
-    private static ICall? s_dalCall=new CallImplementation(); //stage 1
-    private static IAssignment? s_dalAssignment= new AssignmentImplementation(); //stage 1
-    private static IVolunteer? s_dalVolunteer=new VolunteerImplementation(); //stage 1
-    private static IConfig? s_dalConfig=new ConfigImplementation();
+    private static IDal? s_dal;
     private static readonly Random s_rand = new();
     private static void createCalls()
     {
@@ -40,7 +37,7 @@ public static class Initialization
             string address = addresses[s_rand.Next(addresses.Length)];
             double latitude = Math.Round(s_rand.NextDouble() * 180 - 90, 6); // Random latitude
             double longitude = Math.Round(s_rand.NextDouble() * 360 - 180, 6); // Random longitude
-            DateTime openHour = s_dalConfig.Clock.AddHours(-s_rand.Next(1, 48)); // Randomly in the last 2 days
+            DateTime openHour = s_dal.Config.Clock.AddHours(-s_rand.Next(1, 48)); // Randomly in the last 2 days
             DateTime closeHour = openHour.AddHours(s_rand.Next(1, 5)); // Duration between 1 to 5 hours
             string? description = s_rand.Next(2) == 0 ? "Urgent response required" : null;
 
@@ -56,20 +53,20 @@ public static class Initialization
                 
             );
 
-            s_dalCall.Create(newCall);
+            s_dal.Call.Create(newCall);
         }
     }
     private static void createAssignments()
     {
-        var callIds = s_dalCall.ReadAll()?.Select(c => c.Id).ToList(); // Retrieve and map call IDs
-        var volunteerIds = s_dalVolunteer.ReadAll()?.Select(v => v.Id).ToList(); // Retrieve and map volunteer IDs
+        var callIds = s_dal.Call.ReadAll()?.Select(c => c.Id).ToList(); // Retrieve and map call IDs
+        var volunteerIds = s_dal.Volunteer.ReadAll()?.Select(v => v.Id).ToList(); // Retrieve and map volunteer IDs
 
         for (int i = 0; i < 10; i++)
         {
             int id = 0;//ConfigImplementation.NextAssignmentId
             int callId = callIds[s_rand.Next(callIds.Count)];
             int volunteerId = volunteerIds[s_rand.Next(volunteerIds.Count)];
-            DateTime assignmentStart = s_dalConfig.Clock.AddMinutes(-s_rand.Next(1, 60)); // Random start within the last hour
+            DateTime assignmentStart = s_dal.Config.Clock.AddMinutes(-s_rand.Next(1, 60)); // Random start within the last hour
             DateTime? assignmentEnd = s_rand.Next(2) == 0 ? (DateTime?)null : assignmentStart.AddMinutes(s_rand.Next(10, 120));
             Enums.finishTreatmentTypeEnum? endKind = assignmentEnd.HasValue
                 ? (Enums.finishTreatmentTypeEnum?)s_rand.Next(Enum.GetValues(typeof(Enums.finishTreatmentTypeEnum)).Length)
@@ -84,7 +81,7 @@ public static class Initialization
                 endKind
             );
 
-            s_dalAssignment.Create(newAssignment);
+            s_dal.Assignment.Create(newAssignment);
         }
     }
     private static void createVolunteers()
@@ -126,7 +123,7 @@ public static class Initialization
               id = s_rand.Next(200000000, 400000000);
                
             }
-            while (s_dalVolunteer!.Read(id) != null);
+            while (s_dal!.Volunteer.Read(id) != null);
             phoneNumber = prefixes[s_rand.Next(0, prefixes.Length)] + s_rand.Next(1000000, 10000000);
             email = phoneNumber + "@gmail.com";
             password = $"{new string(name.Where(char.IsLetter).Take(4).ToArray())}{id.ToString().Substring(0, 4)}{"!@#$%^&*()"[s_rand.Next(10)]}";
@@ -134,19 +131,17 @@ public static class Initialization
             role = Enums.RoleEnum.volunteer;
             distanceType = Enums.DistanceTypeEnum.aerialDistance;
             i++;
-            s_dalVolunteer!.Create(new Volunteer(id, name, phoneNumber, email, false, role, distanceType, password,locations[i].Address, locations[i].Latitude, locations[i].Longitude, maxDistance));
+            s_dal!.Volunteer.Create(new Volunteer(id, name, phoneNumber, email, false, role, distanceType, password,locations[i].Address, locations[i].Latitude, locations[i].Longitude, maxDistance));
         }
 
     }
-    public static void Do(IVolunteer? dalVolunteer, IAssignment? dalAssignment, ICall? dalCall, IConfig? dalConfig) //stage 1
+    public static void Do(IDal dal) //stage 1
     {
 
         Console.WriteLine("Reset Configuration values and List values...");
-        s_dalConfig.Reset(); //stage 1
-        s_dalVolunteer.DeleteAll(); //stage 1
-        s_dalAssignment.DeleteAll();
-        s_dalCall.DeleteAll();
+        s_dal = dal ?? throw new NullReferenceException("DAL object can not be null!");
         //...
+        s_dal.ResetDB();
         Console.WriteLine("Initializing volunteer list ...");
         createVolunteers();
         Console.WriteLine("Initializing Call list ...");
