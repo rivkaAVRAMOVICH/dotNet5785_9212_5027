@@ -59,5 +59,4 @@ public class CallImplementation : ICall
             DataSource.Calls.Add(item);
         }
     }
-
 }

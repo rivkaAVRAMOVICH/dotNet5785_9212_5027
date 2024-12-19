@@ -16,7 +16,6 @@ internal static class Config
         get => XMLTools.GetAndIncreaseConfigIntVal(s_data_config_xml, "NextAssignmentId");
         private set => XMLTools.SetConfigIntVal(s_data_config_xml, "NextAssignmentId", value);
     }
-    //...	
 
     internal static DateTime Clock
     {
@@ -25,8 +24,8 @@ internal static class Config
     }
     internal static TimeSpan RiskRange
     {
-        get => XMLTools.GetConfigDateVal(s_data_config_xml, "RiskRange");
-        set => XMLTools.SetConfigDateVal(s_data_config_xml, "RiskRange", value);
+        get => (XMLTools.GetConfigDateVal(s_data_config_xml, "RiskRange")) - DateTime.MinValue;
+        set => XMLTools.SetConfigDateVal(s_data_config_xml, "RiskRange", DateTime.MinValue + value);
     }
 
     internal static void Reset()

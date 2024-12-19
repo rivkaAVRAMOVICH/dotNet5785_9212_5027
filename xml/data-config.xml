@@ -2,6 +2,6 @@
 <config>
 	<NextCallId>1000</NextCallId>
 	<NextAssignmentId>1000</NextAssignmentId>
-	<Clock>0</Clock>
-	<RiskRange>0</RiskRange>
+	<Clock>DateTime.Now</Clock>
+	<RiskRange>TimeSpan.Zero</RiskRange>
 </config>
