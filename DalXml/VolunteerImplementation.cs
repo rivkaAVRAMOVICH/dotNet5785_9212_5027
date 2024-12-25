@@ -3,6 +3,7 @@ using DalApi;
 using DO;
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 internal class VolunteerImplementation : IVolunteer
 {
@@ -24,10 +25,14 @@ internal class VolunteerImplementation : IVolunteer
 
     public void Delete(int id)
     {
-        List<Volunteer> Volunteers = XMLTools.LoadListFromXMLSerializer<Volunteer>(Config.s_volunteers_xml);
-        if (Volunteers.RemoveAll(it => it.Id == id) == 0)
-            throw new DalDoesNotExistException($"Volunteer with ID={id} does not exist and cannot be deleted.");
-        XMLTools.SaveListToXMLSerializer(Volunteers, Config.s_volunteers_xml);
+        XElement volunteersRootElem = XMLTools.LoadListFromXMLElement(Config.s_volunteers_xml);
+
+        XElement? volunteer = volunteersRootElem.Elements().FirstOrDefault(v => (int?)v.Element("Id") == id)
+            ?? throw new DO.DalDoesNotExistException($"Volunteer with ID={id} does not exist");
+
+        volunteer.Remove();
+
+        XMLTools.SaveListToXMLElement(volunteersRootElem, Config.s_volunteers_xml);
     }
 
     public void DeleteAll()

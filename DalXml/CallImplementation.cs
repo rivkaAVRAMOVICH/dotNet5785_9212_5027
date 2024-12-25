@@ -3,6 +3,7 @@ using DalApi;
 using DO;
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 internal class CallImplementation : ICall
 {
@@ -17,10 +18,14 @@ internal class CallImplementation : ICall
 
     public void Delete(int id)
     {
-        List<Call> Calls = XMLTools.LoadListFromXMLSerializer<Call>(Config.s_calls_xml);
-        if (Calls.RemoveAll(it => it.Id == id) == 0)
-            throw new DalDoesNotExistException($"Call with ID={id} does not exist and cannot be deleted.");
-        XMLTools.SaveListToXMLSerializer(Calls, Config.s_calls_xml);
+        XElement callsRootElem = XMLTools.LoadListFromXMLElement(Config.s_calls_xml);
+
+        XElement? call = callsRootElem.Elements().FirstOrDefault(v => (int?)v.Element("Id") == id)
+            ?? throw new DO.DalDoesNotExistException($"Call with ID={id} does not exist");
+
+        call.Remove();
+
+        XMLTools.SaveListToXMLElement(callsRootElem, Config.s_calls_xml);
     }
 
     public void DeleteAll()
