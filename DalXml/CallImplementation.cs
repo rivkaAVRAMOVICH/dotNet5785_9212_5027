@@ -31,6 +31,7 @@ internal class CallImplementation : ICall
     public void DeleteAll()
     {
         XMLTools.SaveListToXMLSerializer(new List<Call>(), Config.s_calls_xml);
+
     }
 
     public Call? Read(int id)

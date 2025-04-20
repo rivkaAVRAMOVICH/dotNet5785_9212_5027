@@ -17,6 +17,7 @@ internal class AssignmentImplementation : IAssignment
         assignment.Remove();
 
         XMLTools.SaveListToXMLElement(assignmentsRootElem, Config.s_assignments_xml);
+
     }
 
     public void DeleteAll()
