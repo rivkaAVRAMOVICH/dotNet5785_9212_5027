@@ -6,8 +6,8 @@ namespace DalTest;
 
 internal class Program
 {
-   
-    static readonly IDal s_dal = new DalXml();
+
+    static readonly IDal s_dal = Factory.Get;
     enum MainMenuOptions
     {
         Exit,
@@ -905,7 +905,7 @@ internal class Program
     private static void InitializeData()
     {
         Console.WriteLine("Initializing data...");
-        Initialization.Do(s_dal);
+        Initialization.Do();
         Pause();
     }
 

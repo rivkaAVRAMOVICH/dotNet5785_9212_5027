@@ -52,7 +52,8 @@ internal class CallImplementation : ICall
         List<Call> Calls = XMLTools.LoadListFromXMLSerializer<Call>(Config.s_calls_xml);
         if (filter == null)
         {
-            return Calls.Select(item => item);
+            //return Calls.Select(item => item);
+            return Calls;
         }
         else
         {
