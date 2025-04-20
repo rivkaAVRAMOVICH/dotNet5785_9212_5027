@@ -135,11 +135,11 @@ public static class Initialization
         }
 
     }
-    public static void Do(IDal dal) //stage 1
+    public static void Do()
     {
 
         Console.WriteLine("Reset Configuration values and List values...");
-        s_dal = dal ?? throw new NullReferenceException("DAL object can not be null!");
+        s_dal = DalApi.Factory.Get;
         //...
         s_dal.ResetDB();
         Console.WriteLine("Initializing volunteer list ...");

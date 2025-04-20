@@ -42,7 +42,8 @@ internal class AssignmentImplementation : IAssignment
         List<Assignment> Assignments = XMLTools.LoadListFromXMLSerializer<Assignment>(Config.s_assignments_xml);
         if (filter == null)
         {
-            return Assignments.Select(item => item);
+            //return Assignments.Select(item => item);
+            return Assignments;
         }
         else
         {
