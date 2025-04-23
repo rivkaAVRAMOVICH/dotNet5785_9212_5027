@@ -10,12 +10,11 @@ namespace BO
     {
         public int Id { get; init; }
         public string Name { get; }
-        public boolean IsActive { get; }
-        public boolean IsActive { get; }
+        public bool IsActive { get; }
         public int HandledCallsSum { get; }
         public int CanceledCallsSum { get; }
         public int ExpiredCallsSum { get; }
         public int? HandleCallId { get; }
-        public Enums.HandleCallType HandleCallType { get; }
+        public  HandleCallType HandleCallType { get; }
     }
 }
