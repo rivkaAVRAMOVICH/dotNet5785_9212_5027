@@ -9,11 +9,11 @@ namespace BO
     public class ClosedCallInList
     {
         public int Id { get; init; }
-        public Enums.CallType CallType { get; }
+        public CallType CallType { get; }
         public string CallAddress { get; }
         public DateTime StartCallTime { get; }
         public DateTime EntryCallTime { get; }
         public DateTime? EndCallTime { get; }
-        public Enums.EndCallType? EndCallType { get; }
+        public FinishType? FinishType { get; }
     }
 }

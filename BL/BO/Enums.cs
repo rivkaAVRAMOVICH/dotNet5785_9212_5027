@@ -1,24 +1,52 @@
 ﻿namespace BO;
 
-    public enum Role { Manager, Volunteer }
-    public enum DistanceType { Air, Walking, Driving }
-    public enum CallType { Emergency,Regular,Consulation,Technical,None }
-    public enum Status { Open,InProgress, InRiskProgress,Closed,Expired,openRisk,RiskOfExpiration,completed }
-//public enum HandleCallType { None }
-public enum EndCallType
+public enum Role
 {
-    Treated,
-    SelfCancellation,
-    AdministratorCancellation,
-    ExpiredCancellation,
-    None
+    manager,
+    volunteer
 }
-    public enum TimeUnit
-    {
-        MINUTE,
-        HOUR,
-        DAY,
-        MONTH,
-        SECOND,
-        YEAR
-    }
+
+public enum TypeOfDistance
+{
+    Air,
+    Walking,
+    Driving
+}
+
+public enum CallType
+{
+    none,
+    fixing,
+    cooking,
+    babysitting,
+    cleaning,
+    shopping
+}
+
+public enum Status
+{
+    open,
+    inProgress,
+    closed,
+    expired,
+    openAtRisk,
+    inProgressAtRisk
+}
+
+public enum FinishType
+{
+    takenCareOf,
+    volunteerCanceled,
+    managerCanceledAssignment,
+    expired
+}
+
+public enum TimeUnit
+{
+    MINUTE,
+    HOUR,
+    DAY,
+    MONTH,
+    SECOND,
+    YEAR
+}

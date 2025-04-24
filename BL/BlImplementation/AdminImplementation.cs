@@ -41,7 +41,7 @@ internal class AdminImplementation : IAdmin
     }
     // מתודת בקשת טווח זמן סיכון
     public TimeSpan GetRiskTimeRange()
-    {
+{
         return _dal.Config.RiskRange;
     }
 
