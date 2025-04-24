@@ -8,23 +8,23 @@ namespace BlApi
 {
     public interface IAdmin
     {
-       DateTime GetClock();
+        public DateTime GetClock();
         // מתודת קידום שעון
-         void AdvanceClock(BO.TimeUnit timeUnit);
+        public void AdvanceClock(BO.TimeUnit timeUnit);
         // מתודת בקשת טווח זמן סיכון
-        TimeSpan GetRiskTimeRange();
+        public TimeSpan GetRiskTimeRange();
 
 
         // מתודת הגדרת טווח זמן סיכון
-         void SetRiskTimeRange(TimeSpan riskTimeRange);
+        public void SetRiskTimeRange(TimeSpan riskTimeRange);
 
 
         // מתודת איפוס בסיס נתונים
-        void ResetDatabase();
+        public void ResetDatabase();
 
 
         // מתודת אתחול בסיס נתונים
-         void InitializeDatabase();
+         public void InitializeDatabase();
        
     }
 }

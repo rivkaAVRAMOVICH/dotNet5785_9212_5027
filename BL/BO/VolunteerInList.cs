@@ -9,12 +9,12 @@ namespace BO
     public class VolunteerInList
     {
         public int Id { get; init; }
-        public string Name { get; }
-        public bool IsActive { get; }
-        public int HandledCallsSum { get; }
-        public int CanceledCallsSum { get; }
-        public int ExpiredCallsSum { get; }
-        public int? HandleCallId { get; }
-        public  HandleCallType HandleCallType { get; }
+        public string Name { get; set; }
+        public bool IsActive { get; set; }
+        public int SumOfHandleCalls { get; set; }
+        public int SumCanceledCalls { get; set; }
+        public int SumOfExpiredCalls { get; set; }
+        public int? IdCallInProgress { get; set; }
+        public  HandleCallType TypeCallInProgress { get; set; }
     }
 }

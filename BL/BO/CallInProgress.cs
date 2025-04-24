@@ -15,6 +15,7 @@ namespace BO
         public string? CallDescription { get; set; }
         public DateTime? MaxEndTime { get; set; }
         public DateTime? TimeCallMade {  get; set; }
+        public DateTime? EntryTimeTreatment {  get; set; }
         public double DistanceCallFromVolunteer { get; set; }
         public Status Status  { get; set; }
 }

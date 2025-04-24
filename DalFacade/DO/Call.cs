@@ -9,7 +9,7 @@ public record Call
     double Latitude,
     double Longitude,
     DateTime openTime,
-    Enums.CallTypeEnum CallType,
+    CallType CallType,
     string? VerbalDescription = null,
     DateTime? MaxTimeFinish = null
 )

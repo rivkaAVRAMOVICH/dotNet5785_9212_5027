@@ -1,7 +1,6 @@
 ﻿namespace DO;
 
-public static class Enums
-{
+
     public enum RoleEnum
 {
     manager,
@@ -13,13 +12,16 @@ public enum DistanceTypeEnum
     walkingDistance,
     drivingDistance
 }
-    public enum CallTypeEnum
-    {
-        h
-    }
-    public enum finishTreatmentTypeEnum
-    {
-
-    }
+    //public enum CallType
+    //{
+    //  None
+    //}
+public enum EndTypeAssignment
+{
+    Treated,          
+    SelfCancellation,
+    AdministratorCancellation,
+    ExpiredCancellation
 }
+
 

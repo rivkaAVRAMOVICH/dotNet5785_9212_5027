@@ -1,8 +1,13 @@
 ﻿//using BO;
+using BlApi;
+using BlImplementation;
+using BO;
 using DalApi;
+using DO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -80,19 +85,36 @@ namespace Helpers
             return volunteers.Select(volunteer => new BO.VolunteerInList
             {
                 Id = volunteer.Id,
-                Name = volunteer.Name,
-                Active = volunteer.Active,
-                SumOfCalls = volunteer.SumOfCalls,
-                SumOfCanceledCalls = volunteer.SumOfCanceledCalls,
-                SumOfExpiredCalls = volunteer.SumOfExpiredCalls,
-                IdCallInProgress = null,
-                TypeCallInProgress = volunteer.callInProgress != null
-                    ? (BO.CallType)volunteer.callInProgress // Conversion
-                    : BO.CallType.none
+                Name = volunteer.FullName,
+                IsActive = volunteer.Active,
+                SumOfHandleCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == volunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.Treated),
+                SumCanceledCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == volunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.SelfCancellation),
+                SumOfExpiredCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == volunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.ExpiredCancellation),
+                IdCallInProgress = s_dal.Assignment.ReadAll().FirstOrDefault(a => a.VolunteerId == volunteer.Id && a.FinushTimeTreatment == null)?.CallId,
+                TypeCallInProgress = s_dal.Assignment.ReadAll()
+    .FirstOrDefault(a => a.VolunteerId == volunteer.Id && a.FinushTimeTreatment == null) is DO.Assignment aInProgress &&
+    s_dal.Call.Read(aInProgress.CallId) is DO.Call c
+    ? (BO.CallType)c.CallType
+    : BO.CallType.None
             });
         }
+        public static DO.Volunteer ConvertVolunteersToDo(BO.Volunteer volunteer)
+        {
+            var finalVolunteer = new DO.Volunteer
+            {
+                Id = volunteer.Id,
+                FullName = volunteer.Name,
+                Email = volunteer.Email,
+                PhoneNumber = volunteer.Phone,
+                FullAddress = volunteer.Address,
+                Latitude = CallManager.GetLatitudLongitute(volunteer.Address).Latitude,
+                Longitude = CallManager.GetLatitudLongitute(volunteer.Address).Longitude,
+                Role =(DO.RoleEnum)volunteer.Role
+            };
+            return finalVolunteer;
+        }
 
-       
+
         public static BO.Volunteer addNewVolunteerWithCall(DO.Volunteer tmpVolunteer)
         {
             BO.Volunteer final = new BO.Volunteer()
@@ -109,20 +131,14 @@ namespace Helpers
                 IsActive = tmpVolunteer.Active,
                 MaxDistance = tmpVolunteer.MaxDistance,
                 DistanceType = (BO.DistanceType)tmpVolunteer.DistanceType,
-                SumHandledCalls = tmpVolunteer.SumOfCalls,
-                SumCanceledCalls = tmpVolunteer.SumOfCanceledCalls,
-                SumChosenExpiredCalls = tmpVolunteer.SumOfExpiredCalls,
-                CallInVolunteerHandle = (BO.CallInProgress)tmpVolunteer.callInProgress
+                SumHandledCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == tmpVolunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.Treated),
+                SumCanceledCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == tmpVolunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.SelfCancellation),
+                SumChosenExpiredCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == tmpVolunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.ExpiredCancellation),
+                CallInVolunteerHandle = s_dal.Assignment.ReadAll().FirstOrDefault(a => a.VolunteerId == tmpVolunteer.Id && a.FinushTimeTreatment == null) is DO.Assignment aInProgress? addCall(aInProgress, tmpVolunteer) : null
             };
             return final;
         }
 
-        /// <summary>
-        /// Creates a new DO.Volunteer object based on a BO.Volunteer object.
-        /// </summary>
-        /// <param name="myVolunteer">Original DO.Volunteer object.</param>
-        /// <param name="v1">BO.Volunteer object with updated information.</param>
-        /// <returns>A DO.Volunteer object.</returns>
         public static DO.Volunteer addNewVolunteer(DO.Volunteer myVolunteer, BO.Volunteer v1)
         {
             var finalVolunteer = new DO.Volunteer
@@ -138,35 +154,38 @@ namespace Helpers
             };
             return finalVolunteer;
         }
-        +
-        /// <summary>
-        /// Adds a new call to a BO.Volunteer object.
-        /// </summary>
-        /// <param name="callInProgress">DO.Call object representing the ongoing call.</param>
-        /// <param name="final">BO.Volunteer object to update.</param>
-        /// <returns>An updated BO.Volunteer object with the new call information.</returns>
-        public static BO.Volunteer addNewCall(DO.Call callInProgress, BO.Volunteer final)
+  
+        public static BO.CallInProgress addCall(DO.Assignment aInProgress,DO.Volunteer volunteer)
         {
-            double latV = final.Latitude.Value;
-            double longV = final.Longitude.Value;
-
-            // Add an object representing the ongoing call
-            final.CallInVolunteerHandle = new BO.CallInProgress
+            DO.Call call = s_dal.Call.Read(aInProgress.CallId);
+            return new BO.CallInProgress
             {
-                Id = callInProgress.Id,
-                CallId = callInProgress.Id,
-                CallType = (BO.CallType)callInProgress.CallType,
-                CallDescription = callInProgress.VerbalDescription,
-                CallAddress = callInProgress.FullAddressCall,
-                TimeCallMade = callInProgress.openTime,
-                MaxEndTime = callInProgress.MaxTimeFinish,
-                //StartTime = DateTime.Now,
-                DistanceCallFromVolunteer = CallManager.GetDistance(latV, longV, callInProgress.Latitude, callInProgress.Longitude),
-                Status =BO.Status.open
+                Id = aInProgress.Id,
+                CallId = call.Id,
+                CallType = (BO.CallType)call.CallType,
+                CallAddress = call.FullAddressCall,
+                CallDescription = call.VerbalDescription,
+                MaxEndTime = call.MaxTimeFinish,
+                TimeCallMade = call.openTime,
+                EntryTimeTreatment = aInProgress.EnteryTimeTreatment,
+                DistanceCallFromVolunteer = CalculateDistance(call.Latitude, call.Longitude, (double)volunteer.Latitude, (double)volunteer.Longitude),
+                Status = (call.MaxTimeFinish.Value - DateTime.Now) <= AdminImplementation.GetRiskTimeRange()
+    ? BO.Status.InRiskProgress
+    : BO.Status.InProgress
             };
-            return final;
         }
-
+        public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+        {
+            
+            double R = 6371; // רדיוס כדור הארץ בק\"מ
+            double dLat = Math.PI / 180 * (lat2 - lat1);
+            double dLon = Math.PI / 180 * (lon2 - lon1);
+            double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                       Math.Cos(Math.PI / 180 * lat1) * Math.Cos(Math.PI / 180 * lat2) *
+                       Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+            double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return R * c;
+        }
 
         /// <summary>
         /// Validates and checks if the BO.Volunteer object can be updated.
@@ -174,7 +193,7 @@ namespace Helpers
         /// <param name="v1">The BO.Volunteer object to validate.</param>
         /// <param name="myStatus">Optional status to check against the volunteer's role.</param>
         /// <returns>True if validation passes, otherwise throws an exception.</returns>
-        public static bool checkedToUpdate(BO.Volunteer v1, BO.Role? myStatus)
+        public static bool IntegrityChecker(BO.Volunteer v1)
         {
             if (v1 != null)
             {
@@ -193,15 +212,7 @@ namespace Helpers
                 // Validate address
                 if (!Helpers.Tools.TryGetCoordinates(v1.Address, out var coordinates))
                     throw new InvalidException("Invalid address");
-
-                // Check if the role was changed
-                bool roleChanged = myStatus.HasValue && myStatus != v1.Role;
-
-                // Ensure only volunteers or managers can update
-                if (myStatus != BO.Role.Volunteer && roleChanged)
-                {
-                    throw new InvalidException("Only the volunteer or a manager can update this information.");
-                }
+                
                 return true;
             }
             return false;

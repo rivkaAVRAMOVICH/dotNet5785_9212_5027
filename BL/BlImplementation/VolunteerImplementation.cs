@@ -2,10 +2,11 @@
 using Helpers;
 using System;
 namespace BlImplementation;
-    internal class VolunteerImplementation : IVolunteer
-    {
+internal class VolunteerImplementation : IVolunteer
+{
     private readonly DalApi.IDal _dal = DalApi.Factory.Get;
-    public BO.Role EnteredSystem(string userName, string password) {
+    public BO.Role EnteredSystem(string userName, string password)
+    {
         try
         {
             var volunteer = _dal.Volunteer.ReadAll()
@@ -20,8 +21,8 @@ namespace BlImplementation;
             throw new BO.EntityNotFoundException("שגיאה בגישה לנתונים: " + ex.Message, ex);
         }
     }
-    public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? active, BO.HandleCallType? sortBy=null) {
-        
+    public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? active = null, BO.CallType? sortBy = null)
+    {
         try
         {
             var volunteers = _dal.Volunteer.ReadAll();
@@ -34,18 +35,16 @@ namespace BlImplementation;
 
             if (sortBy != null)
             {
-                var sortsortByName = sortBy.ToString();
+                var sortByName = sortBy.ToString();
 
                 // check property : Sort by property
-                if (typeof(BO.VolunteerInList).GetProperty(sortsortByName) != null)
+                if (typeof(BO.VolunteerInList).GetProperty(sortByName) != null)
                 {
-                    volunteerList = volunteerList
-                        .OrderBy(v => typeof(BO.VolunteerInList).GetProperty(sortsortByName)?.GetValue(v))
-                        .ToList();
+                    volunteerList = volunteerList.OrderBy(v => typeof(BO.VolunteerInList).GetProperty(sortByName)?.GetValue(v)).ToList();
                 }
                 else
                 {
-                    throw new BO.BlUnauthorizedActionException($"Invalid sort field: {sortsortByName}");
+                    throw new BO.BlUnauthorizedActionException($"Invalid sort field: {sortByName}");
                 }
             }
             else
@@ -63,8 +62,9 @@ namespace BlImplementation;
             throw new BO.BlUnexpectedSystemException($"Error while fetching the volunteer list: {ex.Message}", ex);
         }
     }
-    public BO.Volunteer GetVolunteerDetails(int id){
-       
+    public BO.Volunteer GetVolunteerDetails(int id)
+    {
+
         var tmpVolunteer = _dal.Volunteer.Read(id);
         //cheeck id
         if (tmpVolunteer == null)
@@ -73,38 +73,44 @@ namespace BlImplementation;
         }
 
         //new BO.Volunteer
-        var final = Helpers.VolunteerManager.addNewVolunteerWithCall(tmpVolunteer);
+        return Helpers.VolunteerManager.addNewVolunteerWithCall(tmpVolunteer);
 
         //check call and get
-        var callInProgress = _dal.Call.ReadAll()
-            .FirstOrDefault(c => c.Id == id && CallManager.CallStatus(c) == BO.Status.InProgress);
-        if (callInProgress != null && final != null && final.Latitude.HasValue && final.Longitude.HasValue)
-        {
-            var finalCall = Helpers.VolunteerManager.addNewCall(callInProgress, final); // help function to add new call to the volunteer
-            return finalCall;
-        }
-        else
-            throw new BO.BlUnauthorizedActionException("Error to return the volunteer");
+        //var callInProgress = _dal.Call.ReadAll()
+        //    .FirstOrDefault(c => c.Id == id && CallManager.CallStatus(c) == BO.Status.InProgress);
+        //if (callInProgress != null && final != null && final.Latitude.HasValue && final.Longitude.HasValue)
+        //{
+        //    var finalCall = Helpers.VolunteerManager.addNewCall(callInProgress, final); // help function to add new call to the volunteer
+        //    return finalCall;
+        //}
+        //else
+        //    throw new BO.BlUnauthorizedActionException("Error to return the volunteer");
 
     }
     public void UpdateVolunteerDetails(int id, BO.Volunteer volunteer)
     {
-        var PreviousVolunteer = _dal.Volunteer.Read(id);
-        var myStatus = (BO.Role)PreviousVolunteer?.Role;
         try
         {
-
-            if (Helpers.VolunteerManager.checkedToUpdate(volunteer, myStatus))// help function to check if it can update
+        DO.Volunteer RequesterUpdate = _dal.Volunteer.Read(id);
+        DO.Volunteer PreviousVolunteer= _dal.Volunteer.Read(volunteer.Id);
+            if (Helpers.VolunteerManager.IntegrityChecker(volunteer))// help function to check if it can update
             {
-                //Check what was changed
-                //bool roleChanged = PreviousVolunteer.Role.HasValue && PreviousVolunteer.Role != (DO.Role)volunteer.Role;
-                //bool emailChanged = PreviousVolunteer.Email != volunteer.Email;
-                //bool phoneChanged = PreviousVolunteer.PhoneNumber != volunteer.PhoneNumber;
-                //bool addressChanged = PreviousVolunteer.Address != volunteer.Address;
-
-                //new object (to update) : DO.Volunteer
-                DO.Volunteer finalVolunteer = Helpers.VolunteerManager.addNewVolunteer(PreviousVolunteer, volunteer); // help function to add new volunteer
-
+                // Check if the role was changed
+                bool roleChanged = PreviousVolunteer.Role != null && PreviousVolunteer.Role != (DO.RoleEnum)volunteer.Role;
+                bool emailChanged = PreviousVolunteer.Email != volunteer.Email;
+                bool phoneChanged = PreviousVolunteer.PhoneNumber != volunteer.Phone;
+                bool addressChanged = PreviousVolunteer.FullAddress != volunteer.Address;
+                //Ensure only volunteers or managers can update
+                if (RequesterUpdate.Role != DO.RoleEnum.manager && roleChanged)
+                {
+                    throw new InvalidException("Only the manager can update this information.");
+                }
+                if (RequesterUpdate.Id != volunteer.Id && RequesterUpdate.Role != DO.RoleEnum.manager && (emailChanged|| phoneChanged || addressChanged))
+                {
+                    throw new InvalidException("Only the manager can update this information.");
+                }
+                //new object(to update) : DO.Volunteer
+                DO.Volunteer finalVolunteer = Helpers.VolunteerManager.ConvertVolunteersToDo(volunteer); // help function to add new volunteer
 
                 _dal.Volunteer.Update(finalVolunteer);//update the data of volunteers
             }
@@ -116,16 +122,17 @@ namespace BlImplementation;
     }
     public void DeletingVolunteer(int id)
     {
-        var volunteer = _dal.Volunteer.Read(id);
+        var volunteer = GetVolunteerDetails(id);
 
         if (volunteer == null)
             throw new BO.BlDoesNotExistException($"No volunteer found with ID: {id}");
 
         // check id it's possible to delete
-        if (volunteer.callInProgress != null)
+
+        if (volunteer.CallInVolunteerHandle != null)
             throw new BO.BlDeletionImpossible("Cannot delete a volunteer who is currently handling a call.");
 
-        if (volunteer.SumOfCalls > 0 || volunteer.SumOfCanceledCalls > 0 || volunteer.SumOfExpiredCalls > 0)
+        if (volunteer.SumHandledCalls > 0 || volunteer.SumCanceledCalls > 0 || volunteer.SumChosenExpiredCalls > 0)
             throw new BO.BlDeletionImpossible("Cannot delete a volunteer who has a history of handling calls.");
 
         try
@@ -140,9 +147,34 @@ namespace BlImplementation;
         }
 
     }
-    public void AddingVolunteer(BO.Volunteer volunteer){
-        throw new NotImplementedException();
+    public void AddingVolunteer(BO.Volunteer volunteer)
+    {
+        try
+        {
+            var myVolunteer = _dal.Volunteer.Read(volunteer.Id);
+            //var myStatus = (BO.Role)myVolunteer?.Role;
+            if (Helpers.VolunteerManager.IntegrityChecker(volunteer))// help function to check if the volunteer can be create
+            {
+                DO.Volunteer finalVolunteer = Helpers.VolunteerManager.ConvertVolunteersToDo(volunteer); // help function to create the new volunteer
+                _dal.Volunteer.Create(finalVolunteer); //add the new Volunteer
+            }
+
+        }
+        catch (BO.BlFormatException ex)
+        {
+            throw new BO.BlFormatException("Invalid format in volunteer details to update");
+        }
+        catch (DO.DalAlreadyExistsException ex)
+        {
+            throw new BO.BlAlreadyExistException($"A volunteer with ID {volunteer.Id} already exists in the database", ex);
+        }
+        catch (BO.BlUnexpectedSystemException ex)
+        {
+            throw new BO.BlUnexpectedSystemException("An unexpected error occurred while adding the volunteer", ex);
+        }
+
+
+
     }
 
 }
-

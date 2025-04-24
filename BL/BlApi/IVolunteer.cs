@@ -12,7 +12,7 @@ namespace BlApi
     public interface IVolunteer
     {
         public BO.Role EnteredSystem(string userName, string password);
-        public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? active,BO.HandleCallType? sortBy = null);
+        public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? active=null, BO.CallType? sortBy = null);
         public BO.Volunteer GetVolunteerDetails(int id);
         public void UpdateVolunteerDetails(int id, BO.Volunteer volunteer);
         public void DeletingVolunteer(int id);
