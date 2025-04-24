@@ -101,10 +101,10 @@ internal class CallImplementation : ICall
                 CallAssignList = _dal.Assignment?.ReadAll().Where(item => item.CallId == tmpCall.Id).Select(a => new BO.CallAssignInList
                 {
                     VolunteerId = a.VolunteerId,
-                    VolunteerName = _dal.Volunteer.Read(a.VolunteerId)!.Name,
-                    StartTime = a.StartTime,
-                    EndTime = a.EndTime,
-                    FinishType = (BO.FinishType)a.FinishType
+                    VolunteerName = _dal.Volunteer.Read(a.VolunteerId)!.FullName,
+                    EntryCallTime = a.EntryTimeTreatment,
+                    EndCallTime = a.FinishTimeTreatment,
+                    FinishType = (BO.FinishType)a.EndTypeAssignment
                 }).ToList()
             };
 
@@ -258,14 +258,14 @@ internal class CallImplementation : ICall
     {
         // Fetch all closed assignments for the volunteer
         var closedVolunteerAssignments = _dal.Assignment.ReadAll()
-            .Where(assign => assign.VolunteerId == VolunteerId && assign.FinishTimeTreatment != null);
+            .Where(assign => assign.VolunteerId == volunteerId && assign.FinishTimeTreatment != null);
 
         // Fetch all calls associated with the closed assignments
         var closedVolunteerCalls = _dal.Call.ReadAll()
             .Where(call => closedVolunteerAssignments.Any(a => a.CallId == call.Id));
 
         // Filter calls by type if specified
-        if (callType.HasValue)
+        if (filterType.HasValue)
         {
             closedVolunteerCalls = closedVolunteerCalls.Where(call => call.CallType == (DO.CallType)filterType.Value);
         }
@@ -338,7 +338,7 @@ internal class CallImplementation : ICall
         {
             Id = call.Id,
             CallType = (BO.CallType)call.CallType,
-            Description = call.Description,
+            CallDescription = call.CallDescription,
             CallAddress = call.CallAddress,
             StartCallTime = call.StartCallTime,
             MaxEndCallTime = call.MaxEndCallTime,
@@ -375,7 +375,7 @@ internal class CallImplementation : ICall
             CallManager.ValidateAssignmentToFinish(volunteerId, assignment);
 
             // Update the assignment with the completion details
-            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, volunteerId, assignment.EnteryTimeTreatment, DateTime.Now, DO.FinishType.takenCareOf));
+            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, volunteerId, assignment.EntryTimeTreatment, DateTime.Now, DO.EndTypeAssignment.Treated));
         }
         catch (DO.DalDoesNotExistException ex)
         {
@@ -423,8 +423,8 @@ internal class CallImplementation : ICall
 
             // Determine the finish type based on who is canceling
             var VolunteerOrManager = (assignment.VolunteerId == requesterId)
-                ? DO.FinishType.volunteerCanceled
-                : DO.FinishType.managerCanceledAssignment;
+                ? DO.EndTypeAssignment.SelfCancellation
+                : DO.EndTypeAssignment.AdministratorCancellation;
 
             // Update the assignment with the cancellation details
             _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, requesterId, assignment.EnteryTimeTreatment, ClockManager.Now, VolunteerOrManager));
@@ -491,7 +491,7 @@ internal class CallImplementation : ICall
         }
 
         // Create a new assignment for the volunteer
-        var tmpAssign = new DO.Assignment(0, callId, id, ClockManager.Now, null, null);
+        var tmpAssign = new DO.Assignment(0, callId, volunteerId, ClockManager.Now, null, null);
         try
         {
             _dal.Assignment.Create(tmpAssign);
