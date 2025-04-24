@@ -137,11 +137,11 @@ internal class CallImplementation : ICall
             {
                 Id = call.Id,
                 CallType = (DO.CallType)call.CallType,
-                CallDescription = call.CallDescription,
+                VerbalDescription = call.CallDescription,
                 CallAddress = call.CallAddress,
                 Latitude = CallManager.GetLatitudLongitute(call.CallAddress).Latitude, // Get latitude for the address
                 Longitude = CallManager.GetLatitudLongitute(call.CallAddress).Longitude, // Get longitude for the address
-                StartCallTime = call.StartCallTime,
+                openTime = call.StartCallTime,
                 MaxEndCallTime = call.MaxEndCallTime
             };
 
@@ -217,12 +217,12 @@ internal class CallImplementation : ICall
             {
                 Id = call.Id,
                 CallType = (DO.CallType)call.CallType,
-                Description = call.Description,
-                Address = call.Address,
-                Latitude = CallManager.GetLatitudLongitute(call.Address).Latitude, // Get latitude for the address
-                Longitude = CallManager.GetLatitudLongitute(call.Address).Longitude, // Get longitude for the address
-                TimeCallMade = call.TimeCallMade,
-                MaxTime = call.MaxTime
+                VerbalDescription = call.CallDescription,
+                CallAddress = call.CallAddress,
+                Latitude = CallManager.GetLatitudLongitute(call.CallAddress).Latitude, // Get latitude for the address
+                Longitude = CallManager.GetLatitudLongitute(call.CallAddress).Longitude, // Get longitude for the address
+                openTime = call.StartCallTime,
+                MaxEndCallTime = call.MaxEndCallTime
             };
 
             // Attempt to add the new call in the data layer
@@ -276,18 +276,18 @@ internal class CallImplementation : ICall
         {
             Id = call.Id,
             CallType = (BO.CallType)call.CallType,
-            Address = call.Address,
-            TimeCallMade = call.TimeCallMade,
-            StartTime = call.TimeCallMade,
+            Address = call.CallAddress,
+            TimeCallMade = call.StartCallTime,
+            StartTime = call.StartCallTime,
             EndTime = (DateTime)closedVolunteerAssignments.FirstOrDefault(assign => assign.CallId == call.Id).EndTime,
-            FinishType = BO.FinishType.takenCareOf
+            MaxEndCallTime = BO.FinishType.takenCareOf
         });
 
         // Sort calls by the specified field
-        finalCalls = sortField switch
+        finalCalls = sortBy switch
         {
             BO.CallType => finalCalls.OrderBy(call => call.CallType),
-            BO.FinishType => finalCalls.OrderBy(call => call.FinishType),
+            BO.MaxEndCallTime => finalCalls.OrderBy(call => call.MaxEndCallTime),
             _ => finalCalls.OrderBy(call => call.Id) // Default sorting by ID
         };
 
