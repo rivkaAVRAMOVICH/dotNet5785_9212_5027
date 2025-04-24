@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BO
+﻿namespace BO
 {
     public class CallAssignInList
     {
@@ -12,6 +6,6 @@ namespace BO
         public string? VolunteerName { get; }
         public DateTime EntryCallTime { get; }
         public DateTime? EndCallTime { get; }
-        public Enums.EndCallType? EndCallTime { get; }
+        public FinishType? FinishType { get; }
     }
 }

@@ -259,7 +259,7 @@ internal class CallImplementation : ICall
     {
         // Fetch all closed assignments for the volunteer
         var closedVolunteerAssignments = _dal.Assignment.ReadAll()
-            .Where(assign => assign.VolunteerId == id && assign.FinishType != null);
+            .Where(assign => assign.VolunteerId == VolunteerId && assign.FinushTimeTreatment != null);
 
         // Fetch all calls associated with the closed assignments
         var closedVolunteerCalls = _dal.Call.ReadAll()
@@ -268,7 +268,7 @@ internal class CallImplementation : ICall
         // Filter calls by type if specified
         if (callType.HasValue)
         {
-            closedVolunteerCalls = closedVolunteerCalls.Where(call => call.CallType == (DO.CallType)callType.Value);
+            closedVolunteerCalls = closedVolunteerCalls.Where(call => call.CallType == (DO.CallType)filterType.Value);
         }
 
         // Transform data into BO.ClosedCallInList objects
@@ -276,10 +276,10 @@ internal class CallImplementation : ICall
         {
             Id = call.Id,
             CallType = (BO.CallType)call.CallType,
-            Address = call.CallAddress,
-            TimeCallMade = call.StartCallTime,
-            StartTime = call.StartCallTime,
-            EndTime = (DateTime)closedVolunteerAssignments.FirstOrDefault(assign => assign.CallId == call.Id).EndTime,
+            CallAddress = call.CallAddress,
+            StartCallTime = call.StartCallTime,
+            EntryCallTime = call.EntryCallTime,
+            EndCallTime = (DateTime)closedVolunteerAssignments.FirstOrDefault(assign => assign.CallId == call.Id).EndTime,
             MaxEndCallTime = BO.FinishType.takenCareOf
         });
 
@@ -311,20 +311,20 @@ internal class CallImplementation : ICall
             .Where(call => CallManager.CallStatus(call) == BO.Status.open || CallManager.CallStatus(call) == BO.Status.openAtRisk);
 
         // Filter calls by type if specified
-        if (callType.HasValue)
+        if (filterType.HasValue)
         {
-            openCalls = openCalls.Where(call => call.CallType == (DO.CallType)callType.Value);
+            openCalls = openCalls.Where(call => call.CallType == (DO.CallType)filterType.Value);
         }
 
         DO.Volunteer volunteer;
         // Retrieve the volunteer's location
         try
         {
-            volunteer = _dal.Volunteer.Read(id);
+            volunteer = _dal.Volunteer.Read(volunteerId);
         }
         catch (DO.DalDoesNotExistException ex)
         {
-            throw new BO.BlDoesNotExistException($"Volunteer with ID={id} wass not found", ex);
+            throw new BO.BlDoesNotExistException($"Volunteer with ID={volunteerId} wass not found", ex);
         }
         if (volunteer.Latitude == null || volunteer.Longitude == null)
         {
@@ -340,14 +340,14 @@ internal class CallImplementation : ICall
             Id = call.Id,
             CallType = (BO.CallType)call.CallType,
             Description = call.Description,
-            Address = call.Address,
-            TimeCallMade = call.TimeCallMade,
-            MaxTime = call.MaxTime,
-            Distance = CallManager.GetDistance(volunteerLat, volunteerLon, call.Latitude, call.Longitude)
+            CallAddress = call.CallAddress,
+            StartCallTime = call.StartCallTime,
+            MaxEndCallTime = call.MaxEndCallTime,
+            DistanceCallFromVolunteer = CallManager.GetDistance(volunteerLat, volunteerLon, call.Latitude, call.Longitude)
         });
 
         // Sort calls by the specified field
-        finalCalls = sortField switch
+        finalCalls = sortBy switch
         {
             BO.CallType => finalCalls.OrderBy(call => call.CallType),
             _ => finalCalls.OrderBy(call => call.Id) // Default sorting by ID
@@ -373,10 +373,10 @@ internal class CallImplementation : ICall
             DO.Assignment assignment = _dal.Assignment.Read(assignmentId);
 
             // Validate the assignment's eligibility to be closed
-            CallManager.ValidateAssignmentToFinish(id, assignment);
+            CallManager.ValidateAssignmentToFinish(volunteerId, assignment);
 
             // Update the assignment with the completion details
-            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, id, assignment.StartTime, DateTime.Now, DO.FinishType.takenCareOf));
+            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, volunteerId, assignment.EnteryTimeTreatment, DateTime.Now, DO.FinishType.takenCareOf));
         }
         catch (DO.DalDoesNotExistException ex)
         {
@@ -420,15 +420,15 @@ internal class CallImplementation : ICall
             DO.Assignment assignment = _dal.Assignment.Read(assignmentId);
 
             // Validate the assignment's eligibility to be canceled
-            CallManager.ValidateAssignmentToCancel(id, assignment);
+            CallManager.ValidateAssignmentToCancel(requesterId, assignment);
 
             // Determine the finish type based on who is canceling
-            var VolunteerOrManager = (assignment.VolunteerId == id)
+            var VolunteerOrManager = (assignment.VolunteerId == requesterId)
                 ? DO.FinishType.volunteerCanceled
                 : DO.FinishType.managerCanceledAssignment;
 
             // Update the assignment with the cancellation details
-            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, id, assignment.StartTime, ClockManager.Now, VolunteerOrManager));
+            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, requesterId, assignment.EnteryTimeTreatment, ClockManager.Now, VolunteerOrManager));
         }
         catch (DO.DalDoesNotExistException ex)
         {
@@ -468,11 +468,11 @@ internal class CallImplementation : ICall
         try
         {
             // Fetch volunteer data
-            tmpVol = _dal.Volunteer.Read(id);
+            tmpVol = _dal.Volunteer.Read(volunteerId);
         }
         catch (DO.DalDoesNotExistException ex)
         {
-            throw new BO.BlDoesNotExistException($"Volunteer with ID={id} not found", ex);
+            throw new BO.BlDoesNotExistException($"Volunteer with ID={volunteerId} not found", ex);
         }
 
         try
@@ -502,5 +502,4 @@ internal class CallImplementation : ICall
             throw new BO.BlAlreadyExistException($"Assignment with ID={tmpAssign.Id} already exists", ex);
         }
     }
-
 }

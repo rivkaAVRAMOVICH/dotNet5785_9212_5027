@@ -15,6 +15,6 @@ namespace BO
         public int CanceledCallsSum { get; }
         public int ExpiredCallsSum { get; }
         public int? HandleCallId { get; }
-        public  HandleCallType HandleCallType { get; }
+        public  CallType CallType { get; }
     }
 }
