@@ -68,9 +68,8 @@ internal class CallImplementation : ICall
         if (callList.Any())
         {
             callList = callList.GroupBy(a => a.CallId)
-                .Select(g => g.OrderByDescending(a => a.TimeCallMade).FirstOrDefault());
+                .Select(g => g.OrderByDescending(a => a.StartCallTime).FirstOrDefault());
         }
-
         return callList;
     }
 
@@ -137,11 +136,11 @@ internal class CallImplementation : ICall
             {
                 Id = call.Id,
                 CallType = (DO.CallType)call.CallType,
-                VerbalDescription = call.CallDescription,
+                CallDescription = call.CallDescription,
                 CallAddress = call.CallAddress,
                 Latitude = CallManager.GetLatitudLongitute(call.CallAddress).Latitude, // Get latitude for the address
                 Longitude = CallManager.GetLatitudLongitute(call.CallAddress).Longitude, // Get longitude for the address
-                openTime = call.StartCallTime,
+                StartCallTime = call.StartCallTime,
                 MaxEndCallTime = call.MaxEndCallTime
             };
 
@@ -217,11 +216,11 @@ internal class CallImplementation : ICall
             {
                 Id = call.Id,
                 CallType = (DO.CallType)call.CallType,
-                VerbalDescription = call.CallDescription,
+                CallDescription = call.CallDescription,
                 CallAddress = call.CallAddress,
                 Latitude = CallManager.GetLatitudLongitute(call.CallAddress).Latitude, // Get latitude for the address
                 Longitude = CallManager.GetLatitudLongitute(call.CallAddress).Longitude, // Get longitude for the address
-                openTime = call.StartCallTime,
+                StartCallTime = call.StartCallTime,
                 MaxEndCallTime = call.MaxEndCallTime
             };
 
@@ -259,7 +258,7 @@ internal class CallImplementation : ICall
     {
         // Fetch all closed assignments for the volunteer
         var closedVolunteerAssignments = _dal.Assignment.ReadAll()
-            .Where(assign => assign.VolunteerId == VolunteerId && assign.FinushTimeTreatment != null);
+            .Where(assign => assign.VolunteerId == VolunteerId && assign.FinishTimeTreatment != null);
 
         // Fetch all calls associated with the closed assignments
         var closedVolunteerCalls = _dal.Call.ReadAll()

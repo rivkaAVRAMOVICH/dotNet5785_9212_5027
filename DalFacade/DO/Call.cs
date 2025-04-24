@@ -8,9 +8,9 @@ public record Call
     string CallAddress,
     double Latitude,
     double Longitude,
-    DateTime openTime,
+    DateTime StartCallTime,
     CallType CallType,
-    string? VerbalDescription = null,
+    string? CallDescription = null,
     DateTime? MaxEndCallTime = null
 )
 {

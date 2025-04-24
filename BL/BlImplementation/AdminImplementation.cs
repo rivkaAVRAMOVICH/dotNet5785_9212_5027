@@ -62,6 +62,4 @@ internal class AdminImplementation : IAdmin
         DalTest.Initialization.Do();
         ClockManager.UpdateClock(ClockManager.Now);
     }
-
 }
-
