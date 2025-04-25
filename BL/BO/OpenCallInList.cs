@@ -9,11 +9,11 @@ namespace BO
     public class OpenCallInList
     {
         public int Id { get; init; }
-        public CallType CallType { get;  }
-        public string? CallDescription { get; }
-        public string CallAddress { get; }
-        public DateTime StartCallTime { get; }
-        public DateTime? MaxEndCallTime { get; }
+        public CallType CallType { get; init; }
+        public string? CallDescription { get; init; }
+        public string CallAddress { get; init; }
+        public DateTime StartCallTime { get; init; }
+        public DateTime? MaxEndCallTime { get; init; }
         public double DistanceCallFromVolunteer { get; set; }
     }
 }

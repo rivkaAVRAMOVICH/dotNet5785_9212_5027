@@ -1,6 +1,5 @@
 ﻿namespace DO;
 
-
     public enum RoleEnum
 {
     manager,
@@ -28,5 +27,3 @@ public enum EndTypeAssignment
     AdministratorCancellation,
     ExpiredCancellation
 }
-
-

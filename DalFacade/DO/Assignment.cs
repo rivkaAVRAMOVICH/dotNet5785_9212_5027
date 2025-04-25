@@ -5,8 +5,8 @@ public record Assignment
    int Id,
    int CallId,
    int VolunteerId,
-   DateTime EnteryTimeTreatment,
-   DateTime? FinushTimeTreatment = null,
+   DateTime EntryTimeTreatment,
+   DateTime? FinishTimeTreatment = null,
    EndTypeAssignment? EndTypeAssignment = 0
 )
 {
