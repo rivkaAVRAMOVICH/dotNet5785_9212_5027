@@ -8,10 +8,10 @@ namespace BO;
 public class ClosedCallInList
 {
     public int Id { get; init; }
-    public CallType CallType { get; }
-    public string CallAddress { get; }
-    public DateTime StartCallTime { get; }
-    public DateTime EntryCallTime { get; }
-    public DateTime? EndCallTime { get; }
-    public FinishType? FinishType { get; }
+    public CallType CallType { get; init; }
+    public string CallAddress { get; init; }
+    public DateTime StartCallTime { get; init; }
+    public DateTime EntryCallTime { get; init; }
+    public DateTime? EndCallTime { get; init; }
+    public FinishType? FinishType { get; init; }
 }

@@ -277,16 +277,16 @@ internal class CallImplementation : ICall
             CallType = (BO.CallType)call.CallType,
             CallAddress = call.CallAddress,
             StartCallTime = call.StartCallTime,
-            EntryCallTime = call.EntryCallTime,
-            EndCallTime = (DateTime)closedVolunteerAssignments.FirstOrDefault(assign => assign.CallId == call.Id).EndTime,
-            MaxEndCallTime = BO.FinishType.takenCareOf
+            EntryCallTime = call.StartCallTime,
+            EndCallTime = (DateTime)closedVolunteerAssignments.FirstOrDefault(assign => assign.CallId == call.Id).FinishTimeTreatment,
+            FinishType = BO.FinishType.takenCareOf
         });
 
         // Sort calls by the specified field
         finalCalls = sortBy switch
         {
             BO.CallType => finalCalls.OrderBy(call => call.CallType),
-            BO.MaxEndCallTime => finalCalls.OrderBy(call => call.MaxEndCallTime),
+            BO.FinishType => finalCalls.OrderBy(call => call.EndCallTime),
             _ => finalCalls.OrderBy(call => call.Id) // Default sorting by ID
         };
 
@@ -427,7 +427,7 @@ internal class CallImplementation : ICall
                 : DO.EndTypeAssignment.AdministratorCancellation;
 
             // Update the assignment with the cancellation details
-            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, requesterId, assignment.EnteryTimeTreatment, ClockManager.Now, VolunteerOrManager));
+            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, requesterId, assignment.EntryTimeTreatment, ClockManager.Now, VolunteerOrManager));
         }
         catch (DO.DalDoesNotExistException ex)
         {
