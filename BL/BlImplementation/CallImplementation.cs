@@ -68,7 +68,7 @@ internal class CallImplementation : ICall
         if (callList.Any())
         {
             callList = callList.GroupBy(a => a.CallId)
-                .Select(g => g.OrderByDescending(a => a.TimeCallMade).FirstOrDefault());
+                .Select(g => g.OrderByDescending(a => a.StartCallTime).FirstOrDefault());
         }
 
         return callList;
@@ -92,11 +92,11 @@ internal class CallImplementation : ICall
             {
                 Id = tmpCall.Id,
                 CallType = (BO.CallType)tmpCall.CallType,
-                CallDescription = tmpCall.CallDescription,
+                CallDescription = tmpCall.VerbalDescription,
                 CallAddress = tmpCall.CallAddress,
                 Latitude = tmpCall.Latitude,
                 Longitude = tmpCall.Longitude,
-                StartCallTime = tmpCall.StartCallTime,
+                StartCallTime = tmpCall.openTime,
                 MaxEndCallTime = tmpCall.MaxEndCallTime,
                 Status = CallManager.CallStatus(tmpCall),
                 CallAssignList = _dal.Assignment?.ReadAll().Where(item => item.CallId == tmpCall.Id).Select(a => new BO.CallAssignInList

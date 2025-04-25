@@ -18,6 +18,6 @@ namespace BO
         public DateTime? EntryTimeTreatment {  get; set; }
         public double DistanceCallFromVolunteer { get; set; }
         public Status Status  { get; set; }
-}
+
     }
 }

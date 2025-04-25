@@ -1,6 +1,7 @@
 ﻿using BlApi;
 using Helpers;
 using System;
+using System.Xml.Linq;
 namespace BlImplementation;
 internal class VolunteerImplementation : IVolunteer
 {
@@ -9,16 +10,25 @@ internal class VolunteerImplementation : IVolunteer
     {
         try
         {
-            var volunteer = _dal.Volunteer.ReadAll()
-                .FirstOrDefault(v => v.FullName == userName && v.Password == password);
-            if (volunteer == null)
-                throw new BO.EntityNotFoundException("שם משתמש או סיסמה אינם נכונים");
+            var tmpVolunteer = _dal.Volunteer.ReadAll().Where(item => item.FullName == userName).FirstOrDefault();
 
-            return (BO.Role)volunteer.Role;
+            // Check name
+            if (tmpVolunteer == null)
+            {
+                throw new BO.BlDoesNotExistException($"Volunteer with name={userName} not found");
+            }
+
+            // Check password....  
+            if (!Helpers.VolunteerManager.VerifyPassword(password, tmpVolunteer.Password))
+            {
+                throw new BO.BlUnauthorizedActionException("Incorrect password.");
+            }
+
+            return (BO.Role)tmpVolunteer.Role; ;
         }
-        catch (DO.EntityNotFoundException ex)
+        catch (BO.BlUnexpectedSystemException ex)
         {
-            throw new BO.EntityNotFoundException("שגיאה בגישה לנתונים: " + ex.Message, ex);
+            throw new BO.BlUnexpectedSystemException($"Login failed: {ex.Message}");
         }
     }
     public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? active = null, BO.CallType? sortBy = null)
@@ -103,11 +113,11 @@ internal class VolunteerImplementation : IVolunteer
                 //Ensure only volunteers or managers can update
                 if (RequesterUpdate.Role != DO.RoleEnum.manager && roleChanged)
                 {
-                    throw new InvalidException("Only the manager can update this information.");
+                    throw new BO.InvalidException("Only the manager can update this information.");
                 }
                 if (RequesterUpdate.Id != volunteer.Id && RequesterUpdate.Role != DO.RoleEnum.manager && (emailChanged|| phoneChanged || addressChanged))
                 {
-                    throw new InvalidException("Only the manager can update this information.");
+                    throw new BO.InvalidException("Only the manager can update this information.");
                 }
                 //new object(to update) : DO.Volunteer
                 DO.Volunteer finalVolunteer = Helpers.VolunteerManager.ConvertVolunteersToDo(volunteer); // help function to add new volunteer

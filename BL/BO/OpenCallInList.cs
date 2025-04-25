@@ -9,7 +9,7 @@ namespace BO
     public class OpenCallInList
     {
         public int Id { get; init; }
-        public CallType CallType { get; }
+        public CallType CallType { get;  }
         public string? CallDescription { get; }
         public string CallAddress { get; }
         public DateTime StartCallTime { get; }

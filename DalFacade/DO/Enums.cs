@@ -12,10 +12,15 @@ public enum DistanceTypeEnum
     walkingDistance,
     drivingDistance
 }
-    //public enum CallType
-    //{
-    //  None
-    //}
+public enum CallType
+{
+    none,
+    fixing,
+    cooking,
+    babysitting,
+    cleaning,
+    shopping
+}
 public enum EndTypeAssignment
 {
     Treated,          

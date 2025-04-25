@@ -11,12 +11,15 @@ using System.Net.Mail;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+
 
 namespace Helpers
 {
     internal static class VolunteerManager
     {
-        private static IDal s_dal = Factory.Get; //stage 4
+        private static IDal s_dal =DalApi.Factory.Get; //stage 4
         internal static bool isId(int id)
         {
             int sum = 0;
@@ -64,7 +67,7 @@ namespace Helpers
                    Regex.IsMatch(password, @"[0-9]") && // At least one digit
                    Regex.IsMatch(password, @"[\W_]");  // At least one special character
         }
-      
+
         public static string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -79,7 +82,7 @@ namespace Helpers
             return HashPassword(password) == hashedPassword;
         }
 
-        
+
         public static IEnumerable<BO.VolunteerInList> ConvertVolunteersToBO(IEnumerable<DO.Volunteer> volunteers)
         {
             return volunteers.Select(volunteer => new BO.VolunteerInList
@@ -95,7 +98,7 @@ namespace Helpers
     .FirstOrDefault(a => a.VolunteerId == volunteer.Id && a.FinushTimeTreatment == null) is DO.Assignment aInProgress &&
     s_dal.Call.Read(aInProgress.CallId) is DO.Call c
     ? (BO.CallType)c.CallType
-    : BO.CallType.None
+    : BO.CallType.none
             });
         }
         public static DO.Volunteer ConvertVolunteersToDo(BO.Volunteer volunteer)
@@ -130,7 +133,7 @@ namespace Helpers
                 Role = (BO.Role)tmpVolunteer.Role,
                 IsActive = tmpVolunteer.Active,
                 MaxDistance = tmpVolunteer.MaxDistance,
-                DistanceType = (BO.DistanceType)tmpVolunteer.DistanceType,
+                DistanceType = (BO.TypeOfDistance)tmpVolunteer.DistanceType,
                 SumHandledCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == tmpVolunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.Treated),
                 SumCanceledCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == tmpVolunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.SelfCancellation),
                 SumChosenExpiredCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == tmpVolunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.ExpiredCancellation),
@@ -139,39 +142,40 @@ namespace Helpers
             return final;
         }
 
-        public static DO.Volunteer addNewVolunteer(DO.Volunteer myVolunteer, BO.Volunteer v1)
-        {
-            var finalVolunteer = new DO.Volunteer
-            {
-                Id = myVolunteer.Id,
-                FullName = myVolunteer.FullName,
-                Email = myVolunteer.Email,
-                PhoneNumber = myVolunteer.PhoneNumber,
-                FullAddress = myVolunteer.FullAddress,
-                Latitude = CallManager.GetLatitudLongitute(v1.Address).Latitude,
-                Longitude = CallManager.GetLatitudLongitute(v1.Address).Longitude,
-                Role = myVolunteer.Role
-            };
-            return finalVolunteer;
-        }
+        //public static DO.Volunteer addNewVolunteer(DO.Volunteer myVolunteer, BO.Volunteer v1)
+        //{
+        //    var finalVolunteer = new DO.Volunteer
+        //    {
+        //        Id = myVolunteer.Id,
+        //        FullName = myVolunteer.FullName,
+        //        Email = myVolunteer.Email,
+        //        PhoneNumber = myVolunteer.PhoneNumber,
+        //        FullAddress = myVolunteer.FullAddress,
+        //        Latitude = CallManager.GetLatitudLongitute(v1.Address).Latitude,
+        //        Longitude = CallManager.GetLatitudLongitute(v1.Address).Longitude,
+        //        Role = myVolunteer.Role
+        //    };
+        //    return finalVolunteer;
+        //}
   
         public static BO.CallInProgress addCall(DO.Assignment aInProgress,DO.Volunteer volunteer)
         {
             DO.Call call = s_dal.Call.Read(aInProgress.CallId);
+            BlApi.IAdmin admin = new BlImplementation.AdminImplementation();
             return new BO.CallInProgress
             {
                 Id = aInProgress.Id,
                 CallId = call.Id,
                 CallType = (BO.CallType)call.CallType,
-                CallAddress = call.FullAddressCall,
+                CallAddress = call.CallAddress,
                 CallDescription = call.VerbalDescription,
-                MaxEndTime = call.MaxTimeFinish,
+                MaxEndTime = call.MaxEndCallTime,
                 TimeCallMade = call.openTime,
                 EntryTimeTreatment = aInProgress.EnteryTimeTreatment,
                 DistanceCallFromVolunteer = CalculateDistance(call.Latitude, call.Longitude, (double)volunteer.Latitude, (double)volunteer.Longitude),
-                Status = (call.MaxTimeFinish.Value - DateTime.Now) <= AdminImplementation.GetRiskTimeRange()
-    ? BO.Status.InRiskProgress
-    : BO.Status.InProgress
+                Status = (call.MaxEndCallTime.Value - DateTime.Now) <= admin.GetRiskTimeRange()
+    ? BO.Status.inProgressAtRisk
+    : BO.Status.inProgress
             };
         }
         public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)

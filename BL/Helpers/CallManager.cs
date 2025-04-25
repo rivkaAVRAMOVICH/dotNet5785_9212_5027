@@ -287,4 +287,14 @@ internal class CallManager
             throw new BO.BlNullPropertyException("Address cannot be null or empty");
         }
     }
+
+    internal static void PeriodicCallUpdates(DateTime oldClock, DateTime newClock)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal static void SimulateCourseRegistrationAndGrade()
+    {
+        throw new NotImplementedException();
+    }
 }

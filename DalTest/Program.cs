@@ -293,7 +293,7 @@ internal class Program
 
 
             Console.WriteLine("Enter Kind of Call (0- Emergency, 1- Assistance, 2- Inquiry, 3- Other): ");
-            Enums.CallTypeEnum kindOfCall = (Enums.CallTypeEnum)int.Parse(Console.ReadLine());
+            CallType kindOfCall = (CallType)int.Parse(Console.ReadLine());
 
             Console.Write("Enter Full Address: ");
             string ?fullAddress = Console.ReadLine();
@@ -317,12 +317,12 @@ internal class Program
             Call call = new Call
             {
                 Id = id,
-                FullAddressCall = fullAddress,
+                CallAddress = fullAddress,
                 Longitude = longitude,
                 Latitude = latitude,
                 openTime = openHour,
                 CallType = kindOfCall,
-                MaxTimeFinish = closeHour
+                MaxEndCallTime = closeHour
             };
 
             // Save the Call using DAL
@@ -387,7 +387,7 @@ internal class Program
         int id = int.Parse(Console.ReadLine());
 
         Console.WriteLine("Enter Kind of Call (0- Emergency, 1- Assistance, 2- Inquiry, 3- Other): ");
-        Enums.CallTypeEnum kindOfCall = (Enums.CallTypeEnum)int.Parse(Console.ReadLine());
+        CallType kindOfCall = (CallType)int.Parse(Console.ReadLine());
 
         Console.Write("Enter Full Address: ");
         string fullAddress = Console.ReadLine();
@@ -411,12 +411,12 @@ internal class Program
         Call call = new Call
         {
             Id = id,
-            FullAddressCall = fullAddress,
+            CallAddress = fullAddress,
             Longitude = longitude,
             Latitude = latitude,
             openTime = openHour,
             CallType = kindOfCall,
-            MaxTimeFinish = closeHour
+            MaxEndCallTime = closeHour
         };
 
         s_dal.Call?.Update(call);
@@ -467,14 +467,14 @@ internal class Program
             string email = Console.ReadLine();
 
             Console.Write("Enter Role (1- Driver, 2- Organizer, 3- Other): ");
-            Enums.RoleEnum role = (Enums.RoleEnum)Enum.Parse(typeof(Enums.RoleEnum), Console.ReadLine(), true);
+            RoleEnum role = (RoleEnum)Enum.Parse(typeof(RoleEnum), Console.ReadLine(), true);
 
             Console.Write("Is the Volunteer Active? (true/false): ");
             bool active = bool.Parse(Console.ReadLine());
 
             Console.Write("Enter Distance (in km, or press 0): ");
             string distanceInput = Console.ReadLine();
-            Enums.DistanceTypeEnum distance = (Enums.DistanceTypeEnum)int.Parse(distanceInput);
+            DistanceTypeEnum distance = (DistanceTypeEnum)int.Parse(distanceInput);
 
             Console.Write("Enter Password (optional): ");
             string? password = Console.ReadLine();
@@ -581,14 +581,14 @@ internal class Program
         string email = Console.ReadLine();
 
         Console.Write("Enter Role (1- Driver, 2- Organizer, 3- Other): ");
-        Enums.RoleEnum role = (Enums.RoleEnum)Enum.Parse(typeof(Enums.RoleEnum), Console.ReadLine(), true);
+        RoleEnum role = (RoleEnum)Enum.Parse(typeof(RoleEnum), Console.ReadLine(), true);
 
         Console.Write("Is the Volunteer Active? (true/false): ");
         bool active = bool.Parse(Console.ReadLine());
 
         Console.Write("Enter Distance (in km, or press 0): ");
         string distanceInput = Console.ReadLine();
-        Enums.DistanceTypeEnum distance = (Enums.DistanceTypeEnum)int.Parse(distanceInput);
+        DistanceTypeEnum distance = (DistanceTypeEnum)int.Parse(distanceInput);
 
         Console.Write("Enter Password (optional): ");
         string? password = Console.ReadLine();
@@ -680,9 +680,9 @@ internal class Program
 
             Console.Write("Enter Kind of End Assignment (0- Completed, 1- Cancelled, 2- Expired, or press Enter to skip): ");
             string kindOfEndInput = Console.ReadLine();
-            Enums.finishTreatmentTypeEnum? kindOfEndAssignment = string.IsNullOrEmpty(kindOfEndInput)
+            EndTypeAssignment? kindOfEndAssignment = string.IsNullOrEmpty(kindOfEndInput)
                 ? null
-                : (Enums.finishTreatmentTypeEnum)int.Parse(kindOfEndInput);
+                : (EndTypeAssignment)int.Parse(kindOfEndInput);
 
             // Create the Assignment object
             Assignment assignment = new Assignment
@@ -692,7 +692,7 @@ internal class Program
                 VolunteerId = volunteerId,
                 EnteryTimeTreatment = assignmentStart,
                 FinushTimeTreatment = assignmentEnd,
-                FinishTreatmentType = kindOfEndAssignment
+                EndTypeAssignment = kindOfEndAssignment
             };
 
             // Save the Assignment using DAL
@@ -772,9 +772,9 @@ internal class Program
 
         Console.Write("Enter Kind of End Assignment (0- Completed, 1- Cancelled, 2- Expired, or press Enter to skip): ");
         string kindOfEndInput = Console.ReadLine();
-        Enums.finishTreatmentTypeEnum? kindOfEndAssignment = string.IsNullOrEmpty(kindOfEndInput)
+       EndTypeAssignment? kindOfEndAssignment = string.IsNullOrEmpty(kindOfEndInput)
             ? null
-            : (Enums.finishTreatmentTypeEnum)int.Parse(kindOfEndInput);
+            : (EndTypeAssignment)int.Parse(kindOfEndInput);
 
         // Update the Assignment object
         Assignment assignment = new Assignment
@@ -784,7 +784,7 @@ internal class Program
             VolunteerId = volunteerId,
             EnteryTimeTreatment = assignmentStart,
             FinushTimeTreatment = assignmentEnd,
-            FinishTreatmentType = kindOfEndAssignment
+            EndTypeAssignment = kindOfEndAssignment
         };
 
         s_dal.Assignment?.Update(assignment);

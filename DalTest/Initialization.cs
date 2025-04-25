@@ -4,7 +4,6 @@ using Dal;
 using DalApi;
 using DO;
 using System.Net;
-using static DO.Enums;
 
 public static class Initialization
 {
@@ -33,7 +32,7 @@ public static class Initialization
         for (int i = 0; i < 10; i++)
         {
             int id =0;
-            Enums.CallTypeEnum callType = 0;
+            CallType callType = 0;
             string address = addresses[s_rand.Next(addresses.Length)];
             double latitude = Math.Round(s_rand.NextDouble() * 180 - 90, 6); // Random latitude
             double longitude = Math.Round(s_rand.NextDouble() * 360 - 180, 6); // Random longitude
@@ -68,8 +67,8 @@ public static class Initialization
             int volunteerId = volunteerIds[s_rand.Next(volunteerIds.Count)];
             DateTime assignmentStart = s_dal.Config.Clock.AddMinutes(-s_rand.Next(1, 60)); // Random start within the last hour
             DateTime? assignmentEnd = s_rand.Next(2) == 0 ? (DateTime?)null : assignmentStart.AddMinutes(s_rand.Next(10, 120));
-            Enums.finishTreatmentTypeEnum? endKind = assignmentEnd.HasValue
-                ? (Enums.finishTreatmentTypeEnum?)s_rand.Next(Enum.GetValues(typeof(Enums.finishTreatmentTypeEnum)).Length)
+            EndTypeAssignment? endKind = assignmentEnd.HasValue
+                ? (EndTypeAssignment?)s_rand.Next(Enum.GetValues(typeof(EndTypeAssignment)).Length)
                 : null;
 
             var newAssignment = new Assignment(
@@ -128,8 +127,8 @@ public static class Initialization
             email = phoneNumber + "@gmail.com";
             password = $"{new string(name.Where(char.IsLetter).Take(4).ToArray())}{id.ToString().Substring(0, 4)}{"!@#$%^&*()"[s_rand.Next(10)]}";
             maxDistance = s_rand.Next(20, 100);
-            role = Enums.RoleEnum.volunteer;
-            distanceType = Enums.DistanceTypeEnum.aerialDistance;
+            role = RoleEnum.volunteer;
+            distanceType = DistanceTypeEnum.aerialDistance;
             i++;
             s_dal!.Volunteer.Create(new Volunteer(id, name, phoneNumber, email, false, role, distanceType, password,locations[i].Address, locations[i].Latitude, locations[i].Longitude, maxDistance));
         }
