@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using Newtonsoft.Json;
-
+using System.Text.Json.Serialization;
 namespace Helpers;
+//using Newtonsoft.Json;
 using DalApi;
 using DO;
 
@@ -26,30 +26,31 @@ internal class CallManager
         var currentTime = DateTime.Now;
 
         // Check for an open assignment related to the call
-        var openAssignment = _dal.Assignment.ReadAll().FirstOrDefault(item => item.CallId == call.Id && item.EndTime == null);
+        var openAssignment = _dal.Assignment.ReadAll().FirstOrDefault(item => item.CallId == call.Id && item.FinishTimeTreatment == null);
         if (openAssignment != null)
         {
+            if (call.MaxEndCallTime != null && call.StartCallTime.AddHours(1) < currentTime)
+            {
+                return BO.Status.inProgressAtRisk;
+            }
             return BO.Status.inProgress;
         }
 
-        // Check if the call has expired
-        if (call.MaxEndCallTime < currentTime)
+        if (call.MaxEndCallTime != null)
         {
-            return BO.Status.expired;
+            // Check if the call has expired
+            if (call.MaxEndCallTime < currentTime)
+            {
+                return BO.Status.expired;
+            }
         }
-
         // Check for a closed assignment related to the call
-        var closedAssignment = _dal.Assignment.ReadAll().FirstOrDefault(item => item.CallId == call.Id && item.EndTime != null);
+        var closedAssignment = _dal.Assignment.ReadAll().FirstOrDefault(item => item.CallId == call.Id && item.FinishTimeTreatment != null);
         if (closedAssignment != null)
         {
             return BO.Status.closed;
         }
 
-        // Check if the call is at risk of expiring while in progress
-        if (call.MaxEndCallTime != null && call.StartCallTime.AddHours(1) < currentTime)
-        {
-            return BO.Status.inProgressAtRisk;
-        }
 
         // Check if the call is open but at risk of expiring
         if (call.MaxEndCallTime < currentTime.AddHours(1))
@@ -68,33 +69,7 @@ internal class CallManager
     /// <returns>A tuple containing latitude and longitude of the address</returns>
     /// <exception cref="BO.BlNullPropertyException">Thrown when the provided address is null or empty</exception>
     /// <exception cref="BO.BlUnexpectedSystemException">Thrown when there is an error during the API call or the response cannot be processed</exception>
-    public static (double Latitude, double Longitude) GetLatitudLongitute(string address)
-    {
-        if (string.IsNullOrWhiteSpace(address))
-            throw new BO.BlNullPropertyException("Address cannot be empty");
-
-        using (var client = new HttpClient())
-        {
-            var requestUri = "https://us1.locationiq.com/v1/reverse?key=Your_API_Access_Token&lat=51.525460&lon=-0.15222855&format=json&";
-
-            // Perform a synchronous HTTP GET request
-            var response = client.GetAsync(requestUri).Result;
-
-            if (!response.IsSuccessStatusCode)
-                throw new BO.BlUnexpectedSystemException($"Error fetching coordinates: {response.ReasonPhrase}");
-
-            var jsonResponse = response.Content.ReadAsStringAsync().Result;
-
-            // Parse the JSON response
-            var locationData = JsonConvert.DeserializeObject<List<LocationIqResponse>>(jsonResponse);
-
-            if (locationData == null || locationData.Count == 0)
-                throw new BO.BlUnexpectedSystemException("Unable to find coordinates for the specified address.");
-
-            var firstResult = locationData[0];
-            return (double.Parse(firstResult.Lat), double.Parse(firstResult.Lon));
-        }
-    }
+  
 
     /// <summary>
     /// Calculates the distance between two geographical points using the Haversine formula
@@ -129,18 +104,6 @@ internal class CallManager
     private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180;
 
     /// <summary>
-    /// Represents a response object from the LocationIQ API
-    /// </summary>
-    private class LocationIqResponse
-    {
-        [JsonProperty("lat")]
-        public string Lat { get; set; }
-
-        [JsonProperty("lon")]
-        public string Lon { get; set; }
-    }
-
-    /// <summary>
     /// Updates calls that have expired by creating or updating assignments accordingly
     /// </summary>
     public static void UpdateExpiredCalls()
@@ -153,7 +116,7 @@ internal class CallManager
 
         // Retrieve calls with existing assignments but no actual end time
         var callsThatHaveAssignments = _dal.Call.ReadAll()
-            .Where(call => call.MaxEndCallTime <= currentTime && CallManager.CallStatus(call) != BO.Status.closed && _dal.Assignment.ReadAll().Any(a => a.CallId == call.Id && a.EndTime == null));
+            .Where(call => call.MaxEndCallTime <= currentTime && CallManager.CallStatus(call) != BO.Status.closed && _dal.Assignment.ReadAll().Any(a => a.CallId == call.Id && a.FinishTimeTreatment == null));
 
         // Handle calls with no assignments
         foreach (var call in callsWithNoAssignments)
@@ -163,24 +126,24 @@ internal class CallManager
                 Id = 0,
                 CallId = call.Id,
                 VolunteerId = 0,
-                StartTime = currentTime,
-                EndTime = currentTime,
-                FinishType = DO.FinishType.expired
+                EntryTimeTreatment = currentTime,
+                FinishTimeTreatment = currentTime,
+                EndTypeAssignment = DO.EndTypeAssignment.ExpiredCancellation
             });
         }
 
         // Handle calls with existing assignments
         foreach (var call in callsThatHaveAssignments)
         {
-            var tmpAssignment = _dal.Assignment.ReadAll().First(a => a.CallId == call.Id && a.EndTime == null);
+            var tmpAssignment = _dal.Assignment.ReadAll().First(a => a.CallId == call.Id && a.FinishTimeTreatment == null);
             _dal.Assignment.Update(new Assignment
             {
                 Id = tmpAssignment.Id,
                 CallId = tmpAssignment.CallId,
                 VolunteerId = tmpAssignment.VolunteerId,
-                StartTime = tmpAssignment.StartTime,
-                EndTime = currentTime,
-                FinishType = DO.FinishType.expired
+               EntryTimeTreatment = tmpAssignment.EntryTimeTreatment,
+                FinishTimeTreatment = currentTime,
+                EndTypeAssignment = DO.EndTypeAssignment.ExpiredCancellation
             });
         }
     }
@@ -201,7 +164,7 @@ internal class CallManager
         }
 
         // Check if the assignment is still active
-        if (assignment.EndTime != null)
+        if (assignment.FinishTimeTreatment != null)
         {
             throw new BO.BlInvalidAssignmentException("The assignment has already been completed or is no longer active");
         }
@@ -217,14 +180,14 @@ internal class CallManager
     public static void ValidateAssignmentToCancel(int id, DO.Assignment assignment)
     {
         // Authorization check: manager or volunteer assigned to the task
-        bool isAuthorized = (assignment.VolunteerId == id || _dal.Volunteer.Read(id)!.Role == DO.Role.manager);
+        bool isAuthorized = (assignment.VolunteerId == id || _dal.Volunteer.Read(id)!.Role == DO.RoleEnum.manager);
         if (!isAuthorized)
         {
             throw new BO.BlUnauthorizedActionException("The requester does not have permission to cancel this assignment");
         }
 
         // Check if the assignment is still active
-        if (assignment.EndTime != null)
+        if (assignment.FinishTimeTreatment != null)
         {
             throw new BO.BlInvalidAssignmentException("The assignment has already been completed or is no longer active");
         }
@@ -243,11 +206,11 @@ internal class CallManager
             CallId = call.Id,
             CallType = (BO.CallType)call.CallType,
             StartCallTime = call.StartCallTime,
-            RemainingTime = call.MaxEndCallTime.HasValue ? call.MaxEndCallTime.Value - DateTime.Now : null,
-            LastVolunteer = null,
-            CompletionTime = null,
+            CompleteTreatmentTimeSpan = call.MaxEndCallTime.HasValue ? call.MaxEndCallTime.Value - DateTime.Now : null,
+            LastVolunteerName = null,
+             EndCallTimeSpan= null,
             Status = BO.Status.open,
-            Assignments = 0
+            AssignSum = 0
         });
     }
 

@@ -19,7 +19,11 @@ namespace Helpers
 {
     internal static class VolunteerManager
     {
-        private static IDal s_dal =DalApi.Factory.Get; //stage 4
+        private static IDal s_dal = DalApi.Factory.Get; // Access to the DAL layer
+
+        /// <summary>
+        /// Validates an Israeli ID using a checksum algorithm.
+        /// </summary>
         internal static bool isId(int id)
         {
             int sum = 0;
@@ -30,14 +34,17 @@ namespace Helpers
             for (int i = 0; i < 9; i++)
             {
                 int digit = id % 10;
-                id /= 10; // Removing the right digit
-                int multiplied = digit * ((i % 2) + 1); // Alternating multiplication by 1 and 2
-                sum += (multiplied > 9) ? multiplied - 9 : multiplied; // Adding the result digits
+                id /= 10;
+                int multiplied = digit * ((i % 2) + 1);
+                sum += (multiplied > 9) ? multiplied - 9 : multiplied;
             }
 
             return sum % 10 == 0;
         }
 
+        /// <summary>
+        /// Validates if the given string is a valid email address format.
+        /// </summary>
         internal static bool isEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -45,29 +52,36 @@ namespace Helpers
             string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
 
             return Regex.IsMatch(email, emailPattern);
-
         }
 
+        /// <summary>
+        /// Validates the given phone number format.
+        /// </summary>
         internal static bool isPhone(string number)
         {
             if (string.IsNullOrWhiteSpace(number))
                 return false;
 
-            // Regular expression to check phone numbers
             string phonePattern = @"^\+?\d{1,4}?[-.\s]?(\(?\d{1,3}?\)?[-.\s]?)?\d{3,4}[-.\s]?\d{4}$";
 
             return Regex.IsMatch(number, phonePattern);
         }
 
+        /// <summary>
+        /// Checks if the password meets strength requirements.
+        /// </summary>
         internal static bool IsPasswordStrong(string password)
         {
             return password.Length >= 8 &&
-                   Regex.IsMatch(password, @"[A-Z]") && // At least one capital letter
-                   Regex.IsMatch(password, @"[a-z]") && // At least a tiny one
-                   Regex.IsMatch(password, @"[0-9]") && // At least one digit
-                   Regex.IsMatch(password, @"[\W_]");  // At least one special character
+                   Regex.IsMatch(password, @"[A-Z]") &&
+                   Regex.IsMatch(password, @"[a-z]") &&
+                   Regex.IsMatch(password, @"[0-9]") &&
+                   Regex.IsMatch(password, @"[\W_]");
         }
 
+        /// <summary>
+        /// Hashes a password using SHA256.
+        /// </summary>
         public static string HashPassword(string password)
         {
             using (var sha256 = SHA256.Create())
@@ -77,12 +91,17 @@ namespace Helpers
             }
         }
 
+        /// <summary>
+        /// Verifies that a plain password matches the hashed version.
+        /// </summary>
         public static bool VerifyPassword(string password, string hashedPassword)
         {
             return HashPassword(password) == hashedPassword;
         }
 
-
+        /// <summary>
+        /// Converts a list of DO.Volunteer objects to BO.VolunteerInList with calculated properties.
+        /// </summary>
         public static IEnumerable<BO.VolunteerInList> ConvertVolunteersToBO(IEnumerable<DO.Volunteer> volunteers)
         {
             return volunteers.Select(volunteer => new BO.VolunteerInList
@@ -93,31 +112,38 @@ namespace Helpers
                 SumOfHandleCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == volunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.Treated),
                 SumCanceledCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == volunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.SelfCancellation),
                 SumOfExpiredCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == volunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.ExpiredCancellation),
-                IdCallInProgress = s_dal.Assignment.ReadAll().FirstOrDefault(a => a.VolunteerId == volunteer.Id && a.FinushTimeTreatment == null)?.CallId,
+                IdCallInProgress = s_dal.Assignment.ReadAll().FirstOrDefault(a => a.VolunteerId == volunteer.Id && a.FinishTimeTreatment == null)?.CallId,
                 TypeCallInProgress = s_dal.Assignment.ReadAll()
-    .FirstOrDefault(a => a.VolunteerId == volunteer.Id && a.FinushTimeTreatment == null) is DO.Assignment aInProgress &&
-    s_dal.Call.Read(aInProgress.CallId) is DO.Call c
-    ? (BO.CallType)c.CallType
-    : BO.CallType.none
+                    .FirstOrDefault(a => a.VolunteerId == volunteer.Id && a.FinishTimeTreatment == null) is DO.Assignment aInProgress &&
+                    s_dal.Call.Read(aInProgress.CallId) is DO.Call c
+                    ? (BO.CallType)c.CallType
+                    : BO.CallType.none
             });
         }
+
+        /// <summary>
+        /// Converts a BO.Volunteer object to a DO.Volunteer object including geolocation.
+        /// </summary>
         public static DO.Volunteer ConvertVolunteersToDo(BO.Volunteer volunteer)
         {
             var finalVolunteer = new DO.Volunteer
             {
                 Id = volunteer.Id,
+                Password = HashPassword(volunteer.Password),
                 FullName = volunteer.Name,
                 Email = volunteer.Email,
                 PhoneNumber = volunteer.Phone,
                 FullAddress = volunteer.Address,
-                Latitude = CallManager.GetLatitudLongitute(volunteer.Address).Latitude,
-                Longitude = CallManager.GetLatitudLongitute(volunteer.Address).Longitude,
-                Role =(DO.RoleEnum)volunteer.Role
+                Latitude = Tools.GetLatitudLongitutes(volunteer.Address).Latitude,
+                Longitude = Tools.GetLatitudLongitutes(volunteer.Address).Longitude,
+                Role = (DO.RoleEnum)volunteer.Role
             };
             return finalVolunteer;
         }
 
-
+        /// <summary>
+        /// Creates a BO.Volunteer object with call details and statistics from a DO.Volunteer.
+        /// </summary>
         public static BO.Volunteer addNewVolunteerWithCall(DO.Volunteer tmpVolunteer)
         {
             BO.Volunteer final = new BO.Volunteer()
@@ -128,37 +154,24 @@ namespace Helpers
                 Email = tmpVolunteer.Email,
                 Latitude = tmpVolunteer.Latitude,
                 Longitude = tmpVolunteer.Longitude,
-                Password = tmpVolunteer.Password, // Initialize password
+                Password = tmpVolunteer.Password,
                 Address = tmpVolunteer.FullAddress,
                 Role = (BO.Role)tmpVolunteer.Role,
                 IsActive = tmpVolunteer.Active,
                 MaxDistance = tmpVolunteer.MaxDistance,
-                DistanceType = (BO.TypeOfDistance)tmpVolunteer.DistanceType,
+                TypeOfDistance = (BO.TypeOfDistance)tmpVolunteer.DistanceType,
                 SumHandledCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == tmpVolunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.Treated),
                 SumCanceledCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == tmpVolunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.SelfCancellation),
                 SumChosenExpiredCalls = s_dal.Assignment.ReadAll().Count(a => a.VolunteerId == tmpVolunteer.Id && a.EndTypeAssignment == DO.EndTypeAssignment.ExpiredCancellation),
-                CallInVolunteerHandle = s_dal.Assignment.ReadAll().FirstOrDefault(a => a.VolunteerId == tmpVolunteer.Id && a.FinushTimeTreatment == null) is DO.Assignment aInProgress? addCall(aInProgress, tmpVolunteer) : null
+                CallInVolunteerHandle = s_dal.Assignment.ReadAll().FirstOrDefault(a => a.VolunteerId == tmpVolunteer.Id && a.FinishTimeTreatment == null) is DO.Assignment aInProgress ? addCall(aInProgress, tmpVolunteer) : null
             };
             return final;
         }
 
-        //public static DO.Volunteer addNewVolunteer(DO.Volunteer myVolunteer, BO.Volunteer v1)
-        //{
-        //    var finalVolunteer = new DO.Volunteer
-        //    {
-        //        Id = myVolunteer.Id,
-        //        FullName = myVolunteer.FullName,
-        //        Email = myVolunteer.Email,
-        //        PhoneNumber = myVolunteer.PhoneNumber,
-        //        FullAddress = myVolunteer.FullAddress,
-        //        Latitude = CallManager.GetLatitudLongitute(v1.Address).Latitude,
-        //        Longitude = CallManager.GetLatitudLongitute(v1.Address).Longitude,
-        //        Role = myVolunteer.Role
-        //    };
-        //    return finalVolunteer;
-        //}
-  
-        public static BO.CallInProgress addCall(DO.Assignment aInProgress,DO.Volunteer volunteer)
+        /// <summary>
+        /// Builds a BO.CallInProgress object with detailed status based on timing.
+        /// </summary>
+        public static BO.CallInProgress addCall(DO.Assignment aInProgress, DO.Volunteer volunteer)
         {
             DO.Call call = s_dal.Call.Read(aInProgress.CallId);
             BlApi.IAdmin admin = new BlImplementation.AdminImplementation();
@@ -168,20 +181,23 @@ namespace Helpers
                 CallId = call.Id,
                 CallType = (BO.CallType)call.CallType,
                 CallAddress = call.CallAddress,
-                CallDescription = call.VerbalDescription,
+                CallDescription = call.CallDescription,
                 MaxEndTime = call.MaxEndCallTime,
-                TimeCallMade = call.openTime,
-                EntryTimeTreatment = aInProgress.EnteryTimeTreatment,
+                TimeCallMade = call.StartCallTime,
+                EntryTimeTreatment = aInProgress.EntryTimeTreatment,
                 DistanceCallFromVolunteer = CalculateDistance(call.Latitude, call.Longitude, (double)volunteer.Latitude, (double)volunteer.Longitude),
                 Status = (call.MaxEndCallTime.Value - DateTime.Now) <= admin.GetRiskTimeRange()
-    ? BO.Status.inProgressAtRisk
-    : BO.Status.inProgress
+                    ? BO.Status.inProgressAtRisk
+                    : BO.Status.inProgress
             };
         }
+
+        /// <summary>
+        /// Calculates the distance in kilometers between two geo-coordinates using the Haversine formula.
+        /// </summary>
         public static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
         {
-            
-            double R = 6371; // רדיוס כדור הארץ בק\"מ
+            double R = 6371;
             double dLat = Math.PI / 180 * (lat2 - lat1);
             double dLon = Math.PI / 180 * (lon2 - lon1);
             double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
@@ -192,34 +208,29 @@ namespace Helpers
         }
 
         /// <summary>
-        /// Validates and checks if the BO.Volunteer object can be updated.
+        /// Validates the given BO.Volunteer object, including ID, email, phone and address.
+        /// Throws exceptions if invalid.
         /// </summary>
-        /// <param name="v1">The BO.Volunteer object to validate.</param>
-        /// <param name="myStatus">Optional status to check against the volunteer's role.</param>
-        /// <returns>True if validation passes, otherwise throws an exception.</returns>
         public static bool IntegrityChecker(BO.Volunteer v1)
         {
             if (v1 != null)
             {
-                // Validate email
-                if (!Helpers.VolunteerManager.isEmail(v1.Email))
+                if (!isEmail(v1.Email))
                     throw new InvalidException("Invalid email");
 
-                // Validate phone number
-                if (!Helpers.VolunteerManager.isPhone(v1.Phone))
+                if (!isPhone(v1.Phone))
                     throw new InvalidException("Invalid phone");
 
-                // Validate ID
-                if (!Helpers.VolunteerManager.isId(v1.Id))
+                if (!isId(v1.Id))
                     throw new InvalidException("Invalid id");
 
-                // Validate address
-                if (!Helpers.Tools.TryGetCoordinates(v1.Address, out var coordinates))
+                if (!Tools.TryGetCoordinates(v1.Address, out var coordinates))
                     throw new InvalidException("Invalid address");
-                
+
                 return true;
             }
             return false;
         }
     }
 }
+

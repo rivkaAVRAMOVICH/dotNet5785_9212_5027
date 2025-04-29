@@ -85,16 +85,6 @@ internal class VolunteerImplementation : IVolunteer
         //new BO.Volunteer
         return Helpers.VolunteerManager.addNewVolunteerWithCall(tmpVolunteer);
 
-        //check call and get
-        //var callInProgress = _dal.Call.ReadAll()
-        //    .FirstOrDefault(c => c.Id == id && CallManager.CallStatus(c) == BO.Status.InProgress);
-        //if (callInProgress != null && final != null && final.Latitude.HasValue && final.Longitude.HasValue)
-        //{
-        //    var finalCall = Helpers.VolunteerManager.addNewCall(callInProgress, final); // help function to add new call to the volunteer
-        //    return finalCall;
-        //}
-        //else
-        //    throw new BO.BlUnauthorizedActionException("Error to return the volunteer");
 
     }
     public void UpdateVolunteerDetails(int id, BO.Volunteer volunteer)
@@ -182,8 +172,6 @@ internal class VolunteerImplementation : IVolunteer
         {
             throw new BO.BlUnexpectedSystemException("An unexpected error occurred while adding the volunteer", ex);
         }
-
-
 
     }
 

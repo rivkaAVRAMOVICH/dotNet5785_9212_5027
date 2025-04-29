@@ -15,7 +15,7 @@ internal class AdminImplementation : IAdmin
     {
         return _dal.Config.Clock;
     }
-    // מתודת קידום שעון
+    // Clock promotion method
     public void AdvanceClock(BO.TimeUnit timeUnit) {
         switch (timeUnit)
         {
@@ -39,25 +39,25 @@ internal class AdminImplementation : IAdmin
                 break;
         }
     }
-    // מתודת בקשת טווח זמן סיכון
+    // Risk Time Range Request Method
     public TimeSpan GetRiskTimeRange()
 {
         return _dal.Config.RiskRange;
     }
 
-    // מתודת הגדרת טווח זמן סיכון
+    // Risk time frame definition method
     public void SetRiskTimeRange(TimeSpan riskTimeRange) {
         _dal.Config.RiskRange = riskTimeRange;
     }
 
-    // מתודת איפוס בסיס נתונים
+    // Database reset method
     public void ResetDatabase()
     {
         _dal.ResetDB();
         ClockManager.UpdateClock(ClockManager.Now);
     }
 
-    // מתודת אתחול בסיס נתונים
+    // Database initialization method
     public void InitializeDatabase() {
         DalTest.Initialization.Do();
         ClockManager.UpdateClock(ClockManager.Now);

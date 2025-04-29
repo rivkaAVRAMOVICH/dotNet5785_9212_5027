@@ -11,6 +11,6 @@ namespace stage0
         static partial void Welcome5027()
         {
             Console.WriteLine("I am also here!");
-        }
+             }
     }
 }

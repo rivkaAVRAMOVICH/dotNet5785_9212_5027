@@ -9,7 +9,7 @@ public class ConfigImplementation : IConfig
         get => Config.Clock;
         set => Config.Clock = value;
     }
-    TimeSpan IConfig.RiskRange { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    TimeSpan IConfig.RiskRange { get => Config.RiskRange; set => Config.RiskRange = value; }
 
     public void Reset()
     {

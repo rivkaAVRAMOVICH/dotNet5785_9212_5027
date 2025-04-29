@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,4 +15,5 @@ public class ClosedCallInList
     public DateTime EntryCallTime { get; init; }
     public DateTime? EndCallTime { get; init; }
     public FinishType? FinishType { get; init; }
+    public override string ToString() { return this.ToStringProperty(); }
 }

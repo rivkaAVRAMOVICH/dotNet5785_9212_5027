@@ -11,6 +11,10 @@
 	  <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	  <UseCommonOutputDirectory>true</UseCommonOutputDirectory>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\DalFacade\DalFacade.csproj" />
 		<ProjectReference Include="..\DalList\DalList.csproj" />

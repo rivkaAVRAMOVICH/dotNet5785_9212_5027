@@ -1,8 +1,10 @@
 namespace BlImplementation;
 using BlApi;
+using BO;
 using Helpers;
 using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 
 internal class CallImplementation : ICall
 {
@@ -38,7 +40,7 @@ internal class CallImplementation : ICall
     /// <param name="filterValue">Optional value to match against the filter field</param>
     /// <param name="sortField">Optional field to sort the results</param>
     /// <returns>A collection of BO.CallInList objects</returns>
-    public IEnumerable<BO.CallInList> GetCallsList(BO.CallType? filterField, object? filterValue, BO.CallType? sortBy)
+    public IEnumerable<BO.CallInList> GetCallsList(BO.CallType? filterField, object? filterValue=null, BO.CallType? sortBy=null)
     {
         var callList = CallManager.ConvertCallsToBO(_dal.Call.ReadAll());
 
@@ -85,30 +87,35 @@ internal class CallImplementation : ICall
         {
             // Retrieve call data from the data layer
             var tmpCall = _dal.Call.Read(id);
-
-            // Build a BO.Call object with assignments related to the call
-            var boCall = new BO.Call
+            if (tmpCall != null)
             {
-                Id = tmpCall.Id,
-                CallType = (BO.CallType)tmpCall.CallType,
-                CallDescription = tmpCall.VerbalDescription,
-                CallAddress = tmpCall.CallAddress,
-                Latitude = tmpCall.Latitude,
-                Longitude = tmpCall.Longitude,
-                StartCallTime = tmpCall.openTime,
-                MaxEndCallTime = tmpCall.MaxEndCallTime,
-                Status = CallManager.CallStatus(tmpCall),
-                CallAssignList = _dal.Assignment?.ReadAll().Where(item => item.CallId == tmpCall.Id).Select(a => new BO.CallAssignInList
+                // Build a BO.Call object with assignments related to the call
+                var boCall = new BO.Call
                 {
-                    VolunteerId = a.VolunteerId,
-                    VolunteerName = _dal.Volunteer.Read(a.VolunteerId)!.FullName,
-                    EntryCallTime = a.EntryTimeTreatment,
-                    EndCallTime = a.FinishTimeTreatment,
-                    FinishType = (BO.FinishType)a.EndTypeAssignment
-                }).ToList()
-            };
+                    Id = tmpCall.Id,
+                    CallType = (BO.CallType)tmpCall.CallType,
+                    CallDescription = tmpCall.CallDescription,
+                    CallAddress = tmpCall.CallAddress,
+                    Latitude = tmpCall.Latitude,
+                    Longitude = tmpCall.Longitude,
+                    StartCallTime = tmpCall.StartCallTime,
+                    MaxEndCallTime = tmpCall.MaxEndCallTime,
+                    Status = CallManager.CallStatus(tmpCall),
+                    CallAssignList = _dal.Assignment?.ReadAll().Where(item => item.CallId == tmpCall.Id).Select(a => new BO.CallAssignInList
+                    {
+                        VolunteerId = a.VolunteerId,
+                        VolunteerName = _dal.Volunteer.Read(a.VolunteerId)!.FullName,
+                        EntryCallTime = a.EntryTimeTreatment,
+                        EndCallTime = a.FinishTimeTreatment,
+                        FinishType = (BO.FinishType)a.EndTypeAssignment
+                    }).ToList()
+                };
 
-            return boCall;
+                return boCall;
+            }
+            else {
+                throw new DO.DalDoesNotExistException("Fail");
+            }
         }
         catch (DO.DalDoesNotExistException ex)
         {
@@ -138,8 +145,8 @@ internal class CallImplementation : ICall
                 CallType = (DO.CallType)call.CallType,
                 CallDescription = call.CallDescription,
                 CallAddress = call.CallAddress,
-                Latitude = CallManager.GetLatitudLongitute(call.CallAddress).Latitude, // Get latitude for the address
-                Longitude = CallManager.GetLatitudLongitute(call.CallAddress).Longitude, // Get longitude for the address
+                Latitude = Tools.GetLatitudLongitutes(call.CallAddress).Latitude, // Get latitude for the address
+                Longitude = Tools.GetLatitudLongitutes(call.CallAddress).Longitude, // Get longitude for the address
                 StartCallTime = call.StartCallTime,
                 MaxEndCallTime = call.MaxEndCallTime
             };
@@ -178,22 +185,34 @@ internal class CallImplementation : ICall
     public void DeletingCall(int id)
     {
         try
-        {
+        { 
             var tmpCall = _dal.Call.Read(id);
+            if (tmpCall == null)
+            {
+                throw new DO.DalDoesNotExistException("Not found");
+            }
+            
             var tmpAssignments = _dal.Assignment.ReadAll().Where(item => item.CallId == id);
             var tmpStatus = CallManager.CallStatus(tmpCall!);
 
-            // Only delete the call if its status is 'open' or 'openAtRisk'.
-            foreach (var item in tmpAssignments)
+            if (!tmpAssignments.Any() && (tmpStatus == BO.Status.open || tmpStatus == BO.Status.openAtRisk))
             {
-                if (tmpStatus == BO.Status.open || tmpStatus == BO.Status.openAtRisk)
-                    _dal.Call.Delete(id);
+                _dal.Call.Delete(id);
+            }
+            else
+        {
+                throw new BO.BlDeletionImpossible("cant delet completed assignment");
             }
         }
         catch (DO.DalDoesNotExistException ex)
         {
             throw new BO.BlDoesNotExistException($"Call with ID={id} was not found", ex);
         }
+        catch (BO.BlDeletionImpossible)
+        {
+            throw new BO.BlDeletionImpossible("cant delet completed assignment");
+        }
+      
     }
 
     /// <summary>
@@ -214,13 +233,12 @@ internal class CallImplementation : ICall
             // Create a DO.Call object from the given data
             var finalCall = new DO.Call
             {
-                Id = call.Id,
                 CallType = (DO.CallType)call.CallType,
                 CallDescription = call.CallDescription,
                 CallAddress = call.CallAddress,
-                Latitude = CallManager.GetLatitudLongitute(call.CallAddress).Latitude, // Get latitude for the address
-                Longitude = CallManager.GetLatitudLongitute(call.CallAddress).Longitude, // Get longitude for the address
-                StartCallTime = call.StartCallTime,
+                Latitude = Tools.GetLatitudLongitutes(call.CallAddress).Latitude, // Get latitude for the address
+                Longitude = Tools.GetLatitudLongitutes(call.CallAddress).Longitude, // Get longitude for the address
+                StartCallTime = ClockManager.Now,
                 MaxEndCallTime = call.MaxEndCallTime
             };
 
@@ -254,7 +272,7 @@ internal class CallImplementation : ICall
     /// <param name="callType">Optional filter by type of call</param>
     /// <param name="sortField">Optional sorting field (e.g., CallType, FinishType)</param>
     /// <returns>A collection of closed calls formatted as BO.ClosedCallInList objects</returns>
-    public IEnumerable<BO.ClosedCallInList> GetClosedCallsByVolunteer(int volunteerId, BO.CallType? filterType, BO.CallType? sortBy)
+    public IEnumerable<BO.ClosedCallInList> GetClosedCallsByVolunteer(int volunteerId, BO.CallType? filterType=null, Enum? sortBy = null)
     {
         // Fetch all closed assignments for the volunteer
         var closedVolunteerAssignments = _dal.Assignment.ReadAll()
@@ -450,7 +468,6 @@ internal class CallImplementation : ICall
             throw new BO.BlUnexpectedSystemException("An unexpected error occurred while canceling the assignment");
         }
     }
-
     /// <summary>
     /// Assigns a volunteer to handle a call
     /// </summary>
@@ -465,27 +482,32 @@ internal class CallImplementation : ICall
         DO.Call tmpCall;
 
         try
-        {
-            // Fetch volunteer data
+        { 
             tmpVol = _dal.Volunteer.Read(volunteerId);
+            // Fetch volunteer data
+            if (tmpVol == null) 
+            { throw new DO.DalDoesNotExistException("not found"); }
         }
         catch (DO.DalDoesNotExistException ex)
         {
             throw new BO.BlDoesNotExistException($"Volunteer with ID={volunteerId} not found", ex);
         }
-
         try
         {
             // Fetch call data
             tmpCall = _dal.Call.Read(callId);
+            if(tmpCall == null)
+            {
+                throw new DO.DalDoesNotExistException("not found");
+            }
         }
         catch (DO.DalDoesNotExistException ex)
         {
             throw new BO.BlDoesNotExistException($"Call with ID={callId} not found", ex);
         }
-
+        BO.Status status = CallManager.CallStatus(tmpCall);
         // Validate the call status
-        if (CallManager.CallStatus(tmpCall) != BO.Status.open && CallManager.CallStatus(tmpCall) != BO.Status.openAtRisk)
+        if (status != BO.Status.open && status != BO.Status.openAtRisk)
         {
             throw new BO.BlInvalidAssignmentException($"Call is not closed, expired or already being handled");
         }

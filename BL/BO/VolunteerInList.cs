@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,7 @@ namespace BO
         public int SumCanceledCalls { get; set; }
         public int SumOfExpiredCalls { get; set; }
         public int? IdCallInProgress { get; set; }
-        public  HandleCallType TypeCallInProgress { get; set; }
+        public  CallType TypeCallInProgress { get; set; }
+        public override string ToString() { return this.ToStringProperty(); }
     }
 }

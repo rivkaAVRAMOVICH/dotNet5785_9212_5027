@@ -15,12 +15,12 @@ public enum TypeOfDistance
 
 public enum CallType
 {
-    none,
     fixing,
     cooking,
     babysitting,
     cleaning,
-    shopping
+    shopping,
+    none
 }
 
 public enum Status
@@ -49,4 +49,10 @@ public enum TimeUnit
     MONTH,
     SECOND,
     YEAR
+}
+public enum CallSortField
+{
+    Id,
+    CallType,
+    FinishType
 }

@@ -320,7 +320,7 @@ internal class Program
                 CallAddress = fullAddress,
                 Longitude = longitude,
                 Latitude = latitude,
-                openTime = openHour,
+                StartCallTime = openHour,
                 CallType = kindOfCall,
                 MaxEndCallTime = closeHour
             };
@@ -414,7 +414,7 @@ internal class Program
             CallAddress = fullAddress,
             Longitude = longitude,
             Latitude = latitude,
-            openTime = openHour,
+            StartCallTime = openHour,
             CallType = kindOfCall,
             MaxEndCallTime = closeHour
         };
@@ -690,8 +690,8 @@ internal class Program
                 Id = id,
                 CallId = callId,
                 VolunteerId = volunteerId,
-                EnteryTimeTreatment = assignmentStart,
-                FinushTimeTreatment = assignmentEnd,
+                EntryTimeTreatment = assignmentStart,
+                FinishTimeTreatment = assignmentEnd,
                 EndTypeAssignment = kindOfEndAssignment
             };
 
@@ -782,8 +782,8 @@ internal class Program
             Id = id,
             CallId = callId,
             VolunteerId = volunteerId,
-            EnteryTimeTreatment = assignmentStart,
-            FinushTimeTreatment = assignmentEnd,
+           EntryTimeTreatment = assignmentStart,
+            FinishTimeTreatment = assignmentEnd,
             EndTypeAssignment = kindOfEndAssignment
         };
 

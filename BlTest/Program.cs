@@ -105,25 +105,6 @@ Enter your choice:
     }
 
     /// <summary>
-    /// Displays a submenu to update call-related information.
-    /// </summary>
-    private static void UpdateCallSubMenu()
-    {
-        Console.WriteLine("What would you like to update?");
-        Console.WriteLine("1- Cancel Call");
-        Console.WriteLine("2- Finish Call");
-        Console.WriteLine("3- General Update");
-        Console.WriteLine("enter your choice:");
-        int choice = int.Parse(Console.ReadLine());
-        if (choice == 1)
-            UpdateCancelTreatment();
-        if (choice == 2)
-            UpdateFinishTreatment();
-        if (choice == 3)
-            UpdateCall();
-    }
-
-    /// <summary>
     /// Displays and processes options for the Volunteer submenu.
     /// </summary>
     private static void VolunteerSubMenu()
@@ -138,47 +119,43 @@ Enter your choice:
                 switch (subChoice)
                 {
                     case 0:
-                        //exit
+                        // exit
                         return;
                     case 1:
-                        //create
                         AddVolunteer();
                         break;
                     case 2:
-                        //read
                         VolunteerDetails();
                         break;
                     case 3:
-                        //read all
                         AllVolunteers();
                         break;
                     case 4:
-                        //update
                         UpdateVolunteer();
                         break;
                     case 5:
-                        //delete
                         DeleteVolunteer();
                         break;
                     case 6:
-                        //login
                         VolunteerLogin();
                         break;
                     case 7:
-                        //assign call
                         AssignCall();
                         break;
-
                 }
-
             }
-            catch (Exception ex) { Console.WriteLine($"Error:{ex}"); }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex}");
+            }
+
             Console.Write(@"
 Enter your choice: ");
-            PrintMainMenu();
+            PrintSubMenu("Volunteer"); // להציג שוב את תפריט המשנה
+            subChoice = int.Parse(Console.ReadLine()!); // ← ← ← ← הוספתי כאן קריאה נוספת!
         }
-
     }
+
 
     /// <summary>
     /// Adds a new volunteer to the system.
@@ -214,7 +191,7 @@ Enter your choice: ");
             Password = v1password,
             Address = v1address,
             MaxDistance = v1maxDistance,
-            DistanceType = v1distanceType,
+            TypeOfDistance= v1distanceType,
             IsActive = true
         };
         s_bl.Volunteer.AddingVolunteer(v1);
@@ -293,7 +270,7 @@ Enter your choice: ");
                     Password = v1password,
                     Address = v1address,
                     MaxDistance = v1maxDistance,
-                    DistanceType = v1distanceType,
+                    TypeOfDistance = v1distanceType,
                     IsActive = true
                 };
                 s_bl.Volunteer.UpdateVolunteerDetails(id, v1);
@@ -354,49 +331,45 @@ Enter your choice: ");
                 switch (subChoice)
                 {
                     case 0:
-                        //exit
                         return;
                     case 1:
-                        //create
                         AddCall();
                         break;
                     case 2:
-                        //read
                         CallDetails();
                         break;
                     case 3:
-                        //read all
                         AllCalls();
                         break;
                     case 4:
-                        //update
-                        UpdateCallSubMenu();
+                        UpdateCall();
                         break;
                     case 5:
-                        //delete
                         DeleteCall();
                         break;
                     case 6:
-                        //all closed calls
                         AllClosedCalls();
                         break;
                     case 7:
-                        //all open calls
                         AllOpenCalls();
                         break;
                     case 8:
-                        //number of calls per status
                         NumberOfCallsByStatus();
                         break;
                     case 9:
-                        //assign call to volunteer
                         AssignCall();
                         break;
                 }
-
             }
-            catch (Exception ex) { Console.WriteLine($"Error:{ex}"); }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex}");
+            }
+
+            Console.Write(@"
+Enter your choice: ");
             PrintSubMenu("Call");
+            subChoice = int.Parse(Console.ReadLine()!); // ← הוספתי כאן קריאה מחודשת לקלט
         }
     }
 
@@ -406,31 +379,23 @@ Enter your choice: ");
     /// </summary>
     private static void AddCall()
     {
-        Console.WriteLine("Enter call ID: ");
-        int c1id = int.Parse(Console.ReadLine()!);
         Console.WriteLine(@"Enter call type (0- fixing, 1- cooking, 2- babysitting, 3- cleaning, 4- shopping): ");
         CallType c1callType = (CallType)int.Parse(Console.ReadLine()!);
         Console.WriteLine(@"Enter description (if necessary): ");
         string c1description = Console.ReadLine()!;
         Console.WriteLine("Enter call address: ");
         string c1address = Console.ReadLine()!;
-        Console.WriteLine("Enter longitude: ");
-        double c1latitude = double.Parse(Console.ReadLine()!);
-        Console.WriteLine("Enter latitude: ");
-        double c1longitude = double.Parse(Console.ReadLine()!);
         Console.WriteLine(@"Enter latest time for call to be taken: ");
         DateTime c1maxTime = DateTime.Parse(Console.ReadLine()!);
 
         Call c1 = new Call
         {
-            Id = c1id,
+
             CallType = c1callType,
             CallDescription = c1description,
             CallAddress = c1address,
-            Latitude = c1latitude,
-            Longitude = c1longitude,
             MaxEndCallTime = c1maxTime,
-            StartCallTime = s_bl.Admin.GetClock()
+         
         };
 
         s_bl.Call.AddingCall(c1);
@@ -445,7 +410,7 @@ Enter your choice: ");
         Console.WriteLine("Enter call ID: ");
         if (int.TryParse(Console.ReadLine(), out int id))
         {
-            var myCall = s_bl.Volunteer.GetVolunteerDetails(id);
+            var myCall = s_bl.Call.GetCallsDetails(id);
             Console.WriteLine(myCall != null ? myCall.ToString() : "Call not found.");
         }
         else
@@ -523,10 +488,6 @@ Enter your choice: ");
                 string c1description = Console.ReadLine()!;
                 Console.WriteLine("Enter call address: ");
                 string c1address = Console.ReadLine()!;
-                Console.WriteLine("Enter longitude: ");
-                double c1latitude = double.Parse(Console.ReadLine()!);
-                Console.WriteLine("Enter latitude: ");
-                double c1longitude = double.Parse(Console.ReadLine()!);
                 Console.WriteLine(@"Enter latest time for call to be taken: ");
                 DateTime c1maxTime = DateTime.Parse(Console.ReadLine()!);
 
@@ -536,10 +497,7 @@ Enter your choice: ");
                     CallType = c1callType,
                     CallDescription = c1description,
                     CallAddress = c1address,
-                    Latitude = c1latitude,
-                    Longitude = c1longitude,
                     MaxEndCallTime = c1maxTime,
-                    StartCallTime = s_bl.Admin.GetClock()
                 };
 
                 s_bl!.Call.UpdateCallDetails(c1);
@@ -555,29 +513,7 @@ Enter your choice: ");
         }
     }
 
-    /// <summary>
-    /// Marks a call as completed for a specified volunteer and assignment.
-    /// </summary>
-    private static void UpdateFinishTreatment()
-    {
-        Console.WriteLine("Enter Volunteer ID: ");
-        int.TryParse(Console.ReadLine(), out int id);
-        Console.WriteLine("Enter Assignment ID: ");
-        int.TryParse(Console.ReadLine(), out int myId);
-        s_bl.Call.ReportCallCompletion(id, myId);
-    }
-
-    /// <summary>
-    /// Cancels an ongoing treatment for a specified volunteer and assignment.
-    /// </summary>
-    private static void UpdateCancelTreatment()
-    {
-        Console.WriteLine("Enter Volunteer ID: ");
-        int.TryParse(Console.ReadLine(), out int id);
-        Console.WriteLine("Enter Assignment ID: ");
-        int.TryParse(Console.ReadLine(), out int myId);
-        s_bl.Call.CancelCallHandling(id, myId);
-    }
+   
 
     /// <summary>
     /// Deletes a call by its ID.
@@ -758,7 +694,7 @@ Enter your choice:
     private static void GetRiskRange()
     {
 
-        s_bl.Admin.GetRiskTimeRange();
+        Console.WriteLine(s_bl.Admin.GetRiskTimeRange().ToString());
     }
 
     /// <summary>

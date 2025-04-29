@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +16,6 @@ namespace BO
         public DateTime StartCallTime { get; init; }
         public DateTime? MaxEndCallTime { get; init; }
         public double DistanceCallFromVolunteer { get; set; }
+        public override string ToString() { return this.ToStringProperty(); }
     }
 }
