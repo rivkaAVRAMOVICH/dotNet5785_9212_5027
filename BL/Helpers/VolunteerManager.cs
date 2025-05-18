@@ -20,7 +20,7 @@ namespace Helpers
     internal static class VolunteerManager
     {
         private static IDal s_dal = DalApi.Factory.Get; // Access to the DAL layer
-
+        internal static ObserverManager Observers = new(); //stage 5 
         /// <summary>
         /// Validates an Israeli ID using a checksum algorithm.
         /// </summary>
@@ -230,6 +230,33 @@ namespace Helpers
                 return true;
             }
             return false;
+        }
+
+        internal static void PeriodicVolunteerUpdates(DateTime oldClock, DateTime newClock)
+        {
+            bool volunteersUpdated = false;
+
+
+            var volunteers = s_dal.Volunteer.ReadAll().ToList();
+
+            foreach (var doVolunteer in volunteers)
+            {
+                // תנאי לדוגמה: אם אין טלפון או מיקום -> לא פעיל
+                if ((string.IsNullOrWhiteSpace(doVolunteer.PhoneNumber) ||
+                    doVolunteer.Latitude == null ||
+                    doVolunteer.Longitude == null) &&
+                    doVolunteer.Active) // עדכון רק אם היה פעיל
+                {
+                    var updatedVolunteer = doVolunteer with { Active = false };
+                    s_dal.Volunteer.Update(updatedVolunteer);
+                    Observers.NotifyItemUpdated(doVolunteer.Id);
+                    volunteersUpdated = true;
+                }
+            }
+
+
+            if (volunteersUpdated)
+                Observers.NotifyListUpdated();
         }
     }
 }

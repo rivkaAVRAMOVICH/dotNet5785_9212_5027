@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json.Serialization;
 namespace Helpers;
+
+using BO;
 //using Newtonsoft.Json;
 using DalApi;
 using DO;
@@ -15,6 +17,7 @@ using DO;
 internal class CallManager
 {
     private static IDal _dal = Factory.Get;
+    internal static ObserverManager Observers = new(); //stage 5 
 
     /// <summary>
     /// Determines the status of a given call
@@ -108,7 +111,7 @@ internal class CallManager
     /// </summary>
     public static void UpdateExpiredCalls()
     {
-        var currentTime = ClockManager.Now;
+        var currentTime = AdminManager.Now;
 
         // Retrieve calls with no assignments whose time has expired
         var callsWithNoAssignments = _dal.Call.ReadAll()
@@ -251,11 +254,82 @@ internal class CallManager
         }
     }
 
+    private static DO.Call BoToDo(BO.Call boCall)
+    {
+        return new DO.Call(
+            Id: boCall.Id,
+            CallAddress: boCall.CallAddress,
+            Latitude:boCall.Latitude,
+            Longitude:boCall.Longitude,
+           StartCallTime : boCall.StartCallTime,
+            CallDescription: boCall.CallDescription,
+            MaxEndCallTime: boCall.MaxEndCallTime,
+            CallType: (DO.CallType)boCall.CallType
+ 
+        );
+    }
+    public static BO.Call ConvertToBo(DO.Call doCall)
+    {
+        var assignments = _dal.Assignment.ReadAll()
+            .Where(a => a.CallId == doCall.Id)
+            .ToList();
+
+        return new BO.Call
+        {
+            Id = doCall.Id,
+            CallType = (BO.CallType)doCall.CallType,
+            CallDescription = doCall.CallDescription,
+            CallAddress = doCall.CallAddress,
+            Latitude = doCall.Latitude,
+            Longitude = doCall.Longitude,
+            StartCallTime = doCall.StartCallTime,
+            MaxEndCallTime = doCall.MaxEndCallTime,
+            CallAssignList =assignments
+        };
+    }
     internal static void PeriodicCallUpdates(DateTime oldClock, DateTime newClock)
     {
-        throw new NotImplementedException();
-    }
+        bool callUpdated = false;
 
+        var list = _dal.Call.ReadAll().ToList();
+        foreach (var doCall in list)
+        {
+            var boCall = ConvertToBo(doCall); // המרת DO ל־BO
+            bool updated = false;
+
+            // תנאי 1: הדדליין עבר, הקריאה לא הושלמה ולא פג תוקף
+            if (boCall.MaxEndCallTime is DateTime deadline &&
+                deadline < newClock &&
+                boCall.Status != BO.Status.closed &&
+                boCall.Status != BO.Status.expired)
+            {
+                boCall.Status = BO.Status.expired;
+                updated = true;
+            }
+
+            // תנאי 2: אין הקצאות, עברו 3 ימים מאז פתיחת הקריאה, סטטוס עדיין פתוח
+            if ((boCall.CallAssignList == null || boCall.CallAssignList.Count == 0) &&
+                (newClock - boCall.StartCallTime).TotalDays >= 3 &&
+                boCall.Status == BO.Status.open)
+            {
+                boCall.Status = BO.Status.open;
+                updated = true;
+            }
+
+            if (updated)
+            {
+                var updatedDo = BoToDo(boCall);
+                _dal.Call.Update(updatedDo);
+                Observers.NotifyItemUpdated(boCall.Id);
+                callUpdated = true;
+                Observers.NotifyItemUpdated(boCall.Id); //stage 5
+            }
+        }
+
+        bool yearChanged = oldClock.Year != newClock.Year;
+        if (yearChanged || callUpdated)
+            Observers.NotifyListUpdated();
+    }
     internal static void SimulateCourseRegistrationAndGrade()
     {
         throw new NotImplementedException();

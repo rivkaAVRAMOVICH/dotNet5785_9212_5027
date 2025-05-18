@@ -6,6 +6,17 @@ namespace BlImplementation;
 internal class VolunteerImplementation : IVolunteer
 {
     private readonly DalApi.IDal _dal = DalApi.Factory.Get;
+    #region Stage 5
+    public void AddObserver(Action listObserver) =>
+    VolunteerManager.Observers.AddListObserver(listObserver); //stage 5
+    public void AddObserver(int id, Action observer) =>
+VolunteerManager.Observers.AddObserver(id, observer); //stage 5
+    public void RemoveObserver(Action listObserver) =>
+VolunteerManager.Observers.RemoveListObserver(listObserver); //stage 5
+    public void RemoveObserver(int id, Action observer) =>
+VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
+    #endregion Stage 5
+
     public BO.Role EnteredSystem(string userName, string password)
     {
         try
@@ -113,6 +124,8 @@ internal class VolunteerImplementation : IVolunteer
                 DO.Volunteer finalVolunteer = Helpers.VolunteerManager.ConvertVolunteersToDo(volunteer); // help function to add new volunteer
 
                 _dal.Volunteer.Update(finalVolunteer);//update the data of volunteers
+               VolunteerManager.Observers.NotifyItemUpdated(finalVolunteer.Id);  //stage 5
+               VolunteerManager.Observers.NotifyListUpdated();  //stage 5
             }
         }
         catch (BO.BlUnexpectedSystemException ex)
@@ -139,6 +152,7 @@ internal class VolunteerImplementation : IVolunteer
         {
             // volunteer removed from data
             _dal.Volunteer.Delete(id);
+           VolunteerManager.Observers.NotifyListUpdated();  //stage 5  
         }
         catch (DO.DalDoesNotExistException ex)
         {
@@ -157,6 +171,7 @@ internal class VolunteerImplementation : IVolunteer
             {
                 DO.Volunteer finalVolunteer = Helpers.VolunteerManager.ConvertVolunteersToDo(volunteer); // help function to create the new volunteer
                 _dal.Volunteer.Create(finalVolunteer); //add the new Volunteer
+                VolunteerManager.Observers.NotifyListUpdated(); //stage 5  
             }
 
         }

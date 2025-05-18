@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 ///interface IVolunteer
 namespace BlApi
 {
-    public interface IVolunteer
+    public interface IVolunteer: IObservable
     {
         public BO.Role EnteredSystem(string userName, string password);
         public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? active=null, BO.CallType? sortBy = null);

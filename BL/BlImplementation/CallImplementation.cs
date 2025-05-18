@@ -10,6 +10,17 @@ internal class CallImplementation : ICall
 {
     private readonly DalApi.IDal _dal = DalApi.Factory.Get;
 
+    #region Stage 5
+    public void AddObserver(Action listObserver) =>
+    CallManager.Observers.AddListObserver(listObserver); //stage 5
+    public void AddObserver(int id, Action observer) =>
+CallManager.Observers.AddObserver(id, observer); //stage 5
+    public void RemoveObserver(Action listObserver) =>
+CallManager.Observers.RemoveListObserver(listObserver); //stage 5
+    public void RemoveObserver(int id, Action observer) =>
+CallManager.Observers.RemoveObserver(id, observer); //stage 5
+    #endregion Stage 5
+
     /// <summary>
     /// Retrieves the number of calls grouped by their status
     /// </summary>
@@ -18,6 +29,7 @@ internal class CallImplementation : ICall
     /// The mapping of indices is as follows:
     /// 0: open, 1:inProgress, 2:closed, 3:expired, 4:openAtRisk, 5:inProgressAtRisk
     /// </returns>
+    /// 
     public int[] RequestCallsQuantities()
     {
         int[] final = new int[6];
@@ -153,6 +165,8 @@ internal class CallImplementation : ICall
 
             // Attempt to update the call in the data layer
             _dal.Call.Update(newCall);
+            CallManager.Observers.NotifyItemUpdated(newCall.Id);  //stage 5
+            CallManager.Observers.NotifyListUpdated();  //stage 5
         }
 
         catch (BO.BlValidationException ex)
@@ -177,6 +191,7 @@ internal class CallImplementation : ICall
 
     }
 
+   
     /// <summary>
     /// Removes a call and its related assignments if the call is open or openAtRisk
     /// </summary>
@@ -198,6 +213,7 @@ internal class CallImplementation : ICall
             if (!tmpAssignments.Any() && (tmpStatus == BO.Status.open || tmpStatus == BO.Status.openAtRisk))
             {
                 _dal.Call.Delete(id);
+                CallManager.Observers.NotifyListUpdated();  //stage 5  
             }
             else
         {
@@ -238,12 +254,13 @@ internal class CallImplementation : ICall
                 CallAddress = call.CallAddress,
                 Latitude = Tools.GetLatitudLongitutes(call.CallAddress).Latitude, // Get latitude for the address
                 Longitude = Tools.GetLatitudLongitutes(call.CallAddress).Longitude, // Get longitude for the address
-                StartCallTime = ClockManager.Now,
+                StartCallTime = AdminManager.Now,
                 MaxEndCallTime = call.MaxEndCallTime
             };
 
             // Attempt to add the new call in the data layer
             _dal.Call.Create(finalCall);
+            CallManager.Observers.NotifyListUpdated(); //stage 5  
         }
 
         catch (BO.BlValidationException ex)
@@ -394,6 +411,8 @@ internal class CallImplementation : ICall
 
             // Update the assignment with the completion details
             _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, volunteerId, assignment.EntryTimeTreatment, DateTime.Now, DO.EndTypeAssignment.Treated));
+            AssignmentManager.Observers.NotifyItemUpdated(assignment.Id);  //stage 5
+            AssignmentManager.Observers.NotifyListUpdated();  //stage 5
         }
         catch (DO.DalDoesNotExistException ex)
         {
@@ -445,7 +464,9 @@ internal class CallImplementation : ICall
                 : DO.EndTypeAssignment.AdministratorCancellation;
 
             // Update the assignment with the cancellation details
-            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, requesterId, assignment.EntryTimeTreatment, ClockManager.Now, VolunteerOrManager));
+            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, requesterId, assignment.EntryTimeTreatment, AdminManager.Now, VolunteerOrManager));
+            AssignmentManager.Observers.NotifyItemUpdated(assignment.Id);  //stage 5
+            AssignmentManager.Observers.NotifyListUpdated();  //stage 5
         }
         catch (DO.DalDoesNotExistException ex)
         {
@@ -513,10 +534,11 @@ internal class CallImplementation : ICall
         }
 
         // Create a new assignment for the volunteer
-        var tmpAssign = new DO.Assignment(0, callId, volunteerId, ClockManager.Now, null, null);
+        var tmpAssign = new DO.Assignment(0, callId, volunteerId, AdminManager.Now, null, null);
         try
         {
             _dal.Assignment.Create(tmpAssign);
+            AssignmentManager.Observers.NotifyListUpdated(); //stage 5  
         }
         catch (DO.DalAlreadyExistsException ex)
         {

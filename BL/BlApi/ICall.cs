@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BlApi
 {
-    public interface ICall
+    public interface ICall: IObservable
     {
         int[] RequestCallsQuantities();
         IEnumerable<BO.CallInList> GetCallsList(BO.CallType? filterField=null, object? filterValue=null, BO.CallType? sortBy = null);
