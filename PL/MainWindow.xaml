@@ -5,8 +5,67 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="450" Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 
+        <Grid Margin="10">
+        <!-- Define two main rows in the main layout -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- System Clock Section -->
+        <GroupBox Header="System Clock" Grid.Row="0" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
+
+                <!-- Label to display the current system time -->
+                <Label Content="{Binding CurrentTime}" FontSize="16" FontWeight="Bold" Margin="0,0,20,0"/>
+
+                <!-- Buttons to advance the time -->
+                <Button Content="Add Minute" Click="btnAddOneMinute_Click" Margin="5"/>
+                <Button Content="Add Hour" Click="btnAddOneMinute_Click" Margin="5"/>
+                <Button Content="Add Day" Click="btnAddOneMinute_Click" Margin="5"/>
+                <Button Content="Add Week" Click="btnAddOneMinute_Click" Margin="5"/>
+                <Button Content="Add Year" Click="btnAddOneMinute_Click" Margin="5"/>
+                
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Bottom section: Configuration variables + Navigation buttons -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Configuration Variables Section -->
+            <GroupBox Header="Configuration Variables" Grid.Row="0" Margin="0,0,0,10">
+                <StackPanel Margin="10">
+
+                    <!-- Configuration variable 1 -->
+                    <TextBox Text="{Binding MaxYearRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+
+                    <!-- Button to update the configuration variable in the database -->
+                    <Button Content="Update Max Range" Width="200" Margin="0,5" Click="btnUpdateMaxRange_Click"/>
+                    <Button Content="Update Configuration" Width="200" Margin="0,5"/>
+                    
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Action Buttons -->
+            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="10">
+
+                <!-- Button to open the list display window -->
+                <Button Content="Show List" Width="200" Margin="0,5"/>
+
+                <!-- Button to initialize the database with initial data -->
+                <Button Content="Initialize Database" Width="200" Margin="0,5"/>
+
+                <!-- Button to reset the database (clear all data) -->
+                <Button Content="Reset Database" Width="200" Margin="0,5"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
