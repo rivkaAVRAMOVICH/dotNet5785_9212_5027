@@ -268,6 +268,17 @@ internal class CallManager
  
         );
     }
+    private static List<CallAssignInList> MapAssignments(List<DO.Assignment> assignments)
+    {
+        return assignments.Select(a => new CallAssignInList
+        {
+            VolunteerId = a.VolunteerId,
+            VolunteerName = _dal.Volunteer.Read(a.VolunteerId).FullName ?? "",
+            EntryCallTime = a.EntryTimeTreatment,
+            EndCallTime = a.FinishTimeTreatment,
+            FinishType = (FinishType?)a.EndTypeAssignment
+        }).ToList();
+    }
     public static BO.Call ConvertToBo(DO.Call doCall)
     {
         var assignments = _dal.Assignment.ReadAll()
@@ -284,7 +295,7 @@ internal class CallManager
             Longitude = doCall.Longitude,
             StartCallTime = doCall.StartCallTime,
             MaxEndCallTime = doCall.MaxEndCallTime,
-            CallAssignList =assignments
+            CallAssignList = MapAssignments(assignments)
         };
     }
     internal static void PeriodicCallUpdates(DateTime oldClock, DateTime newClock)
