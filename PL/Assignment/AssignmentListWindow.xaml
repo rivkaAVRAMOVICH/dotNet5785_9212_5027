@@ -6,6 +6,9 @@
         xmlns:local="clr-namespace:PL.Assignment"
         mc:Ignorable="d"
         Title="Assignment list window" Height="640" Width="800">
+        <Window.Resources>
+            <CollectionViewSource x:Key="AssignmentCollectionKey" Source="{Binding AssignmentCollection}" />
+        </Window.Resources>
     <!--External Grid-->
     <Grid>
         <Grid.RowDefinitions>
@@ -20,7 +23,10 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Content="Select Semester:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
-            <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            <ComboBox x:Name="CallComboBox" Grid.Column="1"
+                ItemsSource="{Binding Source={StaticResource AssignmentCollectionKey}}"
+                SelectionChanged="CallComboBox_SelectionChanged"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="150"/>
         </Grid>
         <ListView Grid.Row="1" ItemsSource="{Binding Path=AssignmentList}"></ListView>
         <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100"/>

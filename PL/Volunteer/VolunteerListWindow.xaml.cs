@@ -22,6 +22,7 @@ namespace PL.Volunteer
         public VolunteerListWindow()
         {
             InitializeComponent();
+            this.DataContext = new VolunteerListWindow();
         }
     }
 }

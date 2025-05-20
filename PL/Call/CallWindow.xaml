@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Call"
         mc:Ignorable="d"
-        Title="CallWindow" Height="640" Width="800">
+        Title="Call window" Height="640" Width="800">
     <!--External Grid-->
     <Grid>
         <Grid.RowDefinitions>
