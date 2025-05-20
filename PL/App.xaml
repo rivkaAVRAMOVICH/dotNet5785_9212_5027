@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:PL"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <local:AssignmentCollection x:Key="AssignmentCollectionKey" />
+        <local:CallCollection x:Key="CallCollectionKey" />
+        <local:VolunteerCollection x:Key="VolunteerCollectionKey" />
     </Application.Resources>
 </Application>

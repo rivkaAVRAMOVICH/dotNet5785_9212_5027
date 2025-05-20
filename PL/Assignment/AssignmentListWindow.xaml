@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Assignment"
         mc:Ignorable="d"
-        Title="AssignmentListWindow" Height="640" Width="800">
+        Title="Assignment list window" Height="640" Width="800">
     <!--External Grid-->
     <Grid>
         <Grid.RowDefinitions>
@@ -22,7 +22,7 @@
             <Label Content="Select Semester:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
             <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Grid>
-        <ListView Grid.Row="1"></ListView>
+        <ListView Grid.Row="1" ItemsSource="{Binding Path=AssignmentList}"></ListView>
         <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100"/>
     </Grid>
 </Window>

@@ -13,8 +13,8 @@ namespace BO
         public CallType CallType { get; set; }
         public string? CallDescription { get; set; }
         public string CallAddress { get; set; }
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public DateTime StartCallTime { get; set; }
         public DateTime? MaxEndCallTime { get; set; }
         public Status Status { get; set; }

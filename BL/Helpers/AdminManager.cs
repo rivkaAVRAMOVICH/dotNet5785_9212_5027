@@ -113,20 +113,20 @@ internal static class AdminManager //stage 4
         {
             UpdateClock(Now.AddMinutes(s_interval));
 
-            #region Stage 7
-            //TO_DO:
-            //Add calls here to any logic simulation that was required in stage 7
-            //for example: course registration simulation
-            StudentManager.SimulateCourseRegistrationAndGrade(); //stage 7
+            //        #region Stage 7
+            //        //TO_DO:
+            //        //Add calls here to any logic simulation that was required in stage 7
+            //        //for example: course registration simulation
+            //        StudentManager.SimulateCourseRegistrationAndGrade(); //stage 7
 
-            //etc...
-            #endregion Stage 7
+            //        //etc...
+            //        #endregion Stage 7
 
-            try
-            {
-                Thread.Sleep(1000); // 1 second
-            }
-            catch (ThreadInterruptedException) { }
+            //        try
+            //        {
+            //            Thread.Sleep(1000); // 1 second
+            //        }
+            //        catch (ThreadInterruptedException) { }
         }
     }
     #endregion Stage 7 base

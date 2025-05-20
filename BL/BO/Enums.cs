@@ -50,9 +50,31 @@ public enum TimeUnit
     SECOND,
     YEAR
 }
+
+public enum AssignmentSortField
+{
+    Id,
+    VolunteerId,
+    CallId,
+    Status,
+    Distance,
+    CallType,
+    FinishType
+}
 public enum CallSortField
 {
     Id,
+    CallType,
+    FinishType
+}
+
+public enum  VolunteerSortField
+{   
+    Id,
+    Name,
+    Phone,
+    Distance,
+    Status,
     CallType,
     FinishType
 }
