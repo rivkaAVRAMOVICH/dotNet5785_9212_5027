@@ -22,10 +22,10 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Label Content="Select Semester:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
-            <ComboBox x:Name="CallComboBox" Grid.Column="1"
+            <Label Content="Select Assignment:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+            <ComboBox x:Name="AssignmentComboBox" Grid.Column="1"
                 ItemsSource="{Binding Source={StaticResource AssignmentCollectionKey}}"
-                SelectionChanged="CallComboBox_SelectionChanged"
+                SelectionChanged="AssignmentComboBox_SelectionChanged"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="150"/>
         </Grid>
         <ListView Grid.Row="1" ItemsSource="{Binding Path=AssignmentList}"></ListView>

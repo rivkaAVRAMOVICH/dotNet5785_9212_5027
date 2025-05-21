@@ -22,6 +22,16 @@ namespace PL.Call
         public CallListWindow()
         {
             InitializeComponent();
+            this.DataContext = new
+            {
+                CallCollection = new PL.Enums.CallCollection()
+            };
         }
+
+        private void CallComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedCall = CallComboBox.SelectedItem;
+        }
+
     }
 }

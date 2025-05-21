@@ -22,6 +22,15 @@ namespace PL.Assignment
         public AssignmentListWindow()
         {
             InitializeComponent();
+            this.DataContext = new
+            {
+                AssignmentCollection = new PL.Enums.AssignmentCollection()
+            };
+        }
+
+        private void AssignmentComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedAssignment = AssignmentComboBox.SelectedItem;
         }
     }
 }

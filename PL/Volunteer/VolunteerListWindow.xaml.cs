@@ -22,7 +22,16 @@ namespace PL.Volunteer
         public VolunteerListWindow()
         {
             InitializeComponent();
-            this.DataContext = new VolunteerListWindow();
+            this.DataContext = new
+            {
+                VolunteerCollection = new PL.Enums.VolunteerCollection()
+            };
         }
+
+        private void VolunteerComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedVolunteer = VolunteerComboBox.SelectedItem;
+        }
+
     }
 }
