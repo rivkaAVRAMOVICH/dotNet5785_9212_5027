@@ -26,7 +26,8 @@
             <ComboBox x:Name="AssignmentComboBox" Grid.Column="1"
                 ItemsSource="{Binding Source={StaticResource AssignmentCollectionKey}}"
                 SelectionChanged="AssignmentComboBox_SelectionChanged"
-                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="150"/>
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="150"
+                SelectedValue="{Binding SelectedAssignment, Mode=TwoWay}"/>
         </Grid>
         <ListView Grid.Row="1" ItemsSource="{Binding Path=AssignmentList}"></ListView>
         <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100"/>

@@ -1,7 +1,9 @@
 ﻿<Window x:Class="PL.Volunteer.VolunteerListWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Volunteer list window" Height="450" Width="800">
+        Title="Volunteer list window" Height="450" Width="800"
+            Loaded="Window_Loaded"
+    DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <Window.Resources>
         <CollectionViewSource x:Key="VolunteerCollectionKey" Source="{Binding VolunteerCollection}" />
     </Window.Resources>
@@ -19,12 +21,44 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Content="Select Volunteer:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
-            <ComboBox x:Name="VolunteerComboBox" Grid.Column="1" 
+            <ComboBox Grid.Column="1" 
           ItemsSource="{Binding Source={StaticResource VolunteerCollectionKey}}"
           SelectionChanged="VolunteerComboBox_SelectionChanged"
-          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="150"/>
+          HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch" Width="150"
+                      SelectedValue="{Binding SelectedVolunteer, Mode=TwoWay}"
+          />
         </Grid>
-        <ListView Grid.Row="1" ItemsSource="{Binding Path=VolunteerList}"></ListView>
-        <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100"/>
+        <ListView Grid.Row="1" ItemsSource="{Binding Path=VolunteerList}">
+            <ListView.View>
+                <GridView>
+                    <!-- עמודת טקסט רגילה -->
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}" />
+                    <GridViewColumn Header="Id call in progress" DisplayMemberBinding="{Binding IdCallInProgress}" />
+                    <GridViewColumn Header="Sum of expired calls" DisplayMemberBinding="{Binding SumOfExpiredCalls}" />
+                    <GridViewColumn Header="Sum canceled calls" DisplayMemberBinding="{Binding SumCanceledCalls }" />
+                    <GridViewColumn Header="Sum of handle calls" DisplayMemberBinding="{Binding SumOfHandleCalls}" />
+                    <!-- עמודה עם טקסט צבעוני -->
+                    <GridViewColumn Header="Type call in progress">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TypeCallInProgress}" Foreground="DarkBlue" FontWeight="Bold" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- עמודה בוליאנית עם CheckBox -->
+                    <GridViewColumn Header="Active">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsActive}" IsEnabled="False" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100" Click="btnAdd_Click"/>
     </Grid>
 </Window>

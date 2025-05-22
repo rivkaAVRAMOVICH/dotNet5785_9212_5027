@@ -7,5 +7,7 @@
         <CollectionViewSource x:Key="AssignmentCollectionKey" Source="{Binding AssignmentCollection}" />
         <CollectionViewSource x:Key="callCollectionKey" Source="{Binding CallCollection}" />
         <CollectionViewSource x:Key="VolunteerCollectionKey" Source="{Binding VolunteerCollection}" />
+        <CollectionViewSource x:Key="RolesCollectionKey" Source="{Binding RolesCollection}" />
+        <CollectionViewSource x:Key="DistanceTypesCollectionKey" Source="{Binding DistanceTypesCollection}" />
     </Application.Resources>
 </Application>

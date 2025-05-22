@@ -17,8 +17,10 @@ namespace PL.Call
     /// <summary>
     /// Interaction logic for CallWindow.xaml
     /// </summary>
+   
     public partial class CallWindow : Window
     {
+        public BO.CallType SelectedCall { get; set; } = BO.CallType.none;
         public CallWindow()
         {
             InitializeComponent();

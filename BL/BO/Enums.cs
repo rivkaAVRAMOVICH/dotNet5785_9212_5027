@@ -3,14 +3,16 @@
 public enum Role
 {
     manager,
-    volunteer
+    volunteer,
+    None
 }
 
 public enum TypeOfDistance
 {
     Air,
     Walking,
-    Driving
+    Driving,
+    None
 }
 
 public enum CallType

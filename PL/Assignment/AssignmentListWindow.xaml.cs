@@ -19,18 +19,36 @@ namespace PL.Assignment
     /// </summary>
     public partial class AssignmentListWindow : Window
     {
+        static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+        public BO.CallType SelectedAssignment { get; set; } = BO.CallType.none;
         public AssignmentListWindow()
         {
             InitializeComponent();
             this.DataContext = new
             {
-                AssignmentCollection = new PL.Enums.AssignmentCollection()
+                AssignmentCollection = new PL.AssignmentCollection()
             };
         }
+        //private IEnumerable<BO.Assignment> _assignmentList;
+        //public IEnumerable<BO.Assignment> AssignmentList
+        //{
+        //    get => _assignmentList;
+        //    set
+        //    {
+        //        _assignmentList = value;
+        //        OnPropertyChanged(nameof(AssignmentList));
+        //    }
+        //}
 
         private void AssignmentComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectedAssignment = AssignmentComboBox.SelectedItem;
+
+            //var selectedAssignment = AssignmentComboBox.SelectedItem;
+             var AssignmentList = (SelectedAssignment == BO.CallType.none)
+       ? s_bl?.Call.GetCallsList()!
+       : s_bl?.Call.GetCallsList(null, BO.CallType.cooking, SelectedAssignment)!;
+
         }
+
     }
 }

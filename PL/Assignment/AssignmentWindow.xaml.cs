@@ -19,6 +19,7 @@ namespace PL.Assignment
     /// </summary>
     public partial class AssignmentWindow : Window
     {
+        public BO.CallType SelectedAssignment { get; set; } = BO.CallType.none;
         public AssignmentWindow()
         {
             InitializeComponent();

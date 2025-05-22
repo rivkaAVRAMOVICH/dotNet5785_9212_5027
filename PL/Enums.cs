@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace PL
 {
-    internal class Enums
-    {
+ 
         internal class AssignmentCollection : IEnumerable
         {
             static readonly IEnumerable<BO.AssignmentSortField> s_enums =
@@ -29,5 +28,23 @@ namespace PL
                 (System.Enum.GetValues(typeof(BO.VolunteerSortField)) as IEnumerable<BO.VolunteerSortField>)!;
             public IEnumerator GetEnumerator() => s_enums.GetEnumerator();
         }
-    }
+        internal class RolesEnumCollection : IEnumerable
+        {
+            static readonly IEnumerable<BO.Role> s_positions =
+                (Enum.GetValues(typeof(BO.Role)) as IEnumerable<BO.Role>)!;
+
+            public IEnumerator GetEnumerator() => s_positions.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Collection for DistanceTypeEnum values, used in ComboBox binding for distance preferences
+        /// </summary>
+        internal class DistanceTypeEnumCollection : IEnumerable
+        {
+            static readonly IEnumerable<BO.TypeOfDistance> s_distanceTypes =
+                (Enum.GetValues(typeof(BO.TypeOfDistance)) as IEnumerable<BO.TypeOfDistance>)!;
+
+            public IEnumerator GetEnumerator() => s_distanceTypes.GetEnumerator();
+        }
+    
 }

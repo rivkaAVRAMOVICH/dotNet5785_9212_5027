@@ -203,24 +203,24 @@ namespace PL
             }
         }
 
-        public IEnumerable<BO.CallInList> AssignmentList
-        {
-            get { return (IEnumerable<BO.CallInList>)GetValue(CallListProperty); }
-            set { SetValue(CallListProperty, value); }
-        }
+        //public IEnumerable<BO.CallInList> AssignmentList
+        //{
+        //    get { return (IEnumerable<BO.CallInList>)GetValue(CallListProperty); }
+        //    set { SetValue(CallListProperty, value); }
+        //}
 
-        public static readonly DependencyProperty CallListProperty =
-            DependencyProperty.Register("CallList", typeof(IEnumerable<BO.CallInList>),
-                                        typeof(CallListWindow), new PropertyMetadata(null));
+        //public static readonly DependencyProperty CallListProperty =
+        //    DependencyProperty.Register("CallList", typeof(IEnumerable<BO.CallInList>),
+        //                                typeof(CallListWindow), new PropertyMetadata(null));
 
-        public IEnumerable<BO.VolunteerInList> VolunteerList
-        {
-            get { return (IEnumerable<BO.VolunteerInList>)GetValue(VolunteerListProperty); }
-            set { SetValue(VolunteerListProperty, value); }
-        }
+        //public IEnumerable<BO.VolunteerInList> VolunteerList
+        //{
+        //    get { return (IEnumerable<BO.VolunteerInList>)GetValue(VolunteerListProperty); }
+        //    set { SetValue(VolunteerListProperty, value); }
+        //}
 
-        public static readonly DependencyProperty VolunteerListProperty =
-            DependencyProperty.Register("VolunteerList", typeof(IEnumerable<BO.VolunteerInList>),
-                                        typeof(VolunteerListWindow), new PropertyMetadata(null));
+        //public static readonly DependencyProperty VolunteerListProperty =
+        //    DependencyProperty.Register("VolunteerList", typeof(IEnumerable<BO.VolunteerInList>),
+        //                                typeof(VolunteerListWindow), new PropertyMetadata(null));
     }
 }

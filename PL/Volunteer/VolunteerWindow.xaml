@@ -5,24 +5,73 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Volunteer"
         mc:Ignorable="d"
-        Title="Volunteer window" Height="640" Width="800">
+        Title="Volunteer window" Height="640" Width="800"
+         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
     <!--External Grid-->
-    <Grid>
+    <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="500*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <!--Internal, Upper Grid-->
-        <Grid HorizontalAlignment="Stretch" Height="auto" Grid.Row="0" VerticalAlignment="Stretch" Width="auto">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Label Content="Select Semester:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
-            <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!-- ID -->
+        <Label Content="ID:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="5"
+       Text="{Binding Volunteer.Id, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnExceptions=True}"
+       IsReadOnly="{Binding ButtonText}"/>
+
+
+        <!-- Name -->
+        <Label Content="Name:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Name, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Margin="5"/>
+
+        <!-- PhoneNumber -->
+        <Label Content="Phone:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Phone, Mode=TwoWay}" Grid.Row="2" Grid.Column="1" Margin="5"/>
+
+        <!-- Email -->
+        <Label Content="Email:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Email, Mode=TwoWay}" Grid.Row="3" Grid.Column="1" Margin="5"/>
+
+        <!-- Password -->
+        <Label Content="Password:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Password, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" Margin="5"/>
+
+        <!-- Address -->
+        <Label Content="Address:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Address, Mode=TwoWay}" Grid.Row="5" Grid.Column="1" Margin="5"/>
+
+        <!-- Position Enum -->
+        <Label Content="Role:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <ComboBox ItemsSource="{Binding Source={StaticResource RolesCollectionKey}}"
+                SelectedItem="{Binding Volunteer.Role, Mode=TwoWay}"
+                Grid.Row="6" Grid.Column="1" Margin="5"/>
+
+        <!-- Distance Enum -->
+        <Label Content="Distance Type:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <ComboBox ItemsSource="{Binding Source={StaticResource DistanceTypesCollectionKey}}"
+                SelectedItem="{Binding Volunteer.TypeOfDistance, Mode=TwoWay}"
+                Grid.Row="7" Grid.Column="1" Margin="5"/>
+
+        <!-- Max Distance -->
+        <Label Content="Max Distance:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.MaxDistance, Mode=TwoWay}" Grid.Row="8" Grid.Column="1" Margin="5"/>
+
+        <!-- Submit Button -->
+        <Button Content="{Binding ButtonText}" Click="btnAddUpdate_Click"
+              Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2"
+              Height="40" Margin="5"/>
         </Grid>
-        <ListView Grid.Row="1"></ListView>
-        <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100"/>
-    </Grid>
 </Window>

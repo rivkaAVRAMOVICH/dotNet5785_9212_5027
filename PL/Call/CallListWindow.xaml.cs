@@ -19,18 +19,24 @@ namespace PL.Call
     /// </summary>
     public partial class CallListWindow : Window
     {
+        static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+     
+        public BO.CallType SelectedCall { get; set; } = BO.CallType.none;
         public CallListWindow()
         {
             InitializeComponent();
             this.DataContext = new
             {
-                CallCollection = new PL.Enums.CallCollection()
+                CallCollection = new PL.CallCollection()
             };
         }
 
         private void CallComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectedCall = CallComboBox.SelectedItem;
+            //var selectedCall = CallComboBox.SelectedItem;
+            var CallList = (SelectedCall == BO.CallType.none)
+? s_bl?.Call.GetCallsList()!
+: s_bl?.Call.GetCallsList(null, BO.CallType.cooking, SelectedCall)!;
         }
 
     }
