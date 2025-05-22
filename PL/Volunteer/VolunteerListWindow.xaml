@@ -29,7 +29,10 @@
                       SelectedValue="{Binding SelectedVolunteer, Mode=TwoWay}"
           />
         </Grid>
-        <ListView Grid.Row="1" ItemsSource="{Binding Path=VolunteerList}">
+        <ListView Grid.Row="1"
+          ItemsSource="{Binding Path=VolunteerList}"
+          SelectedItem="{Binding SelectedVolunteerInList}"
+          MouseDoubleClick="lsvVolunteersList_MouseDoubleClick">
             <ListView.View>
                 <GridView>
                     <!-- עמודת טקסט רגילה -->

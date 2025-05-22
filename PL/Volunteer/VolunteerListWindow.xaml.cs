@@ -21,6 +21,8 @@ namespace PL.Volunteer
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
         public BO.CallType SelectedVolunteer { get; set; } = BO.CallType.none;
+        public BO.VolunteerInList? SelectedVolunteerInList { get; set; }
+
         public VolunteerListWindow()
         {
             InitializeComponent();
@@ -29,6 +31,14 @@ namespace PL.Volunteer
                 VolunteerCollection = new PL.VolunteerCollection()
             };
         }
+        private void lsvVolunteersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (SelectedVolunteerInList != null)
+            {
+                new VolunteerWindow(SelectedVolunteerInList.Id).Show();
+            }
+        }
+
         public static readonly DependencyProperty VolunteerListProperty =
     DependencyProperty.Register("VolunteerList", typeof(IEnumerable<BO.VolunteerInList>), typeof(VolunteerListWindow), new PropertyMetadata(null));
         public IEnumerable<BO.VolunteerInList> VolunteerList
@@ -66,5 +76,4 @@ namespace PL.Volunteer
         }
     }
    
-
     }

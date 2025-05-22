@@ -86,11 +86,7 @@ Volunteer = null;
                 };
             }
 
-
-
             // טיפול בלחיצה על כפתור Add/Update
-
-
 
         }
         private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
