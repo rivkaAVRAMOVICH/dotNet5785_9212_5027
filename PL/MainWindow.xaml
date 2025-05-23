@@ -5,12 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
-        Title="Main window" Height="450" Width="800"
+        Title="Main window" Height="500" Width="800"
         Loaded="MainWindow_Loaded"
         Closed="MainWindow_Closed"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 
-        <Grid Margin="10">
+    <Window.Resources>
+        <SolidColorBrush x:Key="SoftPink" Color="#FFE6E6FA"/>
+        <SolidColorBrush x:Key="SoftBlue" Color="#FFDDF3FF"/>
+        <SolidColorBrush x:Key="BorderColor" Color="#FFB0C4DE"/>
+        <Style TargetType="GroupBox">
+            <Setter Property="Background" Value="{StaticResource SoftBlue}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#FFFDEFF3"/>
+            <Setter Property="BorderBrush" Value="#FFB0C4DE"/>
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFB0C4DE"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Margin" Value="5,0,5,5"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="{StaticResource SoftPink}" Margin="10">
         <!-- Define two main rows in the main layout -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -19,19 +42,16 @@
 
         <!-- System Clock Section -->
         <GroupBox Header="System Clock" Grid.Row="0" Margin="0,0,0,10">
-            
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
-
                 <!-- Label to display the current system time -->
                 <Label Content="{Binding CurrentTime}" FontSize="16" FontWeight="Bold" Margin="0,0,20,0"/>
 
                 <!-- Buttons to advance the time -->
-                <Button Content="Add Minute" Click="btnAddOneMinute_Click" Margin="5"/>
-                <Button Content="Add Hour" Click="btnAddOneHour_Click" Margin="5"/>
-                <Button Content="Add Day" Click="btnAddOneDay_Click" Margin="5"/>
-                <Button Content="Add Month" Click="btnAddOneMonth_Click" Margin="5"/>
-                <Button Content="Add Year" Click="btnAddOneYear_Click" Margin="5"/>
-                
+                <Button Content="Add Minute" Click="btnAddOneMinute_Click"/>
+                <Button Content="Add Hour" Click="btnAddOneHour_Click"/>
+                <Button Content="Add Day" Click="btnAddOneDay_Click"/>
+                <Button Content="Add Month" Click="btnAddOneMonth_Click"/>
+                <Button Content="Add Year" Click="btnAddOneYear_Click"/>
             </StackPanel>
         </GroupBox>
 
@@ -45,32 +65,26 @@
             <!-- Configuration Variables Section -->
             <GroupBox Header="Configuration Variables" Grid.Row="0" Margin="0,0,0,10">
                 <StackPanel Margin="10">
-
                     <!-- Configuration variable 1 -->
                     <TextBox Text="{Binding MaxYearRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
-
                     <!-- Button to update the configuration variable in the database -->
-                    <Button Content="Update Max Range" Width="200" Margin="0,5" Click="btnUpdateMaxRange_Click"/>
-                    <Button Content="Update Configuration" Width="200" Margin="0,5"/>
-                    
+                    <Button Content="Update Max Range" Width="200" Click="btnUpdateMaxRange_Click"/>
+                    <Button Content="Update Configuration" Width="200"/>
                 </StackPanel>
             </GroupBox>
 
             <!-- Action Buttons -->
             <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="10">
-
                 <!-- Button to initialize the database with initial data -->
-                <Button x:Name="btnInitializeDB" Content="Initialize Database" Width="200" Margin="0,5" Click="btnInitializeDB_Click"/>
+                <Button x:Name="btnInitializeDB" Content="Initialize Database" Width="200" Click="btnInitializeDB_Click"/>
                 <!-- Button to reset the database (clear all data) -->
-                <Button x:Name="btnResetDB" Content="Reset Database" Width="200" Margin="0,5" Click="btnResetDB_Click"/>
-
+                <Button x:Name="btnResetDB" Content="Reset Database" Width="200" Click="btnResetDB_Click"/>
 
                 <!-- Button to open list windows -->
-                <Button Content="Show Assignment List" Width="200" Margin="0,5" Click="btnAssignment_Click"/>
-                <Button Content="Show Call List" Width="200" Margin="0,5" Click="btnCall_Click"/>
-                <Button Content="Show Volunteer List" Width="200" Margin="0,5" Click="btnVolunteer_Click"/>
-
+                <Button Content="Show Assignment List" Width="200" Click="btnAssignment_Click"/>
+                <Button Content="Show Call List" Width="200" Click="btnCall_Click"/>
+                <Button Content="Show Volunteer List" Width="200" Click="btnVolunteer_Click"/>
             </StackPanel>
         </Grid>
     </Grid>

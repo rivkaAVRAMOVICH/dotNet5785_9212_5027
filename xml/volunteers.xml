@@ -1,17 +1,2 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ArrayOfVolunteer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Volunteer>
-    <Id>214915027</Id>
-    <FullName>Shanis</FullName>
-    <PhoneNumber>0534107188</PhoneNumber>
-    <Email>s@gmail.com</Email>
-    <Active>false</Active>
-    <Role>manager</Role>
-    <DistanceType>aerialDistance</DistanceType>
-    <Password>JzPv46/nDYGjostGkCdx9hwCRjq1XZWe/r+fz5BBJi4=</Password>
-    <FullAddress>aba 3</FullAddress>
-    <Latitude>46.8910802</Latitude>
-    <Longitude>29.4581968</Longitude>
-    <MaxDistance xsi:nil="true" />
-  </Volunteer>
-</ArrayOfVolunteer>
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfVolunteer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />

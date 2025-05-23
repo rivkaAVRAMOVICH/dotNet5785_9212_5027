@@ -5,13 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL.Volunteer"
         mc:Ignorable="d"
-        Title="Volunteer window" Height="640" Width="800"
-         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+        Title="Volunteer Window" Height="640" Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+
+    <!-- Resources for ComboBoxes -->
     <Window.Resources>
-        <CollectionViewSource x:Key="RolesCollectionKey"/>
-        <CollectionViewSource x:Key="DistanceTypesCollectionKey"/>
+        <CollectionViewSource x:Key="RolesCollectionKey" />
+        <CollectionViewSource x:Key="DistanceTypesCollectionKey" />
     </Window.Resources>
-    <!--External Grid-->
+
+    <!-- Main Layout Grid -->
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -25,56 +28,56 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <!-- ID -->
+
+        <!-- Volunteer ID -->
         <Label Content="ID:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <TextBox Grid.Row="0" Grid.Column="1" Margin="5"
-       Text="{Binding Volunteer.Id, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnExceptions=True}"
-       IsReadOnly="{Binding IsUpdateMode}"/>
+                 Text="{Binding Volunteer.Id, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnExceptions=True}"
+                 IsReadOnly="{Binding IsUpdateMode}"/>
 
-
-        <!-- Name -->
+        <!-- Volunteer Name -->
         <Label Content="Name:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <TextBox Text="{Binding Volunteer.Name, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Margin="5"/>
 
-        <!-- PhoneNumber -->
+        <!-- Volunteer Phone -->
         <Label Content="Phone:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <TextBox Text="{Binding Volunteer.Phone, Mode=TwoWay}" Grid.Row="2" Grid.Column="1" Margin="5"/>
 
-        <!-- Email -->
+        <!-- Volunteer Email -->
         <Label Content="Email:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <TextBox Text="{Binding Volunteer.Email, Mode=TwoWay}" Grid.Row="3" Grid.Column="1" Margin="5"/>
 
-        <!-- Password -->
+        <!-- Volunteer Password -->
         <Label Content="Password:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <TextBox Text="{Binding Volunteer.Password, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" Margin="5"/>
 
-        <!-- Address -->
+        <!-- Volunteer Address -->
         <Label Content="Address:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <TextBox Text="{Binding Volunteer.Address, Mode=TwoWay}" Grid.Row="5" Grid.Column="1" Margin="5"/>
 
-        <!-- Position Enum -->
+        <!-- Role Enum -->
         <Label Content="Role:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <ComboBox ItemsSource="{Binding Source={StaticResource RolesCollectionKey}}"
-                SelectedItem="{Binding Volunteer.Role, Mode=TwoWay}"
-                Grid.Row="6" Grid.Column="1" Margin="5"/>
-        <!-- Distance Enum -->
+                  SelectedItem="{Binding Volunteer.Role, Mode=TwoWay}"
+                  Grid.Row="6" Grid.Column="1" Margin="5"/>
+
+        <!-- Distance Type Enum -->
         <Label Content="Distance Type:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <ComboBox ItemsSource="{Binding Source={StaticResource DistanceTypesCollectionKey}}"
-                SelectedItem="{Binding Volunteer.TypeOfDistance, Mode=TwoWay}"
-                Grid.Row="7" Grid.Column="1" Margin="5"/>
+                  SelectedItem="{Binding Volunteer.TypeOfDistance, Mode=TwoWay}"
+                  Grid.Row="7" Grid.Column="1" Margin="5"/>
 
-        <!-- Max Distance -->
+        <!-- Max Distance Value -->
         <Label Content="Max Distance:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <TextBox Text="{Binding Volunteer.MaxDistance, Mode=TwoWay}" Grid.Row="8" Grid.Column="1" Margin="5"/>
 
         <!-- Submit Button -->
         <Button Content="{Binding ButtonText}" Click="btnAddUpdate_Click"
-              Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2"
-              Height="40" Margin="5"/>
-        </Grid>
+                Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2"
+                Height="40" Margin="5"/>
+    </Grid>
 </Window>
