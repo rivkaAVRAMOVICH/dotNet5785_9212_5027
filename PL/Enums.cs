@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace PL
 {
- 
         internal class AssignmentCollection : IEnumerable
         {
             static readonly IEnumerable<BO.AssignmentSortField> s_enums =
@@ -46,5 +45,4 @@ namespace PL
 
             public IEnumerator GetEnumerator() => s_distanceTypes.GetEnumerator();
         }
-    
 }

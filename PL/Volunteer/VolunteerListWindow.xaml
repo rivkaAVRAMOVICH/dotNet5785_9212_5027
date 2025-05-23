@@ -4,9 +4,11 @@
         Title="Volunteer list window" Height="450" Width="800"
             Loaded="Window_Loaded"
     DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+
     <Window.Resources>
         <CollectionViewSource x:Key="VolunteerCollectionKey" Source="{Binding VolunteerCollection}" />
     </Window.Resources>
+    
     <!--External Grid-->
     <Grid>
         <Grid.RowDefinitions>
@@ -20,14 +22,13 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Label Content="Select Volunteer:" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5"/>
+            <Label Content="Select Volunteer:" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-400,0,0,0"/>
             <ComboBox Grid.Column="1" 
-          ItemsSource="{Binding Source={StaticResource VolunteerCollectionKey}}"
-          SelectionChanged="VolunteerComboBox_SelectionChanged"
-          HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch" Width="150"
-                      SelectedValue="{Binding SelectedVolunteer, Mode=TwoWay}"
-          />
+                ItemsSource="{Binding Source={StaticResource VolunteerCollectionKey}}"
+                SelectionChanged="VolunteerComboBox_SelectionChanged"
+                HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch" Width="150"
+                            SelectedValue="{Binding SelectedVolunteer, Mode=TwoWay}"/> 
         </Grid>
         <ListView Grid.Row="1"
           ItemsSource="{Binding Path=VolunteerList}"
@@ -56,6 +57,16 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <CheckBox IsChecked="{Binding IsActive}" IsEnabled="False" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <!-- עמודת מחיקה -->
+                    <GridViewColumn Header="Actions">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Delete"
+                                Click="DeleteButton_Click"
+                                Tag="{Binding Id}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

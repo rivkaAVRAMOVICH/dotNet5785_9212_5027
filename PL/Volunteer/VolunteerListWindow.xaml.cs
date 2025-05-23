@@ -26,10 +26,6 @@ namespace PL.Volunteer
         public VolunteerListWindow()
         {
             InitializeComponent();
-            this.DataContext = new
-            {
-                VolunteerCollection = new PL.VolunteerCollection()
-            };
         }
         private void lsvVolunteersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -38,6 +34,37 @@ namespace PL.Volunteer
                 new VolunteerWindow(SelectedVolunteerInList.Id).Show();
             }
         }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is int volunteerId)
+            {
+                // 1. בדיקת אישור מחיקה
+                var result = MessageBox.Show($"Are you sure you want to delete volunteer with ID {volunteerId}?",
+                                             "Confirm Delete",
+                                             MessageBoxButton.YesNo,
+                                             MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        // 2. קריאה למחיקה בשכבת BL
+                        s_bl.Volunteer.DeletingVolunteer(volunteerId);
+
+                        // 3. הרענון מתבצע אוטומטית בזכות המנגנון של ה-Observer שכבר קיים
+                        MessageBox.Show("Volunteer deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        // 4. טיפול בחריגה והצגת הודעת שגיאה
+                        MessageBox.Show($"Failed to delete volunteer:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+
 
         public static readonly DependencyProperty VolunteerListProperty =
     DependencyProperty.Register("VolunteerList", typeof(IEnumerable<BO.VolunteerInList>), typeof(VolunteerListWindow), new PropertyMetadata(null));

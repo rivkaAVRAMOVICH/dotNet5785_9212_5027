@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="Volunteer window" Height="640" Width="800"
          DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+    <Window.Resources>
+        <CollectionViewSource x:Key="RolesCollectionKey"/>
+        <CollectionViewSource x:Key="DistanceTypesCollectionKey"/>
+    </Window.Resources>
     <!--External Grid-->
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -30,7 +34,7 @@
         <Label Content="ID:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <TextBox Grid.Row="0" Grid.Column="1" Margin="5"
        Text="{Binding Volunteer.Id, Mode=TwoWay, NotifyOnValidationError=True, ValidatesOnExceptions=True}"
-       IsReadOnly="{Binding ButtonText}"/>
+       IsReadOnly="{Binding IsUpdateMode}"/>
 
 
         <!-- Name -->
@@ -58,7 +62,6 @@
         <ComboBox ItemsSource="{Binding Source={StaticResource RolesCollectionKey}}"
                 SelectedItem="{Binding Volunteer.Role, Mode=TwoWay}"
                 Grid.Row="6" Grid.Column="1" Margin="5"/>
-
         <!-- Distance Enum -->
         <Label Content="Distance Type:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
         <ComboBox ItemsSource="{Binding Source={StaticResource DistanceTypesCollectionKey}}"
