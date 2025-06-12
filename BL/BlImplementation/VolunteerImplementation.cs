@@ -95,8 +95,6 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
 
         //new BO.Volunteer
         return Helpers.VolunteerManager.addNewVolunteerWithCall(tmpVolunteer);
-
-
     }
     public void UpdateVolunteerDetails(int id, BO.Volunteer volunteer)
     {

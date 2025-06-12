@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Net;
 
 
 namespace Helpers
@@ -223,6 +224,7 @@ namespace Helpers
 
                 if (!isId(v1.Id))
                     throw new InvalidException("Invalid id");
+
 
                 if (!Tools.TryGetCoordinates(v1.Address, out var coordinates))
                     throw new InvalidException("Invalid address");

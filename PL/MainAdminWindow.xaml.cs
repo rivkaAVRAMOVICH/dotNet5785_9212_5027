@@ -29,7 +29,7 @@ namespace PL
         DispatcherTimer simulatorTimer = new DispatcherTimer();
         bool isSimulatorRunning = false;
         public event PropertyChangedEventHandler? PropertyChanged;
-
+        private readonly DispatcherTimer clockTimer = new DispatcherTimer();
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
@@ -39,13 +39,13 @@ namespace PL
             InitializeComponent();
             DataContext = this;
             //Start updating time
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
-            timer.Tick += (s, e) =>
+            //DispatcherTimer timer = new DispatcherTimer();
+            clockTimer.Interval = TimeSpan.FromSeconds(1);
+            clockTimer.Tick += (s, e) =>
             {
                 CurrentTime = s_bl.Admin.GetClock().ToString("HH:mm:ss dd/MM/yyyy");
             };
-            timer.Start();
+            clockTimer.Start();
             this.Loaded += MainAdminWindow_Loaded;
             simulatorTimer.Interval = TimeSpan.FromMilliseconds(1000);
             simulatorTimer.Tick += SimulatorTimer_Tick;
@@ -196,7 +196,8 @@ namespace PL
         }
         private void MainAdminWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            CurrentTime = CurrentTime = s_bl.Admin.GetClock().ToString("HH:mm:ss dd/MM/yyyy");
+
+           CurrentTime = CurrentTime = s_bl.Admin.GetClock().ToString("HH:mm:ss dd/MM/yyyy");
             MaxYearRange = s_bl.Admin.GetRiskTimeRange();
             s_bl.Admin.AddClockObserver(ClockObserver);
             s_bl.Admin.AddConfigObserver(ConfigObserver);
@@ -210,7 +211,7 @@ namespace PL
         }
         private void btnAssignment_Click(object sender, RoutedEventArgs e)
         {
-            new VolunteerManagementWindow().Show();
+            new VolunteersManagementWindow().Show();
         }
 
         private void btnCall_Click(object sender, RoutedEventArgs e)

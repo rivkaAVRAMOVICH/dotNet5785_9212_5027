@@ -1,27 +1,98 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BO;
+using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PL
 {
-    /// <summary>
-    /// Interaction logic for VolunteerManagementWindow.xaml
-    /// </summary>
     public partial class VolunteerManagementWindow : Window
     {
-        public VolunteerManagementWindow()
+        static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+
+        public VolunteerManagementWindow(int volunteerId)
         {
             InitializeComponent();
+
+            // מילוי ComboBoxes עם ערכי ה־Enums שכבר קיימים
+            if (Resources["RolesCollectionKey"] is CollectionViewSource rolesSource)
+                rolesSource.Source = Enum.GetValues(typeof(Role));
+            if (Resources["DistanceTypesCollectionKey"] is CollectionViewSource distanceSource)
+                distanceSource.Source = Enum.GetValues(typeof(TypeOfDistance));
+
+            // שליפת המתנדב לפי ID
+            Volunteer = s_bl.Volunteer.GetVolunteerDetails(volunteerId);
+
+            if (Volunteer == null)
+            {
+                MessageBox.Show("Volunteer not found");
+                Close(); // או זרוק חריגה, או משהו אחר בהתאם להקשר
+                return;
+            }
+            IsUpdateMode = true;
+            ButtonText = "Update";
+
+            DataContext = this;
+
+            Loaded += (_, __) => s_bl.Volunteer.AddObserver(Volunteer.Id, VolunteerObserver);
+            Closed += (_, __) => s_bl.Volunteer.RemoveObserver(Volunteer.Id, VolunteerObserver);
+        }
+
+        public BO.Volunteer Volunteer
+        {
+            get => (BO.Volunteer)GetValue(VolunteerProperty);
+            set => SetValue(VolunteerProperty, value);
+        }
+        public static readonly DependencyProperty VolunteerProperty =
+            DependencyProperty.Register("Volunteer", typeof(BO.Volunteer), typeof(VolunteerManagementWindow));
+
+        public string ButtonText
+        {
+            get => (string)GetValue(ButtonTextProperty);
+            set => SetValue(ButtonTextProperty, value);
+        }
+        public static readonly DependencyProperty ButtonTextProperty =
+            DependencyProperty.Register("ButtonText", typeof(string), typeof(VolunteerManagementWindow));
+
+        public bool IsUpdateMode
+        {
+            get => (bool)GetValue(IsUpdateModeProperty);
+            set => SetValue(IsUpdateModeProperty, value);
+        }
+        public static readonly DependencyProperty IsUpdateModeProperty =
+            DependencyProperty.Register("IsUpdateMode", typeof(bool), typeof(VolunteerManagementWindow));
+
+        private void VolunteerObserver()
+        {
+            int id = Volunteer.Id;
+            Volunteer = s_bl.Volunteer.GetVolunteerDetails(id);
+        }
+
+        private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                s_bl.Volunteer.UpdateVolunteerDetails(Volunteer.Id, Volunteer);
+                MessageBox.Show("Volunteer updated successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error occurred:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void btnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                s_bl.Volunteer.DeletingVolunteer(Volunteer.Id);
+                MessageBox.Show("Volunteer deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                this.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Cannot delete volunteer:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
     }
 }

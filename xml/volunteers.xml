@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfVolunteer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Volunteer>
     <Id>319254109</Id>
@@ -55,20 +55,6 @@
     <Latitude>32.0858</Latitude>
     <Longitude>34.7832</Longitude>
     <MaxDistance>51</MaxDistance>
-  </Volunteer>
-  <Volunteer>
-    <Id>232198356</Id>
-    <FullName>Dina Klein</FullName>
-    <PhoneNumber>0548309742</PhoneNumber>
-    <Email>0548309742@gmail.com</Email>
-    <Active>false</Active>
-    <Role>volunteer</Role>
-    <DistanceType>aerialDistance</DistanceType>
-    <Password>Dina2321)</Password>
-    <FullAddress>Herzl Street 22</FullAddress>
-    <Latitude>32.0837</Latitude>
-    <Longitude>34.7814</Longitude>
-    <MaxDistance>70</MaxDistance>
   </Volunteer>
   <Volunteer>
     <Id>250831183</Id>
