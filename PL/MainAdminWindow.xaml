@@ -1,0 +1,121 @@
+﻿<Window x:Class="PL.MainAdminWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PL"
+        mc:Ignorable="d"
+        Title="MainAdminWindow" Height="630" Width="800"
+    Loaded="MainAdminWindow_Loaded"
+        Closed="MainAdminWindow_Closed"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+
+        <Window.Resources>
+            <SolidColorBrush x:Key="SoftPink" Color="#FFE6E6FA"/>
+            <SolidColorBrush x:Key="SoftBlue" Color="#FFDDF3FF"/>
+            <SolidColorBrush x:Key="BorderColor" Color="#FFB0C4DE"/>
+            <Style TargetType="GroupBox">
+                <Setter Property="Background" Value="{StaticResource SoftBlue}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Padding" Value="10"/>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="Background" Value="#FFFDEFF3"/>
+                <Setter Property="BorderBrush" Value="#FFB0C4DE"/>
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="Background" Value="White"/>
+                <Setter Property="BorderBrush" Value="#FFB0C4DE"/>
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="Margin" Value="5,0,5,5"/>
+            </Style>
+        </Window.Resources>
+
+        <Grid Background="{StaticResource SoftPink}" Margin="10">
+            <!-- Define two main rows in the main layout -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+            <!-- System Clock Section -->
+            <GroupBox Header="System Clock" Grid.Row="0" Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
+                    <!-- Label to display the current system time -->
+                    <Label Content="{Binding CurrentTime}" FontSize="16" FontWeight="Bold" Margin="0,0,20,0"/>
+
+                    <!-- Buttons to advance the time -->
+                    <Button Content="Add Minute" Click="btnAddOneMinute_Click"/>
+                    <Button Content="Add Hour" Click="btnAddOneHour_Click"/>
+                    <Button Content="Add Day" Click="btnAddOneDay_Click"/>
+                    <Button Content="Add Month" Click="btnAddOneMonth_Click"/>
+                    <Button Content="Add Year" Click="btnAddOneYear_Click"/>
+                <Button Content="Clock initialization" Click="btnClockInitialization_Click"/>
+            </StackPanel>
+            </GroupBox>
+
+            <!-- Bottom section: Configuration variables + Navigation buttons -->
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Configuration Variables Section -->
+                <GroupBox Header="Configuration Variables" Grid.Row="0" Margin="0,0,0,10">
+                    <StackPanel Margin="10">
+                        <!-- Configuration variable 1 -->
+                        <TextBox Text="{Binding MaxYearRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                        <!-- Button to update the configuration variable in the database -->
+                    <Button Content="Update Max Range" Width="200" Click="btnUpdateMaxRange_Click"/>
+                </StackPanel>
+                </GroupBox>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="10">
+                    <!-- Button to initialize the database with initial data -->
+                    <Button x:Name="btnInitializeDB" Content="Initialize Database" Width="200" Click="btnInitializeDB_Click"/>
+                    <!-- Button to reset the database (clear all data) -->
+                    <Button x:Name="btnResetDB" Content="Reset Database" Width="200" Click="btnResetDB_Click"/>
+                <Button x:Name="btnResetConfiguration" Content="Reset configuration" Width="200" Click="btnResetConfiguration_Click"/>
+                <!-- Button to open list windows -->
+                <Button Content="Volunteer management" Width="200" Click="btnAssignment_Click"/>
+                <Button Content="Call Management" Width="200" Click="btnShowCallStats_Click"/>
+            </StackPanel>
+            
+        </Grid>
+        <GroupBox Header="Call Counts by Status" Grid.Row="2" Margin="0,10,0,10">
+            <ItemsControl ItemsSource="{Binding CallsByStatus}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <TextBlock Text="{Binding Status}" FontWeight="Bold" Margin="0,0,10,0"/>
+                            <Button Content="{Binding Count}" 
+                            Tag="{Binding Status}" 
+                            Click="CallStatusButton_Click"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </GroupBox>
+        <GroupBox Header="Simulator Control" Grid.Row="3" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
+                <!-- כפתור להפעיל/לכבות סימולטור -->
+                <Button x:Name="btnToggleSimulator" Content="Start Simulator" Width="120" Click="btnToggleSimulator_Click" />
+
+                <!-- בחירת קצב סימולטור -->
+                <TextBlock Text="Speed (ms):" VerticalAlignment="Center" Margin="20,0,5,0"/>
+                <TextBox x:Name="txtSimulatorSpeed" Width="60" Text="1000" />
+
+                <!-- כפתור לעדכון הקצב -->
+                <Button Content="Set Speed" Width="80" Click="btnSetSimulatorSpeed_Click" Margin="10,0,0,0"/>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+    </Window>
+

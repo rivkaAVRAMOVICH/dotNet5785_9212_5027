@@ -1,2 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ArrayOfAssignment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+<ArrayOfAssignment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Assignment>
+    <Id>1000</Id>
+    <CallId>1003</CallId>
+    <VolunteerId>250831183</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T12:29:29</EntryTimeTreatment>
+    <FinishTimeTreatment>2025-06-12T13:30:29</FinishTimeTreatment>
+    <EndTypeAssignment>Treated</EndTypeAssignment>
+  </Assignment>
+  <Assignment>
+    <Id>1001</Id>
+    <CallId>1004</CallId>
+    <VolunteerId>282731797</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T13:22:29</EntryTimeTreatment>
+    <FinishTimeTreatment>2025-06-12T14:17:29</FinishTimeTreatment>
+    <EndTypeAssignment>AdministratorCancellation</EndTypeAssignment>
+  </Assignment>
+  <Assignment>
+    <Id>1002</Id>
+    <CallId>1009</CallId>
+    <VolunteerId>250831183</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T12:27:29</EntryTimeTreatment>
+    <FinishTimeTreatment>2025-06-12T14:10:29</FinishTimeTreatment>
+    <EndTypeAssignment>SelfCancellation</EndTypeAssignment>
+  </Assignment>
+  <Assignment>
+    <Id>1003</Id>
+    <CallId>1004</CallId>
+    <VolunteerId>222957124</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T12:55:29</EntryTimeTreatment>
+    <FinishTimeTreatment xsi:nil="true" />
+    <EndTypeAssignment xsi:nil="true" />
+  </Assignment>
+  <Assignment>
+    <Id>1004</Id>
+    <CallId>1006</CallId>
+    <VolunteerId>222957124</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T12:30:29</EntryTimeTreatment>
+    <FinishTimeTreatment>2025-06-12T14:10:29</FinishTimeTreatment>
+    <EndTypeAssignment>ExpiredCancellation</EndTypeAssignment>
+  </Assignment>
+  <Assignment>
+    <Id>1005</Id>
+    <CallId>1000</CallId>
+    <VolunteerId>319254109</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T13:01:29</EntryTimeTreatment>
+    <FinishTimeTreatment xsi:nil="true" />
+    <EndTypeAssignment xsi:nil="true" />
+  </Assignment>
+  <Assignment>
+    <Id>1006</Id>
+    <CallId>1006</CallId>
+    <VolunteerId>319254109</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T13:17:29</EntryTimeTreatment>
+    <FinishTimeTreatment>2025-06-12T14:14:29</FinishTimeTreatment>
+    <EndTypeAssignment>AdministratorCancellation</EndTypeAssignment>
+  </Assignment>
+  <Assignment>
+    <Id>1007</Id>
+    <CallId>1009</CallId>
+    <VolunteerId>282731797</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T13:16:29</EntryTimeTreatment>
+    <FinishTimeTreatment xsi:nil="true" />
+    <EndTypeAssignment xsi:nil="true" />
+  </Assignment>
+  <Assignment>
+    <Id>1008</Id>
+    <CallId>1002</CallId>
+    <VolunteerId>222957124</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T13:09:29</EntryTimeTreatment>
+    <FinishTimeTreatment xsi:nil="true" />
+    <EndTypeAssignment xsi:nil="true" />
+  </Assignment>
+  <Assignment>
+    <Id>1009</Id>
+    <CallId>1008</CallId>
+    <VolunteerId>250831183</VolunteerId>
+    <EntryTimeTreatment>2025-06-12T12:28:29</EntryTimeTreatment>
+    <FinishTimeTreatment xsi:nil="true" />
+    <EndTypeAssignment xsi:nil="true" />
+  </Assignment>
+</ArrayOfAssignment>

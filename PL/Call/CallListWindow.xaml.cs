@@ -22,7 +22,7 @@ namespace PL.Call
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
      
         public BO.CallType SelectedCall { get; set; } = BO.CallType.none;
-        public CallListWindow()
+        public CallListWindow(string? statusName = null)
         {
             InitializeComponent();
             this.DataContext = new

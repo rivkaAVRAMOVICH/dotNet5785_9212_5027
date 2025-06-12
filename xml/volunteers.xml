@@ -1,2 +1,87 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<ArrayOfVolunteer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfVolunteer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Volunteer>
+    <Id>319254109</Id>
+    <FullName>Dani Levy</FullName>
+    <PhoneNumber>0506429089</PhoneNumber>
+    <Email>0506429089@gmail.com</Email>
+    <Active>false</Active>
+    <Role>volunteer</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>Dani3192)</Password>
+    <FullAddress>Rothschild Boulevard 45</FullAddress>
+    <Latitude>32.086</Latitude>
+    <Longitude>34.7825</Longitude>
+    <MaxDistance>36</MaxDistance>
+  </Volunteer>
+  <Volunteer>
+    <Id>222957124</Id>
+    <FullName>Eli Amar</FullName>
+    <PhoneNumber>0524200613</PhoneNumber>
+    <Email>0524200613@gmail.com</Email>
+    <Active>false</Active>
+    <Role>volunteer</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>EliA2229@</Password>
+    <FullAddress>Ibn Gabirol Street 99</FullAddress>
+    <Latitude>32.0845</Latitude>
+    <Longitude>34.7801</Longitude>
+    <MaxDistance>50</MaxDistance>
+  </Volunteer>
+  <Volunteer>
+    <Id>282731797</Id>
+    <FullName>Yair Cohen</FullName>
+    <PhoneNumber>0583718837</PhoneNumber>
+    <Email>0583718837@gmail.com</Email>
+    <Active>false</Active>
+    <Role>volunteer</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>Yair2827$</Password>
+    <FullAddress>King George Street 76</FullAddress>
+    <Latitude>32.0872</Latitude>
+    <Longitude>34.7799</Longitude>
+    <MaxDistance>26</MaxDistance>
+  </Volunteer>
+  <Volunteer>
+    <Id>225415469</Id>
+    <FullName>Ariela Levin</FullName>
+    <PhoneNumber>0524660488</PhoneNumber>
+    <Email>0524660488@gmail.com</Email>
+    <Active>false</Active>
+    <Role>volunteer</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>Arie2254(</Password>
+    <FullAddress>Allenby Street 100</FullAddress>
+    <Latitude>32.0858</Latitude>
+    <Longitude>34.7832</Longitude>
+    <MaxDistance>51</MaxDistance>
+  </Volunteer>
+  <Volunteer>
+    <Id>232198356</Id>
+    <FullName>Dina Klein</FullName>
+    <PhoneNumber>0548309742</PhoneNumber>
+    <Email>0548309742@gmail.com</Email>
+    <Active>false</Active>
+    <Role>volunteer</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>Dina2321)</Password>
+    <FullAddress>Herzl Street 22</FullAddress>
+    <Latitude>32.0837</Latitude>
+    <Longitude>34.7814</Longitude>
+    <MaxDistance>70</MaxDistance>
+  </Volunteer>
+  <Volunteer>
+    <Id>250831183</Id>
+    <FullName>Shira Israelof</FullName>
+    <PhoneNumber>0585587839</PhoneNumber>
+    <Email>0585587839@gmail.com</Email>
+    <Active>false</Active>
+    <Role>volunteer</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>Shir2508#</Password>
+    <FullAddress>Ben Yehuda Street 67</FullAddress>
+    <Latitude>32.0883</Latitude>
+    <Longitude>34.7827</Longitude>
+    <MaxDistance>59</MaxDistance>
+  </Volunteer>
+</ArrayOfVolunteer>
