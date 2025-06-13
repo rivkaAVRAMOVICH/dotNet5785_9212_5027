@@ -1,0 +1,69 @@
+﻿<Window x:Class="PL.AddVolunteerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Add Volunteer" Height="450" Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+
+    <Window.Resources>
+        <CollectionViewSource x:Key="RolesCollectionKey" />
+        <CollectionViewSource x:Key="DistanceTypesCollectionKey" />
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Content="ID:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="5"
+                 Text="{Binding Volunteer.Id, Mode=TwoWay}" />
+
+        <Label Content="Name:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Name, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Margin="5"/>
+
+        <Label Content="Phone:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Phone, Mode=TwoWay}" Grid.Row="2" Grid.Column="1" Margin="5"/>
+
+        <Label Content="Email:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Email, Mode=TwoWay}" Grid.Row="3" Grid.Column="1" Margin="5"/>
+
+        <Label Content="Password:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Password, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" Margin="5"/>
+
+        <Label Content="Address:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.Address, Mode=TwoWay}" Grid.Row="5" Grid.Column="1" Margin="5"/>
+
+        <Label Content="Role:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <ComboBox ItemsSource="{Binding Source={StaticResource RolesCollectionKey}}"
+                  SelectedItem="{Binding Volunteer.Role, Mode=TwoWay}"
+                  Grid.Row="6" Grid.Column="1" Margin="5"/>
+
+        <Label Content="Distance Type:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <ComboBox ItemsSource="{Binding Source={StaticResource DistanceTypesCollectionKey}}"
+                  SelectedItem="{Binding Volunteer.TypeOfDistance, Mode=TwoWay}"
+                  Grid.Row="7" Grid.Column="1" Margin="5"/>
+
+        <Label Content="Max Distance:" Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
+        <TextBox Text="{Binding Volunteer.MaxDistance, Mode=TwoWay}" Grid.Row="8" Grid.Column="1" Margin="5"/>
+
+        <Button Content="Add" Click="btnAddUpdate_Click"
+                Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2"
+                Height="40" Margin="5"/>
+    </Grid>
+</Window>

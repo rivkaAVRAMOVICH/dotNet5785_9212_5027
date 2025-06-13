@@ -100,7 +100,7 @@ namespace PL
         }
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            new VolunteerWindow(0).Show();
+            new AddVolunteerWindow().Show();
         }
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

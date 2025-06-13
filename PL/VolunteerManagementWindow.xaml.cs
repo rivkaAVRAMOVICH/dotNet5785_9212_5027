@@ -80,19 +80,5 @@ namespace PL
                 MessageBox.Show($"An error occurred:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        private void btnDelete_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                s_bl.Volunteer.DeletingVolunteer(Volunteer.Id);
-                MessageBox.Show("Volunteer deleted successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                this.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Cannot delete volunteer:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
     }
 }

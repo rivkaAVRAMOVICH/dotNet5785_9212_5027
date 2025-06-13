@@ -115,11 +115,12 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
                     Status = CallManager.CallStatus(tmpCall),
                     CallAssignList = _dal.Assignment?.ReadAll().Where(item => item.CallId == tmpCall.Id).Select(a => new BO.CallAssignInList
                     {
+                    
                         VolunteerId = a.VolunteerId,
                         VolunteerName = _dal.Volunteer.Read(a.VolunteerId)!.FullName,
                         EntryCallTime = a.EntryTimeTreatment,
                         EndCallTime = a.FinishTimeTreatment,
-                        FinishType = (BO.FinishType)a.EndTypeAssignment
+                        FinishType = (BO.FinishType?)a.EndTypeAssignment
                     }).ToList()
                 };
 

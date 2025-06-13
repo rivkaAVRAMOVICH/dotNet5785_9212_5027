@@ -45,4 +45,11 @@ namespace PL
 
             public IEnumerator GetEnumerator() => s_distanceTypes.GetEnumerator();
         }
+    internal class CallTypeEnumCollection : IEnumerable
+    {
+        static readonly IEnumerable<BO.CallType> s_callType =
+            (Enum.GetValues(typeof(BO.CallType)) as IEnumerable<BO.CallType>)!;
+
+        public IEnumerator GetEnumerator() => s_callType.GetEnumerator();
+    }
 }
