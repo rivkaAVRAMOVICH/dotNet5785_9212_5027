@@ -11,6 +11,44 @@ internal static class Tools
 {
     private const string ApiKey = "pk.be4ce2e76ebfce8455e92137f1e0ebd3";
       private static readonly HttpClient HttpClient = new HttpClient();
+    //public static async Task<(bool Success, double Latitude, double Longitude)> TryGetCoordinatesAsync(string address)
+    //{
+    //    if (string.IsNullOrWhiteSpace(address))
+    //        return (false, 0, 0);
+
+    //    string url = $"https://us1.locationiq.com/v1/search.php?key={ApiKey}&q={Uri.EscapeDataString(address)}&format=json";
+
+    //    using (HttpClient client = new HttpClient())
+    //    {
+    //        try
+    //        {
+    //            HttpResponseMessage response = await client.GetAsync(url);
+
+    //            if (response.IsSuccessStatusCode)
+    //            {
+    //                string responseBody = await response.Content.ReadAsStringAsync();
+
+    //                JsonNode json = JsonNode.Parse(responseBody);
+    //                var firstResult = json?.AsArray()?.FirstOrDefault();
+
+    //                if (firstResult != null)
+    //                {
+    //                    double lat = double.Parse(firstResult["lat"]?.ToString() ?? "0");
+    //                    double lon = double.Parse(firstResult["lon"]?.ToString() ?? "0");
+
+    //                    return (true, lat, lon);
+    //                }
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            // Logging או טיפול בשגיאה
+    //            Console.WriteLine("Error fetching coordinates: " + ex.Message);
+    //        }
+    //    }
+
+    //    return (false, 0, 0);
+    //}
 
     public static bool TryGetCoordinates(string address, out (double Latitude, double Longitude) coordinates)
     {

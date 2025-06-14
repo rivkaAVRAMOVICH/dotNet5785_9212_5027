@@ -1,0 +1,72 @@
+﻿<Window x:Class="PL.CallsManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PL"
+        
+        mc:Ignorable="d"
+        Title="CallsManagementWindow" Height="450" Width="800"
+        
+  WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:DeleteVisibilityConverter x:Key="DeleteVisibilityConverter"/>
+        <local:UnassignVisibilityConverter x:Key="UnassignVisibilityConverter"/>
+    </Window.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- כפתור הוספה -->
+            <RowDefinition Height="*"/>
+            <!-- טבלת הקריאות -->
+        </Grid.RowDefinitions>
+
+        <!-- כפתור הוספת קריאה -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,10">
+            <Button Content="הוספת קריאה"
+                    Width="120" Height="30"
+                    Click="AddCall_Click"/>
+        </StackPanel>
+
+        <!-- טבלת קריאות -->
+        <DataGrid x:Name="CallsDataGrid"
+                  Grid.Row="1"
+                  AutoGenerateColumns="False"
+                  ItemsSource="{Binding Calls}"
+                  IsReadOnly="True"
+                  SelectionMode="Single"
+                  MouseDoubleClick="CallsDataGrid_MouseDoubleClick" SelectionChanged="CallsDataGrid_SelectionChanged">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="מספר קריאה" Binding="{Binding CallId}" />
+                <DataGridTextColumn Header="סוג קריאה" Binding="{Binding CallType}" />
+                <DataGridTextColumn Header="סטטוס" Binding="{Binding Status}" />
+                <DataGridTextColumn Header="שעת התחלה" Binding="{Binding StartCallTime}" />
+                <DataGridTextColumn Header="זמן לסיום" Binding="{Binding EndCallTimeSpan}" />
+                <DataGridTextColumn Header="זמן טיפול" Binding="{Binding CompleteTreatmentTimeSpan}" />
+                <DataGridTextColumn Header="מתנדב אחרון" Binding="{Binding LastVolunteerName}" />
+                <DataGridTextColumn Header="סה״כ הקצאות" Binding="{Binding AssignSum}" />
+
+                <!-- כפתור מחיקה -->
+                <DataGridTemplateColumn Header="מחיקה">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="מחק" Width="50" Click="DeleteCall_Click"
+                                    Visibility="{Binding AssignSum, Converter={StaticResource DeleteVisibilityConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- כפתור ביטול הקצאה -->
+                <DataGridTemplateColumn Header="ביטול הקצאה">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="בטל" Width="50" Click="UnassignCall_Click"
+                                    Visibility="{Binding Status, Converter={StaticResource UnassignVisibilityConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

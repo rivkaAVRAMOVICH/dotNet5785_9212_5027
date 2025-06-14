@@ -256,7 +256,7 @@ namespace PL
         }
         private void btnShowCallStats_Click(object sender, RoutedEventArgs e)
         {
-            new CallManagementWindow().Show();
+            new ManageSingleCallWindow(1).Show();
            
         }
      
