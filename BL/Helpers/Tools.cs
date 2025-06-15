@@ -5,86 +5,64 @@ using System;
 using System.Net.Http;
 using System.Text.Json.Serialization;
 using System.Text.Json.Nodes;
+using System.Net;
+using BO;
 namespace Helpers;
 //{
 internal static class Tools
 {
     private const string ApiKey = "pk.be4ce2e76ebfce8455e92137f1e0ebd3";
       private static readonly HttpClient HttpClient = new HttpClient();
-    //public static async Task<(bool Success, double Latitude, double Longitude)> TryGetCoordinatesAsync(string address)
-    //{
-    //    if (string.IsNullOrWhiteSpace(address))
-    //        return (false, 0, 0);
-
-    //    string url = $"https://us1.locationiq.com/v1/search.php?key={ApiKey}&q={Uri.EscapeDataString(address)}&format=json";
-
-    //    using (HttpClient client = new HttpClient())
-    //    {
-    //        try
-    //        {
-    //            HttpResponseMessage response = await client.GetAsync(url);
-
-    //            if (response.IsSuccessStatusCode)
-    //            {
-    //                string responseBody = await response.Content.ReadAsStringAsync();
-
-    //                JsonNode json = JsonNode.Parse(responseBody);
-    //                var firstResult = json?.AsArray()?.FirstOrDefault();
-
-    //                if (firstResult != null)
-    //                {
-    //                    double lat = double.Parse(firstResult["lat"]?.ToString() ?? "0");
-    //                    double lon = double.Parse(firstResult["lon"]?.ToString() ?? "0");
-
-    //                    return (true, lat, lon);
-    //                }
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            // Logging או טיפול בשגיאה
-    //            Console.WriteLine("Error fetching coordinates: " + ex.Message);
-    //        }
-    //    }
-
-    //    return (false, 0, 0);
-    //}
-
     public static bool TryGetCoordinates(string address, out (double Latitude, double Longitude) coordinates)
     {
-        coordinates = (0, 0); // ברירת מחדל
-
-        if (string.IsNullOrWhiteSpace(address))
+        try
+        {
+            coordinates = GetCoordinatesFromAddress(address);
+            return true;
+        }
+        catch
+        {
+            coordinates = default;
             return false;
+        }
+    }
+
+    ///<summary>
+    /// Converts an address to (latitude, longitude) using maps.co synchronously.
+    /// Throws an exception if the address is invalid or not found.
+    /// </summary>
+    /// <param name="address">The full address as string</param>
+    /// <returns>Tuple of (Latitude, Longitude)</returns>
+    public static (double Latitude, double Longitude) GetCoordinatesFromAddress(string address)
+    {
+        if (string.IsNullOrWhiteSpace(address))
+            throw new BlFormatException("Address is empty.");
 
         string url = $"https://us1.locationiq.com/v1/search.php?key={ApiKey}&q={Uri.EscapeDataString(address)}&format=json";
 
-        using (HttpClient client = new HttpClient())
+        using var client = new HttpClient();
+        string json;
+
+        try
         {
-            HttpResponseMessage response = client.GetAsync(url).Result;
-
-            if (response.IsSuccessStatusCode)
-            {
-                string responseBody = response.Content.ReadAsStringAsync().Result;
-
-                JsonNode json = JsonNode.Parse(responseBody);
-
-                var firstResult = json?.AsArray()?.FirstOrDefault();
-
-                if (firstResult != null)
-                {
-                    coordinates = (
-                        double.Parse(firstResult["lat"]?.ToString() ?? "0"),
-                        double.Parse(firstResult["lon"]?.ToString() ?? "0")
-                    );
-                    return true;
-                }
-            }
+            json = client.GetStringAsync(url).Result; // קריאה סינכרונית
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to contact geolocation service.", ex);
         }
 
-        return false;
-    }
+        var results = JsonSerializer.Deserialize<List<LocationIqResponse>>(json);
 
+        if (results == null || results.Count == 0)
+            throw new Exception("Address not found.");
+
+        if (!double.TryParse(results[0].Lat, out double lat) ||
+            !double.TryParse(results[0].Lon, out double lon))
+            throw new Exception("Invalid coordinate format from geolocation service.");
+
+        return (lat, lon);
+    }
 
 
     //namespace Helpers;
@@ -150,7 +128,7 @@ internal static class Tools
     {
         if (string.IsNullOrWhiteSpace(address))
         {
-            throw new ArgumentException("הכתובת אינה תקינה.");
+            throw new Exception("הכתובת אינה תקינה.");
         }
 
         string url = $"https://us1.locationiq.com/v1/search.php?key={ApiKey}&q={Uri.EscapeDataString(address)}&format=json";

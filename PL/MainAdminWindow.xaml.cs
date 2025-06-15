@@ -33,6 +33,7 @@ namespace PL
         protected void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+
         public MainAdminWindow()
         {
 
@@ -171,6 +172,7 @@ namespace PL
         private void LoadStatusCounts()
         {
             CallsByStatus = new ObservableCollection<StatusCount>();
+            OnPropertyChanged(nameof(CallsByStatus)); // <<< שורה חשובה!!
 
             string[] statusNames = Enum.GetNames(typeof(BO.Status));
             int[] counts = s_bl.Call.RequestCallsQuantities();
@@ -184,13 +186,14 @@ namespace PL
                 });
             }
         }
+
         private void CallStatusButton_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             if (button?.Tag is string statusName)
             {
                 // נניח ש-CallListWindow מקבל enum או string עם הסטטוס
-                var window = new CallListWindow(statusName);
+                var window = new CallsManagementWindow(statusName);
                 window.Show();
             }
         }
@@ -216,7 +219,7 @@ namespace PL
 
         private void btnCall_Click(object sender, RoutedEventArgs e)
         {
-            new CallListWindow().Show();
+            new CallsManagementWindow().Show();
         }
         private void btnClockInitialization_Click(object sender, RoutedEventArgs e)
         {
@@ -256,7 +259,7 @@ namespace PL
         }
         private void btnShowCallStats_Click(object sender, RoutedEventArgs e)
         {
-            new ManageSingleCallWindow(1).Show();
+            new CallsManagementWindow().Show();
            
         }
      

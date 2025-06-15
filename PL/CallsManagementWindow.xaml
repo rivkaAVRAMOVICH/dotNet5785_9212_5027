@@ -35,15 +35,14 @@
                   ItemsSource="{Binding Calls}"
                   IsReadOnly="True"
                   SelectionMode="Single"
-                  MouseDoubleClick="CallsDataGrid_MouseDoubleClick" SelectionChanged="CallsDataGrid_SelectionChanged">
+                  MouseDoubleClick="CallsDataGrid_MouseDoubleClick">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="מספר קריאה" Binding="{Binding CallId}" />
                 <DataGridTextColumn Header="סוג קריאה" Binding="{Binding CallType}" />
                 <DataGridTextColumn Header="סטטוס" Binding="{Binding Status}" />
                 <DataGridTextColumn Header="שעת התחלה" Binding="{Binding StartCallTime}" />
-                <DataGridTextColumn Header="זמן לסיום" Binding="{Binding EndCallTimeSpan}" />
-                <DataGridTextColumn Header="זמן טיפול" Binding="{Binding CompleteTreatmentTimeSpan}" />
+                <DataGridTextColumn Header="זמן לטיפול" Binding="{Binding CompleteTreatmentTimeSpan}" />
                 <DataGridTextColumn Header="מתנדב אחרון" Binding="{Binding LastVolunteerName}" />
                 <DataGridTextColumn Header="סה״כ הקצאות" Binding="{Binding AssignSum}" />
 

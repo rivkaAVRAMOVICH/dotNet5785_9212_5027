@@ -209,12 +209,37 @@ internal class CallManager
             CallId = call.Id,
             CallType = (BO.CallType)call.CallType,
             StartCallTime = call.StartCallTime,
-            CompleteTreatmentTimeSpan = call.MaxEndCallTime.HasValue ? call.MaxEndCallTime.Value - DateTime.Now : null,
-            LastVolunteerName = null,
-             EndCallTimeSpan= null,
-            Status = BO.Status.open,
-            AssignSum = 0
+            CompleteTreatmentTimeSpan = call.MaxEndCallTime.HasValue
+    ? call.MaxEndCallTime.Value - DateTime.Now
+    : null,
+            LastVolunteerName = GetLastVolunteerName(call.Id),
+            EndCallTimeSpan = null,
+            Status = CallStatus(call),
+            AssignSum = _dal.Assignment
+    .ReadAll()
+    .Where(a => a.CallId == call.Id)
+    .Count()
         });
+    }
+    private static string? GetLastVolunteerName(int callId)
+    {
+        // שליפת כל השיבוצים של הקריאה הזאת
+        var assignments = _dal.Assignment
+            .ReadAll()
+            .Where(a => a.CallId == callId);
+
+        // אם אין שיבוצים - נחזיר null
+        if (!assignments.Any())
+            return null;
+
+        // נאתר את השיבוץ האחרון - לפי מזהה או לפי זמן (אם יש)
+        var lastAssignment = assignments
+            .OrderByDescending(a => a.Id) // אם יש שדה תאריך כמו AssignedAt עדיף למיין לפי זה
+            .First();
+
+        // נביא את שם המתנדב
+        var volunteer = _dal.Volunteer.Read(lastAssignment.VolunteerId);
+        return volunteer?.FullName;
     }
 
     /// <summary>

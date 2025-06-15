@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfVolunteer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Volunteer>
     <Id>319254109</Id>
@@ -69,5 +69,19 @@
     <Latitude>32.0883</Latitude>
     <Longitude>34.7827</Longitude>
     <MaxDistance>59</MaxDistance>
+  </Volunteer>
+  <Volunteer>
+    <Id>215639212</Id>
+    <FullName>רבקה</FullName>
+    <PhoneNumber>0548502925</PhoneNumber>
+    <Email>m@gmail.com</Email>
+    <Active>false</Active>
+    <Role>manager</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=</Password>
+    <FullAddress>10 Bialik Street, Tel Aviv, Israel</FullAddress>
+    <Latitude>31.797499</Latitude>
+    <Longitude>34.645104</Longitude>
+    <MaxDistance xsi:nil="true" />
   </Volunteer>
 </ArrayOfVolunteer>

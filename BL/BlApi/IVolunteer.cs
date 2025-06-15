@@ -11,7 +11,7 @@ namespace BlApi
 {
     public interface IVolunteer: IObservable
     {
-        public BO.Role EnteredSystem(string userName, string password);
+        public BO.Role EnteredSystem(int userId, string password);
         public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? active=null, BO.CallType? sortBy = null);
         public BO.Volunteer GetVolunteerDetails(int id);
         public void UpdateVolunteerDetails(int id, BO.Volunteer volunteer);

@@ -17,16 +17,16 @@ VolunteerManager.Observers.RemoveListObserver(listObserver); //stage 5
 VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
     #endregion Stage 5
 
-    public BO.Role EnteredSystem(string userName, string password)
+    public BO.Role EnteredSystem(int userId, string password)
     {
         try
         {
-            var tmpVolunteer = _dal.Volunteer.ReadAll().Where(item => item.FullName == userName).FirstOrDefault();
+            var tmpVolunteer = _dal.Volunteer.ReadAll().Where(item => item.Id == userId).FirstOrDefault();
 
             // Check name
             if (tmpVolunteer == null)
             {
-                throw new BO.BlDoesNotExistException($"Volunteer with name={userName} not found");
+                throw new BO.BlDoesNotExistException($"Volunteer with id={userId} not found");
             }
 
             // Check password....  

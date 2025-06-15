@@ -4,6 +4,7 @@
         xmlns:local="clr-namespace:YourNamespace.PL.Volunteer"
         Title="פרטי מתנדב" Height="700" Width="900"
         DataContext="{Binding VolunteerViewModel, RelativeSource={RelativeSource Self}}">
+    <!--
     <Window.Resources>
         <local:IsVolunteerActiveToEnableConverter x:Key="IsVolunteerActiveToEnableConverter"/>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
@@ -13,14 +14,14 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- פרטי מתנדב -->
+         
             <RowDefinition Height="Auto"/>
-            <!-- כפתורי פעולה -->
+          
             <RowDefinition Height="*"/>
-            <!-- מפה + פרטי קריאה -->
+    
         </Grid.RowDefinitions>
 
-        <!-- טופס פרטי מתנדב -->
+     
         <GroupBox Header="פרטי מתנדב" Margin="0,0,0,10">
             <Grid Margin="10">
                 <Grid.ColumnDefinitions>
@@ -40,36 +41,35 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" Spacing="4">
-                    <!-- שם -->
+              
                     <TextBox Text="{Binding Volunteer.Name, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <!-- תעודת זהות - לא ניתן לערוך -->
                     <TextBox Text="{Binding Volunteer.IdNumber}" IsEnabled="False"/>
 
-                    <!-- תפקיד - לא ניתן לערוך -->
+                   
                     <TextBox Text="{Binding Volunteer.Role}" IsEnabled="False"/>
 
-                    <!-- כתובת -->
+              
                     <TextBox Text="{Binding Volunteer.Address, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <!-- מרחק מרבי -->
+                
                     <TextBox Text="{Binding Volunteer.MaxDistanceToCall, UpdateSourceTrigger=PropertyChanged}" />
 
-                    <!-- סוג מרחק -->
+            
                     <ComboBox ItemsSource="{Binding DistanceTypes}" 
                               SelectedItem="{Binding Volunteer.DistanceType, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <!-- סטטוס -->
+              
                     <TextBlock Text="{Binding Volunteer.Status}"/>
 
-                    <!-- פעיל -->
+              
                     <CheckBox IsChecked="{Binding Volunteer.IsActive, UpdateSourceTrigger=PropertyChanged}" 
                               IsEnabled="{Binding CanChangeActiveStatus}"/>
                 </StackPanel>
             </Grid>
         </GroupBox>
 
-        <!-- כפתורי פעולה -->
+      
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10" Spacing="10">
             <Button Content="עדכן" Command="{Binding UpdateVolunteerCommand}" Width="100"/>
             <Button Content="היסטוריית קריאות" Command="{Binding ShowCallHistoryCommand}" Width="150"/>
@@ -81,18 +81,18 @@
                     IsEnabled="{Binding HasActiveCall}"/>
         </StackPanel>
 
-        <!-- מפה + פרטי קריאה -->
+        
         <Grid Grid.Row="2" Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- מפה -->
+       
             <local:MapControl Grid.Column="0" Latitude="{Binding Volunteer.Latitude}" Longitude="{Binding Volunteer.Longitude}"
                               CallLatitude="{Binding CurrentCall.Latitude}" CallLongitude="{Binding CurrentCall.Longitude}"/>
 
-            <!-- פרטי קריאה -->
+        
             <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1" Padding="10" CornerRadius="4" 
                     Visibility="{Binding HasActiveCall, Converter={StaticResource BoolToVisibilityConverter}}">
                 <StackPanel>
@@ -105,5 +105,5 @@
                 </StackPanel>
             </Border>
         </Grid>
-    </Grid>
+    </Grid>-->
 </Window>

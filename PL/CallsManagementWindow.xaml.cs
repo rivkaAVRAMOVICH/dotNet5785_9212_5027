@@ -22,14 +22,14 @@ namespace PL
     public partial class CallsManagementWindow : Window
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-
+        private readonly string? statusName;
         public ObservableCollection<CallInList> Calls { get; set; } = new();
 
-        public CallsManagementWindow()
+        public CallsManagementWindow(string? _statusName = null)
         {
             InitializeComponent();
             DataContext = this;
-
+            statusName= _statusName;
             LoadCalls();
         }
 
@@ -51,8 +51,18 @@ namespace PL
                 });
 
             Calls.Clear();
+        
             foreach (var call in calls)
-                Calls.Add(call);
+                if (!string.IsNullOrEmpty(statusName))
+                {
+                    if(call.Status.ToString() == statusName)
+                        Calls.Add(call);
+                }
+                else
+                {
+                   Calls.Add(call);
+                }
+               
         }
 
         private void AddCall_Click(object sender, RoutedEventArgs e)
@@ -90,21 +100,25 @@ namespace PL
 
         private void UnassignCall_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is CallInList call)
+            if (sender is Button btn && btn.DataContext is CallInList call)
             {
-                if (call.Status == Status.inProgress || call.Status == Status.inProgressAtRisk)
+                var result = MessageBox.Show("Cancel the current assignment for this call?", "Cancel Assignment", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
                 {
-                    //BO.Call callDetail = s_bl.Call.GetCallsDetails(call.CallId);
-            
-                    //s_bl.Call.CancelCallHandling(call.CallId);
-                    //MessageBox.Show("ההקצאה בוטלה ואימייל נשלח למתנדב.");
-                    //LoadCalls();
+                    try
+                    {
+                        // call.Id represents the assignment ID
+                        s_bl.Call.CancelCallHandling(call.CallId, call.Id ?? throw new InvalidOperationException("Assignment ID is required."));
+                        LoadCalls();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error while canceling assignment:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
+
         }
-        private void CallsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            // אם את לא צריכה אותה כרגע, אפשר להשאיר ריקה או להסיר לחלוטין מה־XAML
-        }
+     
     }
 }

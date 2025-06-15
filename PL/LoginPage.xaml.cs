@@ -27,14 +27,12 @@ namespace PL
         }
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            string id = IdTextBox.Text.Trim();
-            string password = PasswordBox.Password;
-
-            if (string.IsNullOrEmpty(id))
+            int id;
+            if (int.TryParse(IdTextBox.Text.Trim(), out id))
             {
-                MessageBox.Show("אנא הזן תעודת זהות.", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+                string password = PasswordBox.Password;
+          
+         
 
             try
             {
@@ -67,7 +65,8 @@ namespace PL
                         MessageBox.Show("הרשאה לא מזוהה. פנה למנהל המערכת.", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
                         break;
                 }
-            }
+                    this.Close();
+                }
             catch (UnauthorizedAccessException)
             {
                 MessageBox.Show("סיסמה שגויה או תעודת זהות לא קיימת.", "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -75,6 +74,12 @@ namespace PL
             catch (Exception ex)
             {
                 MessageBox.Show("אירעה שגיאה: " + ex.Message, "שגיאה", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            }
+            else
+            {
+                MessageBox.Show("יש להזין מזהה מספרי תקין.");
+                return;
             }
         }
 

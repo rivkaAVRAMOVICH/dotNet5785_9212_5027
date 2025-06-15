@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,25 +20,27 @@ namespace PL.Call
     /// </summary>
     public partial class CallListWindow : Window
     {
-        static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-     
-        public BO.CallType SelectedCall { get; set; } = BO.CallType.none;
-        public CallListWindow(string? statusName = null)
-        {
-            InitializeComponent();
-            this.DataContext = new
-            {
-                CallCollection = new PL.CallCollection()
-            };
-        }
+            static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-        private void CallComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //var selectedCall = CallComboBox.SelectedItem;
-            var CallList = (SelectedCall == BO.CallType.none)
-? s_bl?.Call.GetCallsList()!
-: s_bl?.Call.GetCallsList(null, BO.CallType.cooking, SelectedCall)!;
+            public CallListWindow(string? statusName = null)
+            {
+                InitializeComponent();
+
+                // שלב 1 - נביא את כל הקריאות
+                IEnumerable<BO.CallInList> allCalls = s_bl.Call.GetCallsList();
+       
+            // שלב 2 - נסנן אם צריך
+            IEnumerable<BO.CallInList> callsToDisplay = allCalls;
+
+         
+            if (!string.IsNullOrEmpty(statusName))
+                {
+                    callsToDisplay = allCalls.Where(call => call.Status.ToString() == statusName);
+                }
+
+                // שלב 3 - נציג במסך
+                CallsListView.ItemsSource = callsToDisplay;
+            }
         }
 
     }
-}
