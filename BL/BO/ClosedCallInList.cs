@@ -15,5 +15,7 @@ public class ClosedCallInList
     public DateTime EntryCallTime { get; init; }
     public DateTime? EndCallTime { get; init; }
     public FinishType? FinishType { get; init; }
+    public CallType? Type { get; set; }
+
     public override string ToString() { return this.ToStringProperty(); }
 }

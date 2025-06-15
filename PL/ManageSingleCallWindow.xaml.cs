@@ -25,7 +25,7 @@ namespace PL
         {
             static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
 
-            public  BO.Call CurrentCall { get; private set; }
+            public  BO.Call? CurrentCall { get; private set; }
 
             public ObservableCollection<BO.CallAssignInList> Assignments { get; set; } = new();
         public ManageSingleCallWindow(int callId)

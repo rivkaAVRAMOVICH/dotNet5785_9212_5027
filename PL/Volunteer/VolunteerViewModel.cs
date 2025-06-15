@@ -4,13 +4,13 @@ using System.Windows.Input;
 using BO;
 using BlApi;
 
-namespace PL
+namespace PL.Volunteer
 {
-    public class VolunteerViewModel : INotifyPropertyChanged
+    public partial class VolunteerViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        private BO.Volunteer _volunteer;
+        private BO.Volunteer? _volunteer;
         public BO.Volunteer Volunteer
         {
             get => _volunteer;
@@ -22,8 +22,8 @@ namespace PL
             }
         }
 
-        private BO.Call _currentCall;
-        public BO.Call CurrentCall
+        private BO.Call? _currentCall;
+        public BO.Call? CurrentCall
         {
             get => _currentCall;
             set

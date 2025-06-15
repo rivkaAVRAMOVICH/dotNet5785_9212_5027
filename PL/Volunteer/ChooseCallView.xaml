@@ -1,0 +1,64 @@
+﻿<Window x:Class="PL.Volunteer.ChooseCallView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:PL.Volunteer"
+        Title="בחירת קריאה לטיפול" Height="700" Width="1000"
+        DataContext="{Binding ChooseCallViewModel, RelativeSource={RelativeSource Self}}">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <!-- סינון ומיון -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="סנן לפי סוג:" Margin="0,0,5,0" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding CallTypes}" SelectedItem="{Binding SelectedCallType}" Width="120" Margin="0,0,20,0"/>
+            <TextBlock Text="סדר לפי מרחק:" Margin="0,0,5,0" VerticalAlignment="Center"/>
+            <CheckBox Content="מהקרוב לרחוק" IsChecked="{Binding IsDistanceAscending}"/>
+            <Button Content="שנה כתובת" Command="{Binding UpdateAddressCommand}" Margin="20,0,0,0"/>
+        </StackPanel>
+
+        <!-- טבלת קריאות פתוחות -->
+        <DataGrid Grid.Row="0" ItemsSource="{Binding FilteredCalls}" SelectedItem="{Binding SelectedCall}" AutoGenerateColumns="False" Margin="0,0,0,10">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="מזהה" Binding="{Binding Id}" Width="Auto"/>
+                <DataGridTextColumn Header="סוג" Binding="{Binding Type}" Width="*"/>
+                <DataGridTextColumn Header="כתובת" Binding="{Binding Address}" Width="*"/>
+                <DataGridTextColumn Header="Distance in km" Binding="{Binding DistanceFromVolunteer}" Width="*"/>
+                    <DataGridTemplateColumn Header="בחר">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="בחר" Command="{Binding DataContext.ChooseCallCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                    CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- תיאור ומפה -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                <TextBlock Text="תיאור הקריאה" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                <TextBlock TextWrapping="Wrap" Text="{Binding SelectedCall.Description}"/>
+            </StackPanel>
+
+            <!-- מפה -->
+            <local:MapControl Grid.Column="1"
+                              Latitude="{Binding VolunteerLatitude}"
+                              Longitude="{Binding VolunteerLongitude}"
+                              CallLatitude="{Binding SelectedCall.Latitude}"
+                              CallLongitude="{Binding SelectedCall.Longitude}"
+                              DrawLines="True"
+                              DrawRoute="True"/>
+        </Grid>
+    </Grid>
+</Window>

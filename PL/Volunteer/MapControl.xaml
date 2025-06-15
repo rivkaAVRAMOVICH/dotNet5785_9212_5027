@@ -1,0 +1,24 @@
+﻿<UserControl x:Class="PL.Volunteer.MapControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="200" d:DesignWidth="300">
+    <Border BorderBrush="Black" BorderThickness="1" Padding="10">
+        <StackPanel>
+            <TextBlock Text="📍 מיקום מתנדב:" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Latitude, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+            <TextBlock Text="{Binding Longitude, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+
+            <TextBlock Text="📍 מיקום קריאה:" FontWeight="Bold" Margin="0,10,0,0"/>
+            <TextBlock Text="{Binding CallLatitude, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+            <TextBlock Text="{Binding CallLongitude, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+
+            <!-- אפשר להחליף כאן לאלמנט של מפה אמיתית בהמשך -->
+            <Rectangle Fill="LightGray" Height="100" Margin="0,10,0,0">
+                <Rectangle.ToolTip>כאן תוצג מפה בעתיד</Rectangle.ToolTip>
+            </Rectangle>
+        </StackPanel>
+    </Border>
+</UserControl>

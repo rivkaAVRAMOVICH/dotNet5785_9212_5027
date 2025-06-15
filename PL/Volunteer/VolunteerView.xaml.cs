@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace YourNamespace.PL.Volunteer
+namespace PL.Volunteer
 {
     public partial class VolunteerView : Window
     {
@@ -8,5 +8,6 @@ namespace YourNamespace.PL.Volunteer
         {
             InitializeComponent();
         }
+        public VolunteerViewModel VolunteerViewModel { get; set; } = new VolunteerViewModel();
     }
 }

@@ -1,0 +1,34 @@
+﻿<Window x:Class="PL.Volunteer.CallHistoryView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="היסטוריית קריאות" Height="600" Width="900"
+        xmlns:local="clr-namespace:PL.Volunteer"
+        DataContext="{Binding CallHistoryViewModel, RelativeSource={RelativeSource Self}}">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- סינון -->
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="סנן לפי סוג:" Margin="0,0,5,0" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding CallTypes}" SelectedItem="{Binding SelectedCallType}" Width="120" Margin="0,0,20,0"/>
+            <TextBlock Text="סדר לפי תאריך:" Margin="0,0,5,0" VerticalAlignment="Center"/>
+            <CheckBox Content="מהחדש לישן" IsChecked="{Binding IsDateDescending}"/>
+        </StackPanel>
+
+        <!-- טבלת קריאות סגורות -->
+        <DataGrid Grid.Row="1" ItemsSource="{Binding FilteredClosedCalls}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="מזהה" Binding="{Binding Id}" Width="Auto"/>
+                <DataGridTextColumn Header="סוג קריאה" Binding="{Binding Type}" Width="*"/>
+                <DataGridTextColumn Header="כתובת" Binding="{Binding Address}" Width="2*"/>
+                <DataGridTextColumn Header="תוצאה" Binding="{Binding Result}" Width="*"/>
+                <DataGridTextColumn Header="תאריך סיום" Binding="{Binding EndDate}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+    </Grid>
+</Window>
