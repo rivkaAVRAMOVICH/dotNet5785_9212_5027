@@ -4,35 +4,35 @@
 //using BO;
 //using BlApi;
 
-//namespace PL
-//{
-//    public class VolunteerViewModel : INotifyPropertyChanged
-//    {
-//        public event PropertyChangedEventHandler PropertyChanged;
+namespace PL.Volunteer
+{
+    public partial class VolunteerViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-//        private BO.Volunteer _volunteer;
-//        public BO.Volunteer Volunteer
-//        {
-//            get => _volunteer;
-//            set
-//            {
-//                _volunteer = value;
-//                OnPropertyChanged(nameof(Volunteer));
-//                UpdateCommandsCanExecute();
-//            }
-//        }
+        private BO.Volunteer? _volunteer;
+        public BO.Volunteer Volunteer
+        {
+            get => _volunteer;
+            set
+            {
+                _volunteer = value;
+                OnPropertyChanged(nameof(Volunteer));
+                UpdateCommandsCanExecute();
+            }
+        }
 
-//        private BO.Call _currentCall;
-//        public BO.Call CurrentCall
-//        {
-//            get => _currentCall;
-//            set
-//            {
-//                _currentCall = value;
-//                OnPropertyChanged(nameof(CurrentCall));
-//                UpdateCommandsCanExecute();
-//            }
-//        }
+        private BO.Call? _currentCall;
+        public BO.Call? CurrentCall
+        {
+            get => _currentCall;
+            set
+            {
+                _currentCall = value;
+                OnPropertyChanged(nameof(CurrentCall));
+                UpdateCommandsCanExecute();
+            }
+        }
 
 //        public ObservableCollection<string> DistanceTypes { get; set; } = new ObservableCollection<string> { "km", "miles" };
 

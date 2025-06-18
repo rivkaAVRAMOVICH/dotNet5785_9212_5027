@@ -80,3 +80,9 @@ public enum  VolunteerSortField
     CallType,
     FinishType
 }
+
+public enum DistanceFromVolunteer
+{
+    AirDistance,
+    DrivingDistance
+}

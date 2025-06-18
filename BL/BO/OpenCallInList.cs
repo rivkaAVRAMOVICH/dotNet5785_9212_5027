@@ -16,6 +16,8 @@ namespace BO
         public DateTime StartCallTime { get; init; }
         public DateTime? MaxEndCallTime { get; init; }
         public double DistanceCallFromVolunteer { get; set; }
+        public string Type { get; set; }
+
         public override string ToString() { return this.ToStringProperty(); }
     }
 }

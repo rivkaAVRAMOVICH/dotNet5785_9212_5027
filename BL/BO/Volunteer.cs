@@ -10,9 +10,9 @@ namespace BO
     public class Volunteer
     {
         public int Id { get; init; }
-        public string Name { get; set; }
-        public string Phone { get; set; }
-        public string Email { get; set; }
+        public string? Name { get; set; }
+        public string? Phone { get; set; }
+        public string? Email { get; set; }
         public string? Password { get; set; }
         public string? Address { get; set; }
         public double? Latitude { get; set; }
@@ -24,7 +24,7 @@ namespace BO
         public int SumHandledCalls { get; set; }
         public int SumCanceledCalls { get; set; }
         public int SumChosenExpiredCalls { get; set; }
-        public BO.CallInProgress CallInVolunteerHandle { get; set; }
+        public BO.CallInProgress? CallInVolunteerHandle { get; set; }
         public override string ToString() { return this.ToStringProperty(); }
     }
 }

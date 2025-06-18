@@ -1,24 +1,15 @@
-﻿<Window x:Class="YourNamespace.PL.Volunteer.VolunteerView"
+﻿<Window x:Class="PL.Volunteer.VolunteerView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:YourNamespace.PL.Volunteer"
+        xmlns:local="clr-namespace:PL.Volunteer"
         Title="פרטי מתנדב" Height="700" Width="900"
         DataContext="{Binding VolunteerViewModel, RelativeSource={RelativeSource Self}}">
-    <!--
-    <Window.Resources>
-        <local:IsVolunteerActiveToEnableConverter x:Key="IsVolunteerActiveToEnableConverter"/>
-        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <local:DistanceConverter x:Key="DistanceConverter"/>
-    </Window.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-         
             <RowDefinition Height="Auto"/>
-          
             <RowDefinition Height="*"/>
-    
         </Grid.RowDefinitions>
 
      
@@ -29,7 +20,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Top" Spacing="6">
+                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Top" Margin="6">
                     <TextBlock Text="שם:"/>
                     <TextBlock Text="תעודת זהות:"/>
                     <TextBlock Text="תפקיד:"/>
@@ -40,40 +31,26 @@
                     <TextBlock Text="פעיל:"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" Spacing="4">
-              
+                <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top" Margin="4">
                     <TextBox Text="{Binding Volunteer.Name, UpdateSourceTrigger=PropertyChanged}" />
-
-                    <TextBox Text="{Binding Volunteer.IdNumber}" IsEnabled="False"/>
-
-                   
+                    <TextBox Text="{Binding Volunteer.Id}" IsEnabled="False"/>
                     <TextBox Text="{Binding Volunteer.Role}" IsEnabled="False"/>
-
-              
                     <TextBox Text="{Binding Volunteer.Address, UpdateSourceTrigger=PropertyChanged}" />
-
-                
-                    <TextBox Text="{Binding Volunteer.MaxDistanceToCall, UpdateSourceTrigger=PropertyChanged}" />
-
-            
+                    <TextBox Text="{Binding Volunteer.MaxDistance, UpdateSourceTrigger=PropertyChanged}" />
                     <ComboBox ItemsSource="{Binding DistanceTypes}" 
-                              SelectedItem="{Binding Volunteer.DistanceType, UpdateSourceTrigger=PropertyChanged}"/>
-
-              
-                    <TextBlock Text="{Binding Volunteer.Status}"/>
-
-              
+                              SelectedItem="{Binding Volunteer.TypeOfDistance, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="{Binding Volunteer.IsActive, StringFormat=פעיל: {0}}" />
                     <CheckBox IsChecked="{Binding Volunteer.IsActive, UpdateSourceTrigger=PropertyChanged}" 
                               IsEnabled="{Binding CanChangeActiveStatus}"/>
                 </StackPanel>
             </Grid>
         </GroupBox>
 
-      
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10" Spacing="10">
+        <!-- כפתורי פעולה -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10">
             <Button Content="עדכן" Command="{Binding UpdateVolunteerCommand}" Width="100"/>
             <Button Content="היסטוריית קריאות" Command="{Binding ShowCallHistoryCommand}" Width="150"/>
-            <Button Content="בחירת קריאה" Command="{Binding ChooseCallCommand}" Width="150" 
+            <Button Content="בחירת קריאה" Command="{Binding ChooseCallCommand}" Width="150"
                     IsEnabled="{Binding CanChooseCall}"/>
             <Button Content="סיום טיפול" Command="{Binding FinishCallCommand}" Width="100"
                     IsEnabled="{Binding HasActiveCall}"/>
@@ -88,18 +65,33 @@
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
 
-       
-            <local:MapControl Grid.Column="0" Latitude="{Binding Volunteer.Latitude}" Longitude="{Binding Volunteer.Longitude}"
-                              CallLatitude="{Binding CurrentCall.Latitude}" CallLongitude="{Binding CurrentCall.Longitude}"/>
+            <!-- מפה -->
+            <local:MapControl Grid.Column="0"
+                              Latitude="{Binding Volunteer.Latitude}"
+                              Longitude="{Binding Volunteer.Longitude}"
+                              CallLatitude="{Binding CurrentCall.Latitude}"
+                              CallLongitude="{Binding CurrentCall.Longitude}"/>
 
-        
-            <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1" Padding="10" CornerRadius="4" 
-                    Visibility="{Binding HasActiveCall, Converter={StaticResource BoolToVisibilityConverter}}">
+            <!-- פרטי קריאה -->
+            <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="1" Padding="10" CornerRadius="4">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasActiveCall}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
                 <StackPanel>
                     <TextBlock Text="פרטי קריאה בטיפול" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                    <TextBlock Text="{Binding CurrentCall.Description}" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding CurrentCall.CallDescription}" TextWrapping="Wrap"/>
                     <TextBlock Text="מרחק מהכתובת:"/>
-                    <TextBlock Text="{Binding CurrentCall.DistanceFromVolunteer, Converter={StaticResource DistanceConverter}}"/>
+                    <TextBlock Text="{Binding CurrentCall.DistanceFromVolunteer, StringFormat={}{0} km}"/>
+                    <TextBlock Text="סוג מרחק:"/>
+                    <TextBlock Text="{Binding CurrentCall.TypeOfDistance}" />
                     <TextBlock Text="סטטוס:"/>
                     <TextBlock Text="{Binding CurrentCall.Status}"/>
                 </StackPanel>
