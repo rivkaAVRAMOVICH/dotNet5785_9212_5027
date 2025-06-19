@@ -1,27 +1,14 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-//using System.Windows;
-//using System.Windows.Controls;
-//using System.Windows.Data;
-//using System.Windows.Documents;
-//using System.Windows.Input;
-//using System.Windows.Media;
-//using System.Windows.Media.Imaging;
-//using System.Windows.Shapes;
+﻿using System.Windows;
 
 namespace PL.Volunteer
 {
-    /// <summary>
-    /// Interaction logic for ChooseCallView.xaml
-    /// </summary>
     public partial class ChooseCallView : Window
     {
-        public ChooseCallView()
+        public ChooseCallView(BO.Volunteer volunteer)
         {
             InitializeComponent();
+            var viewModel = new ChooseCallViewModel(BlApi.Factory.Get(), volunteer);
+            this.DataContext = viewModel;
         }
     }
 }

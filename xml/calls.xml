@@ -95,16 +95,6 @@
   </Call>
   <Call>
     <Id>1010</Id>
-    <CallAddress>1600 Amphitheatre Parkway, Mountain View, CA 94043, USA</CallAddress>
-    <Latitude>37.4217636</Latitude>
-    <Longitude>-122.084614</Longitude>
-    <StartCallTime>2027-07-12T14:27:29</StartCallTime>
-    <CallType>babysitting</CallType>
-    <CallDescription>vgjhubknlm</CallDescription>
-    <MaxEndCallTime>2025-06-15T14:30:00</MaxEndCallTime>
-  </Call>
-  <Call>
-    <Id>1010</Id>
     <CallAddress>hhh 2</CallAddress>
     <Latitude>35.493794</Latitude>
     <Longitude>-78.810486</Longitude>
