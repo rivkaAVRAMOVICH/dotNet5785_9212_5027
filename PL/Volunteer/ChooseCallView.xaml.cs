@@ -7,8 +7,8 @@ namespace PL.Volunteer
         public ChooseCallView(BO.Volunteer volunteer)
         {
             InitializeComponent();
-            var viewModel = new ChooseCallViewModel(BlApi.Factory.Get(), volunteer);
-            this.DataContext = viewModel;
+            var ChooseCallViewModel = new ChooseCallViewModel(BlApi.Factory.Get(), volunteer);
+            this.DataContext = ChooseCallViewModel;
         }
-    }
+    };
 }
