@@ -1,133 +1,154 @@
-﻿
-using BlImplementation;
-using BO;
-using DalApi;
+﻿using System;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace Helpers;
 
 /// <summary>
 /// Internal BL manager for all Application's Clock logic policies
 /// </summary>
-internal static class AdminManager //stage 4
+internal static class AdminManager
 {
-    #region Stage 4
-    private static readonly DalApi.IDal s_dal = DalApi.Factory.Get; //stage 4
-    #endregion Stage 4
+    #region DAL + Events
+    private static readonly DalApi.IDal s_dal = DalApi.Factory.Get;
 
-    #region Stage 5
-    internal static event Action? ConfigUpdatedObservers; //prepared for stage 5 - for config update observers
-    internal static event Action? ClockUpdatedObservers; //prepared for stage 5 - for clock update observers
-    #endregion Stage 5
+    private static event Action? _configUpdatedObservers;
+    private static event Action? _clockUpdatedObservers;
 
-    #region Stage 4
-    /// <summary>
-    /// Property for providing/setting current configuration variable value for any BL class that may need it
-    /// </summary>
-    internal static TimeSpan RiskRange
+    internal static event Action? ConfigUpdatedObservers
     {
-        get => s_dal.Config.RiskRange;
+        add => _configUpdatedObservers += value;
+        remove => _configUpdatedObservers -= value;
+    }
+
+    internal static event Action? ClockUpdatedObservers
+    {
+        add => _clockUpdatedObservers += value;
+        remove => _clockUpdatedObservers -= value;
+    }
+    #endregion
+
+    #region Properties
+    // החליפי את MaxRange במשתנה הסביבה הרלוונטי אצלך אם צריך
+    internal static int MaxRange
+    {
+        get => s_dal.Config.MaxRange;
         set
         {
-            s_dal.Config.RiskRange = value;
-            ConfigUpdatedObservers?.Invoke(); // stage 5
+            s_dal.Config.SetMaxRange(value); // אם אין לך את זה, תורידי את השורה או תשני בהתאם
+            s_dal.Config.Reset();
+            _configUpdatedObservers?.Invoke();
         }
     }
-    internal static DateTime Clock
+
+    internal static DateTime Now => s_dal.Config.Clock;
+    #endregion
+
+    #region StudentManager (יש להגדיר מהצד שלך)
+    public static dynamic StudentManager { get; set; } = default!;
+    #endregion
+
+    #region Reset / Init
+    internal static void ResetDB()
     {
-        get => s_dal.Config.Clock;
-        set
+        lock (BlMutex)
         {
-            s_dal.Config.Clock = value;
-            ConfigUpdatedObservers?.Invoke(); // stage 5
+            s_dal.ResetDB();
+            UpdateClock(Now);
+            MaxRange = MaxRange;
         }
     }
-    /// <summary>
-    /// Property for providing current application's clock value for any BL class that may need it
-    /// </summary>
-    internal static DateTime Now { get => s_dal.Config.Clock; } //stage 4
 
-    /// <summary>
-    /// Method to perform application's clock from any BL class as may be required
-    /// </summary>
-    /// <param name="newClock">updated clock value</param>
-    internal static void UpdateClock(DateTime newClock) //stage 4-7
+    internal static void InitializeDB()
     {
-        // new Thread(() => { // stage 7 - not sure - still under investigation - see stage 7 instructions after it will be released        
-        updateClock(newClock);//stage 4-6
-        // }).Start(); // stage 7 as above
+        lock (BlMutex)
+        {
+            DalTest.Initialization.Do();
+            UpdateClock(Now);
+            MaxRange = MaxRange;
+        }
     }
+    #endregion
 
-    private static void updateClock(DateTime newClock) // prepared for stage 7 as DRY to eliminate needless repetition
+    #region UpdateClock
+    private static Task? _periodicTask = null;
+
+    internal static void UpdateClock(DateTime newClock)
     {
-        var oldClock = s_dal.Config.Clock; //stage 4
-        s_dal.Config.Clock = newClock; //stage 4
+        var oldClock = s_dal.Config.Clock;
+        s_dal.Config.Clock = newClock;
 
-        //TO_DO:
-        //Add calls here to any logic method that should be called periodically,
-        //after each clock update
-        //for example, Periodic students' updates:
-        //Go through all students to update properties that are affected by the clock update
-        //(students becomes not active after 5 years etc.)
+        if (_periodicTask is null || _periodicTask.IsCompleted)
+        {
+            _periodicTask = Task.Run(() =>
+            {
+                StudentManager?.PeriodicStudentsUpdates(oldClock, newClock);
+            });
+        }
 
-        CallManager.PeriodicCallUpdates(oldClock, newClock); //stage 4
-        VolunteerManager.PeriodicVolunteerUpdates(oldClock, newClock); //stage 4
-        //etc ...
-
-        //Calling all the observers of clock update
-        ClockUpdatedObservers?.Invoke(); //prepared for stage 5
+        _clockUpdatedObservers?.Invoke();
     }
-    #endregion Stage 4
+    #endregion
 
-    #region Stage 7 base
-    internal static readonly object blMutex = new();
-    private static Thread? s_thread;
-    private static int s_interval { get; set; } = 1; //in minutes by second    
+    #region סימולטור - שלב 7
+
+    internal static readonly object BlMutex = new();
+    private static volatile Thread? s_thread;
     private static volatile bool s_stop = false;
-    private static readonly object mutex = new();
+    private static int s_interval = 1;
+    private static Task? _simulateTask = null;
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public static void ThrowOnSimulatorIsRunning()
+    {
+        if (s_thread is not null)
+            throw new BO.BLTemporaryNotAvailableException("Cannot perform the operation since Simulator is running");
+    }
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
     internal static void Start(int interval)
     {
-        lock (mutex)
-            if (s_thread == null)
-            {
-                s_interval = interval;
-                s_stop = false;
-                s_thread = new Thread(clockRunner);
-                s_thread.Start();
-            }
+        if (s_thread is null)
+        {
+            s_interval = interval;
+            s_stop = false;
+            s_thread = new Thread(ClockRunner) { Name = "ClockRunner" };
+            s_thread.Start();
+        }
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     internal static void Stop()
     {
-        lock (mutex)
-            if (s_thread != null)
-            {
-                s_stop = true;
-                s_thread?.Interrupt();
-                s_thread = null;
-            }
+        if (s_thread is not null)
+        {
+            s_stop = true;
+            s_thread.Interrupt();
+            s_thread = null;
+        }
     }
 
-    private static void clockRunner()
+    private static void ClockRunner()
     {
         while (!s_stop)
         {
             UpdateClock(Now.AddMinutes(s_interval));
 
-            //        #region Stage 7
-            //        //TO_DO:
-            //        //Add calls here to any logic simulation that was required in stage 7
-            //        //for example: course registration simulation
-            //        StudentManager.SimulateCourseRegistrationAndGrade(); //stage 7
+            if (_simulateTask is null || _simulateTask.IsCompleted)
+            {
+                _simulateTask = Task.Run(() =>
+                {
+                    StudentManager?.SimulateCourseRegistrationAndGrade();
+                });
+            }
 
-            //        //etc...
-            //        #endregion Stage 7
-
-            //        try
-            //        {
-            //            Thread.Sleep(1000); // 1 second
-            //        }
-            //        catch (ThreadInterruptedException) { }
+            try
+            {
+                Thread.Sleep(1000);
+            }
+            catch (ThreadInterruptedException) { }
         }
     }
-    #endregion Stage 7 base
+    #endregion
 }

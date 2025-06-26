@@ -3,10 +3,12 @@ using DalApi;
 using DO;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 internal class AssignmentImplementation : IAssignment
 {
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Delete(int id)
     {
         XElement assignmentsRootElem = XMLTools.LoadListFromXMLElement(Config.s_assignments_xml);
@@ -20,6 +22,7 @@ internal class AssignmentImplementation : IAssignment
 
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void DeleteAll()
     {
         XMLTools.SaveListToXMLSerializer(new List<Assignment>(), Config.s_assignments_xml);
@@ -32,12 +35,14 @@ internal class AssignmentImplementation : IAssignment
 
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public Assignment? Read(Func<Assignment, bool> filter)
     {
         List<Assignment> Assignments = XMLTools.LoadListFromXMLSerializer<Assignment>(Config.s_assignments_xml);
         return Assignments.FirstOrDefault(filter);
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public IEnumerable<Assignment> ReadAll(Func<Assignment, bool>? filter = null)
     {
         List<Assignment> Assignments = XMLTools.LoadListFromXMLSerializer<Assignment>(Config.s_assignments_xml);
@@ -52,6 +57,7 @@ internal class AssignmentImplementation : IAssignment
         }
     }
 
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Update(Assignment item)
     {
         List<Assignment> Assignments = XMLTools.LoadListFromXMLSerializer<Assignment>(Config.s_assignments_xml);
@@ -61,6 +67,8 @@ internal class AssignmentImplementation : IAssignment
         XMLTools.SaveListToXMLSerializer(Assignments, Config.s_assignments_xml);
 
     }
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
     public void Create(Assignment item)
     {
         int nextAssignmentId = Config.NextAssignmentId;
