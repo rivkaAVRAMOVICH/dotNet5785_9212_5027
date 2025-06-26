@@ -31,18 +31,24 @@ internal static class AdminManager
 
     #region Properties
     // החליפי את MaxRange במשתנה הסביבה הרלוונטי אצלך אם צריך
-    internal static int MaxRange
+    internal static TimeSpan RiskRange
     {
-        get => s_dal.Config.MaxRange;
+        get => s_dal.Config.RiskRange;
         set
         {
-            s_dal.Config.SetMaxRange(value); // אם אין לך את זה, תורידי את השורה או תשני בהתאם
-            s_dal.Config.Reset();
-            _configUpdatedObservers?.Invoke();
+            s_dal.Config.RiskRange = value;
+            _configUpdatedObservers?.Invoke(); // stage 5
         }
     }
-
-    internal static DateTime Now => s_dal.Config.Clock;
+    internal static DateTime Clock
+    {
+        get => s_dal.Config.Clock;
+        set
+        {
+            s_dal.Config.Clock = value;
+            _configUpdatedObservers?.Invoke(); // stage 5
+        }
+    }
     #endregion
 
     #region StudentManager (יש להגדיר מהצד שלך)
@@ -55,8 +61,8 @@ internal static class AdminManager
         lock (BlMutex)
         {
             s_dal.ResetDB();
-            UpdateClock(Now);
-            MaxRange = MaxRange;
+            UpdateClock(Clock);
+            RiskRange = RiskRange;
         }
     }
 
@@ -65,8 +71,8 @@ internal static class AdminManager
         lock (BlMutex)
         {
             DalTest.Initialization.Do();
-            UpdateClock(Now);
-            MaxRange = MaxRange;
+            UpdateClock(Clock);
+            RiskRange = RiskRange;
         }
     }
     #endregion
@@ -133,7 +139,7 @@ internal static class AdminManager
     {
         while (!s_stop)
         {
-            UpdateClock(Now.AddMinutes(s_interval));
+            UpdateClock(Clock.AddMinutes(s_interval));
 
             if (_simulateTask is null || _simulateTask.IsCompleted)
             {

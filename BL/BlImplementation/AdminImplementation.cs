@@ -27,25 +27,26 @@ internal class AdminImplementation : IAdmin
     }
     // Clock promotion method
     public void AdvanceClock(BO.TimeUnit timeUnit) {
+        AdminManager.ThrowOnSimulatorIsRunning();
         switch (timeUnit)
         {
             case BO.TimeUnit.SECOND:
-                AdminManager.UpdateClock(AdminManager.Now.AddSeconds(1));
+                AdminManager.UpdateClock(AdminManager.Clock.AddSeconds(1));
                 break;
             case BO.TimeUnit.MINUTE:
-                AdminManager.UpdateClock(AdminManager.Now.AddMinutes(1));
+                AdminManager.UpdateClock(AdminManager.Clock.AddMinutes(1));
                 break;
             case BO.TimeUnit.HOUR:
-                AdminManager.UpdateClock(AdminManager.Now.AddHours(1));
+                AdminManager.UpdateClock(AdminManager.Clock.AddHours(1));
                 break;
             case BO.TimeUnit.DAY:
-                AdminManager.UpdateClock(AdminManager.Now.AddDays(1));
+                AdminManager.UpdateClock(AdminManager.Clock.AddDays(1));
                 break;
             case BO.TimeUnit.MONTH:
-                AdminManager.UpdateClock(AdminManager.Now.AddMonths(1));
+                AdminManager.UpdateClock(AdminManager.Clock.AddMonths(1));
                 break;
             case BO.TimeUnit.YEAR:
-                AdminManager.UpdateClock(AdminManager.Now.AddYears(1));
+                AdminManager.UpdateClock(AdminManager.Clock.AddYears(1));
                 break;
         }
     }
@@ -57,19 +58,30 @@ internal class AdminImplementation : IAdmin
 
     // Risk time frame definition method
     public void SetRiskTimeRange(TimeSpan riskTimeRange) {
+        AdminManager.ThrowOnSimulatorIsRunning();
         AdminManager.RiskRange = riskTimeRange;
     }
 
     // Database reset method
     public void ResetDatabase()
     {
-        _dal.ResetDB();
-        AdminManager.UpdateClock(AdminManager.Now);
+        AdminManager.ThrowOnSimulatorIsRunning();
+        lock (AdminManager.BlMutex) //stage 7
+            _dal.ResetDB();
+        AdminManager.UpdateClock(AdminManager.Clock);
     }
 
     // Database initialization method
     public void InitializeDatabase() {
+        AdminManager.ThrowOnSimulatorIsRunning();
         DalTest.Initialization.Do();
-        AdminManager.UpdateClock(AdminManager.Now);
+        AdminManager.UpdateClock(AdminManager.Clock);
     }
+    public void StartSimulator(int interval)  //stage 7
+    {
+        AdminManager.ThrowOnSimulatorIsRunning();  //stage 7
+        AdminManager.Start(interval); //stage 7
+    }
+public void StopSimulator()
+    => AdminManager.Stop(); //stage 7
 }

@@ -33,14 +33,17 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     public int[] RequestCallsQuantities()
     {
         int[] final = new int[6];
-        var callsByStatus = _dal.Call.ReadAll().GroupBy(call => CallManager.CallStatus(call));
+        lock (AdminManager.BlMutex)
+        {//stage 7
+            var callsByStatus = _dal.Call.ReadAll().GroupBy(call => CallManager.CallStatus(call)).ToList();
 
-        // Group calls by their status and populate the final array with the count of calls in each status.
-        foreach (var callGroup in callsByStatus)
-        {
-            int statusIndex = (int)callGroup.Key;
-            if (statusIndex >= 0 && statusIndex < final.Length)
-                final[statusIndex] = callGroup.Count();
+            // Group calls by their status and populate the final array with the count of calls in each status.
+            foreach (var callGroup in callsByStatus)
+            {
+                int statusIndex = (int)callGroup.Key;
+                if (statusIndex >= 0 && statusIndex < final.Length)
+                    final[statusIndex] = callGroup.Count();
+            }
         }
         return final;
     }
@@ -54,37 +57,41 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     /// <returns>A collection of BO.CallInList objects</returns>
     public IEnumerable<BO.CallInList> GetCallsList(BO.CallType? filterField, object? filterValue=null, BO.CallType? sortBy=null)
     {
-        var callList = CallManager.ConvertCallsToBO(_dal.Call.ReadAll());
-
-        // Apply filtering if necessary
-        if (filterField != null && filterValue != null)
-        {
-            // Retrieve the value of the specified filter field and compare it to the filter value.
-            callList = callList.Where(item =>
+        IEnumerable<BO.CallInList> callList;
+        lock (AdminManager.BlMutex)
+        { //stage 7
+            callList = CallManager.ConvertCallsToBO(_dal.Call.ReadAll()).ToList();
+        }
+            // Apply filtering if necessary
+            if (filterField != null && filterValue != null)
             {
-                var fieldValue = CallManager.GetFieldValue(item, filterField);
-                return fieldValue != null && fieldValue.Equals(filterValue);
-            });
-        }
+                // Retrieve the value of the specified filter field and compare it to the filter value.
+                callList = callList.Where(item =>
+                {
+                    var fieldValue = CallManager.GetFieldValue(item, filterField);
+                    return fieldValue != null && fieldValue.Equals(filterValue);
+                });
+            }
 
-        // Apply sorting if a sort field is provided
-        if (sortBy != null)
-        {
-            // Sort the list based on the provided sort field.
-            callList = callList.OrderBy(call => CallManager.GetFieldValue(call, sortBy));
-        }
-        else
-        {
-            callList = callList.OrderBy(call => call.Id);
-        }
+            // Apply sorting if a sort field is provided
+            if (sortBy != null)
+            {
+                // Sort the list based on the provided sort field.
+                callList = callList.OrderBy(call => CallManager.GetFieldValue(call, sortBy));
+            }
+            else
+            {
+                callList = callList.OrderBy(call => call.Id);
+            }
 
-        // Handle duplicate call IDs by keeping only the most recent entry.
-        if (callList.Any())
-        {
-            callList = callList.GroupBy(a => a.CallId)
-                .Select(g => g.OrderByDescending(a => a.StartCallTime).FirstOrDefault());
-        }
-        return callList;
+            // Handle duplicate call IDs by keeping only the most recent entry.
+            if (callList.Any())
+            {
+                callList = callList.GroupBy(a => a.CallId)
+                    .Select(g => g.OrderByDescending(a => a.StartCallTime).FirstOrDefault());
+            }
+
+            return callList;
     }
 
     /// <summary>
@@ -97,8 +104,10 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     {
         try
         {
+            DO.Call tmpCall;
             // Retrieve call data from the data layer
-            var tmpCall = _dal.Call.Read(id);
+            lock (AdminManager.BlMutex)//stage 7
+                tmpCall = _dal.Call.Read(id);
             if (tmpCall != null)
             {
                 // Build a BO.Call object with assignments related to the call
@@ -146,6 +155,7 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     /// <exception cref="BO.BlUnexpectedSystemException">Thrown when an unexpected system error occurs during the update process</exception>
     public void UpdateCallDetails(BO.Call call)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         try
         {
             // Validate the call's format and logic
@@ -165,7 +175,8 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
             };
 
             // Attempt to update the call in the data layer
-            _dal.Call.Update(newCall);
+            lock (AdminManager.BlMutex) //stage 7
+                _dal.Call.Update(newCall);
             CallManager.Observers.NotifyItemUpdated(newCall.Id);  //stage 5
             CallManager.Observers.NotifyListUpdated();  //stage 5
         }
@@ -200,27 +211,33 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     /// <exception cref="BO.BlDoesNotExistException">Thrown when the specified call ID does not exist in the system</exception>
     public void DeletingCall(int id)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         try
-        { 
-            var tmpCall = _dal.Call.Read(id);
-            if (tmpCall == null)
-            {
-                throw new DO.DalDoesNotExistException("Not found");
-            }
-            
-            var tmpAssignments = _dal.Assignment.ReadAll().Where(item => item.CallId == id);
-            var tmpStatus = CallManager.CallStatus(tmpCall!);
-
-            if (!tmpAssignments.Any() && (tmpStatus == BO.Status.open || tmpStatus == BO.Status.openAtRisk))
-            {
-                _dal.Call.Delete(id);
-                CallManager.Observers.NotifyListUpdated();  //stage 5  
-            }
-            else
         {
-                throw new BO.BlDeletionImpossible("cant delet completed assignment");
+            lock (AdminManager.BlMutex)
+            { //stage 7
+
+                var tmpCall = _dal.Call.Read(id);
+                if (tmpCall == null)
+                {
+                    throw new DO.DalDoesNotExistException("Not found");
+                }
+
+                var tmpAssignments = _dal.Assignment.ReadAll().Where(item => item.CallId == id).ToList();
+                var tmpStatus = CallManager.CallStatus(tmpCall!);
+
+                if (!tmpAssignments.Any() && (tmpStatus == BO.Status.open || tmpStatus == BO.Status.openAtRisk))
+                {
+                    _dal.Call.Delete(id);
+                }
+                else
+                {
+                    throw new BO.BlDeletionImpossible("cant delet completed assignment");
+                }
             }
-        }
+                CallManager.Observers.NotifyListUpdated();  //stage 5  
+
+            }
         catch (DO.DalDoesNotExistException ex)
         {
             throw new BO.BlDoesNotExistException($"Call with ID={id} was not found", ex);
@@ -242,6 +259,7 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     /// <exception cref="BO.BlUnexpectedSystemException">Thrown when an unexpected system error occurs during the addition process</exception>
     public void AddingCall(BO.Call call)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         try
         {
             // Validate the call's format and logic
@@ -255,12 +273,13 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
                 CallAddress = call.CallAddress,
                 Latitude = Tools.GetLatitudLongitutes(call.CallAddress).Latitude, // Get latitude for the address
                 Longitude = Tools.GetLatitudLongitutes(call.CallAddress).Longitude, // Get longitude for the address
-                StartCallTime = AdminManager.Now,
+                StartCallTime = AdminManager.Clock,
                 MaxEndCallTime = call.MaxEndCallTime
             };
 
             // Attempt to add the new call in the data layer
-            _dal.Call.Create(finalCall);
+            lock (AdminManager.BlMutex) //stage 7
+                _dal.Call.Create(finalCall);
             CallManager.Observers.NotifyListUpdated(); //stage 5  
         }
 
@@ -294,16 +313,16 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     {
         // Fetch all closed assignments for the volunteer
         var closedVolunteerAssignments = _dal.Assignment.ReadAll()
-            .Where(assign => assign.VolunteerId == volunteerId && assign.FinishTimeTreatment != null);
+            .Where(assign => assign.VolunteerId == volunteerId && assign.FinishTimeTreatment != null).ToList();
 
         // Fetch all calls associated with the closed assignments
         var closedVolunteerCalls = _dal.Call.ReadAll()
-            .Where(call => closedVolunteerAssignments.Any(a => a.CallId == call.Id));
+            .Where(call => closedVolunteerAssignments.Any(a => a.CallId == call.Id)).ToList();
 
         // Filter calls by type if specified
         if (filterType.HasValue)
         {
-            closedVolunteerCalls = closedVolunteerCalls.Where(call => call.CallType == (DO.CallType)filterType.Value);
+            closedVolunteerCalls = closedVolunteerCalls.Where(call => call.CallType == (DO.CallType)filterType.Value).ToList();
         }
 
         // Transform data into BO.ClosedCallInList objects
@@ -343,12 +362,12 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     {
         // Fetch all open calls
         var openCalls = _dal.Call.ReadAll()
-            .Where(call => CallManager.CallStatus(call) == BO.Status.open || CallManager.CallStatus(call) == BO.Status.openAtRisk);
+            .Where(call => CallManager.CallStatus(call) == BO.Status.open || CallManager.CallStatus(call) == BO.Status.openAtRisk).ToList();
 
         // Filter calls by type if specified
         if (filterType.HasValue)
         {
-            openCalls = openCalls.Where(call => call.CallType == (DO.CallType)filterType.Value);
+            openCalls = openCalls.Where(call => call.CallType == (DO.CallType)filterType.Value).ToList();
         }
 
         DO.Volunteer volunteer;
@@ -402,16 +421,22 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     /// <exception cref="BO.BlUnexpectedSystemException">Thrown when an unexpected system error occurs while completing the assignment</exception>
     public void ReportCallCompletion(int volunteerId, int assignmentId)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         try
         {
+            DO.Assignment assignment;
             // Fetch the assignment data
-            DO.Assignment assignment = _dal.Assignment.Read(assignmentId);
+            lock (AdminManager.BlMutex)
+            { //stage 7
 
-            // Validate the assignment's eligibility to be closed
-            CallManager.ValidateAssignmentToFinish(volunteerId, assignment);
+                assignment = _dal.Assignment.Read(assignmentId);
 
-            // Update the assignment with the completion details
-            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, volunteerId, assignment.EntryTimeTreatment, DateTime.Now, DO.EndTypeAssignment.Treated));
+                // Validate the assignment's eligibility to be closed
+                CallManager.ValidateAssignmentToFinish(volunteerId, assignment);
+
+                // Update the assignment with the completion details
+                _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, volunteerId, assignment.EntryTimeTreatment, DateTime.Now, DO.EndTypeAssignment.Treated));
+            }
             AssignmentManager.Observers.NotifyItemUpdated(assignment.Id);  //stage 5
             AssignmentManager.Observers.NotifyListUpdated();  //stage 5
         }
@@ -451,22 +476,28 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     /// <exception cref="BO.BlUnexpectedSystemException">Thrown when an unexpected system error occurs while canceling the assignment</exception>
     public void CancelCallHandling(int requesterId, int assignmentId)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         try
         {
+            DO.Assignment assignment;
             // Fetch the assignment data
-            DO.Assignment assignment = _dal.Assignment.Read(assignmentId);
+            lock (AdminManager.BlMutex)
+            { //stage 7
 
-            // Validate the assignment's eligibility to be canceled
-            CallManager.ValidateAssignmentToCancel(requesterId, assignment);
+                assignment = _dal.Assignment.Read(assignmentId);
 
-            // Determine the finish type based on who is canceling
-            var VolunteerOrManager = (assignment.VolunteerId == requesterId)
-                ? DO.EndTypeAssignment.SelfCancellation
-                : DO.EndTypeAssignment.AdministratorCancellation;
+                // Validate the assignment's eligibility to be canceled
+                CallManager.ValidateAssignmentToCancel(requesterId, assignment);
 
-            // Update the assignment with the cancellation details
-            _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, requesterId, assignment.EntryTimeTreatment, AdminManager.Now, VolunteerOrManager));
-            AssignmentManager.Observers.NotifyItemUpdated(assignment.Id);  //stage 5
+                // Determine the finish type based on who is canceling
+                var VolunteerOrManager = (assignment.VolunteerId == requesterId)
+                    ? DO.EndTypeAssignment.SelfCancellation
+                    : DO.EndTypeAssignment.AdministratorCancellation;
+
+                // Update the assignment with the cancellation details
+                _dal.Assignment.Update(new DO.Assignment(0, assignment.CallId, requesterId, assignment.EntryTimeTreatment, AdminManager.Clock, VolunteerOrManager));
+            }
+              AssignmentManager.Observers.NotifyItemUpdated(assignment.Id);  //stage 5
             AssignmentManager.Observers.NotifyListUpdated();  //stage 5
         }
         catch (DO.DalDoesNotExistException ex)
@@ -500,50 +531,54 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
     /// <exception cref="BO.BlAlreadyExistException">Thrown when an assignment with the specified details already exists</exception>
     public void AssignCallToVolunteer(int volunteerId, int callId)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         DO.Volunteer tmpVol;
         DO.Call tmpCall;
-
-        try
-        { 
-            tmpVol = _dal.Volunteer.Read(volunteerId);
-            // Fetch volunteer data
-            if (tmpVol == null) 
-            { throw new DO.DalDoesNotExistException("not found"); }
-        }
-        catch (DO.DalDoesNotExistException ex)
+        lock (AdminManager.BlMutex) //stage 7
         {
-            throw new BO.BlDoesNotExistException($"Volunteer with ID={volunteerId} not found", ex);
-        }
-        try
-        {
-            // Fetch call data
-            tmpCall = _dal.Call.Read(callId);
-            if(tmpCall == null)
+            try
             {
-                throw new DO.DalDoesNotExistException("not found");
+                tmpVol = _dal.Volunteer.Read(volunteerId);
+                // Fetch volunteer data
+                if (tmpVol == null)
+                { throw new DO.DalDoesNotExistException("not found"); }
+            }
+            catch (DO.DalDoesNotExistException ex)
+            {
+                throw new BO.BlDoesNotExistException($"Volunteer with ID={volunteerId} not found", ex);
+            }
+            try
+            {
+                // Fetch call data
+                tmpCall = _dal.Call.Read(callId);
+                if (tmpCall == null)
+                {
+                    throw new DO.DalDoesNotExistException("not found");
+                }
+            }
+            catch (DO.DalDoesNotExistException ex)
+            {
+                throw new BO.BlDoesNotExistException($"Call with ID={callId} not found", ex);
+            }
+            BO.Status status = CallManager.CallStatus(tmpCall);
+            // Validate the call status
+            if (status != BO.Status.open && status != BO.Status.openAtRisk)
+            {
+                throw new BO.BlInvalidAssignmentException($"Call is not closed, expired or already being handled");
+            }
+
+            // Create a new assignment for the volunteer
+            var tmpAssign = new DO.Assignment(0, callId, volunteerId, AdminManager.Clock, null, null);
+            try
+            {
+                _dal.Assignment.Create(tmpAssign);
+
+            }
+            catch (DO.DalAlreadyExistsException ex)
+            {
+                throw new BO.BlAlreadyExistException($"Assignment with ID={tmpAssign.Id} already exists", ex);
             }
         }
-        catch (DO.DalDoesNotExistException ex)
-        {
-            throw new BO.BlDoesNotExistException($"Call with ID={callId} not found", ex);
-        }
-        BO.Status status = CallManager.CallStatus(tmpCall);
-        // Validate the call status
-        if (status != BO.Status.open && status != BO.Status.openAtRisk)
-        {
-            throw new BO.BlInvalidAssignmentException($"Call is not closed, expired or already being handled");
-        }
-
-        // Create a new assignment for the volunteer
-        var tmpAssign = new DO.Assignment(0, callId, volunteerId, AdminManager.Now, null, null);
-        try
-        {
-            _dal.Assignment.Create(tmpAssign);
-            AssignmentManager.Observers.NotifyListUpdated(); //stage 5  
-        }
-        catch (DO.DalAlreadyExistsException ex)
-        {
-            throw new BO.BlAlreadyExistException($"Assignment with ID={tmpAssign.Id} already exists", ex);
-        }
+        AssignmentManager.Observers.NotifyListUpdated(); //stage 5  
     }
 }

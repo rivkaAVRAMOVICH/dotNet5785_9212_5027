@@ -22,6 +22,7 @@ namespace Helpers
     {
         private static IDal s_dal = DalApi.Factory.Get; // Access to the DAL layer
         internal static ObserverManager Observers = new(); //stage 5 
+        private static readonly Random s_rand = new();
         /// <summary>
         /// Validates an Israeli ID using a checksum algorithm.
         /// </summary>
@@ -174,7 +175,9 @@ namespace Helpers
         /// </summary>
         public static BO.CallInProgress addCall(DO.Assignment aInProgress, DO.Volunteer volunteer)
         {
-            DO.Call call = s_dal.Call.Read(aInProgress.CallId);
+            DO.Call? call;
+            lock (AdminManager.BlMutex)
+            call = s_dal.Call.Read(aInProgress.CallId);
             BlApi.IAdmin admin = new BlImplementation.AdminImplementation();
             return new BO.CallInProgress
             {
@@ -225,10 +228,6 @@ namespace Helpers
                 if (!isId(v1.Id))
                     throw new InvalidException("Invalid id");
 
-
-                if (!Tools.TryGetCoordinates(v1.Address, out var coordinates))
-                    throw new InvalidException("Invalid address");
-
                 return true;
             }
             return false;
@@ -237,29 +236,175 @@ namespace Helpers
         internal static void PeriodicVolunteerUpdates(DateTime oldClock, DateTime newClock)
         {
             bool volunteersUpdated = false;
+            List<int> updatedVolunteerIds = new(); // רשימת מתנדבים שנשלחו למשקיפים
 
-
-            var volunteers = s_dal.Volunteer.ReadAll().ToList();
-
-            foreach (var doVolunteer in volunteers)
+            lock (AdminManager.BlMutex)
             {
-                // תנאי לדוגמה: אם אין טלפון או מיקום -> לא פעיל
-                if ((string.IsNullOrWhiteSpace(doVolunteer.PhoneNumber) ||
-                    doVolunteer.Latitude == null ||
-                    doVolunteer.Longitude == null) &&
-                    doVolunteer.Active) // עדכון רק אם היה פעיל
+                var volunteers = s_dal.Volunteer.ReadAll().ToList();
+
+                foreach (var doVolunteer in volunteers)
                 {
-                    var updatedVolunteer = doVolunteer with { Active = false };
-                    s_dal.Volunteer.Update(updatedVolunteer);
-                    Observers.NotifyItemUpdated(doVolunteer.Id);
-                    volunteersUpdated = true;
+                    if ((string.IsNullOrWhiteSpace(doVolunteer.PhoneNumber) ||
+                         doVolunteer.Latitude == null ||
+                         doVolunteer.Longitude == null) &&
+                         doVolunteer.Active)
+                    {
+                        var updatedVolunteer = doVolunteer with { Active = false };
+                        s_dal.Volunteer.Update(updatedVolunteer);
+                        updatedVolunteerIds.Add(doVolunteer.Id); // נרשום שנעדכן עליו את המשקיף
+                        volunteersUpdated = true;
+                    }
                 }
             }
 
+            // נעדכן את המשקיפים רק אחרי שהנעילה שוחררה
+            foreach (int id in updatedVolunteerIds)
+            {
+                Observers.NotifyItemUpdated(id);
+            }
 
             if (volunteersUpdated)
+            
                 Observers.NotifyListUpdated();
         }
+        internal static async Task UpdateCoordinatesForVolunteerAsync(DO.Volunteer doVolunteer)
+        {
+            if (string.IsNullOrWhiteSpace(doVolunteer.FullAddress))
+                return;
+
+            var location = await Tools.GetCoordinatesFromAddressAsync(doVolunteer.FullAddress);
+
+            DO.Volunteer updatedVolunteer;
+
+                var (lat, lon) = location.Value;
+                updatedVolunteer = doVolunteer with
+                {
+                    Latitude = lat,
+                    Longitude = lon,
+                };
+            
+           
+
+            lock (AdminManager.BlMutex)
+            {
+                s_dal.Volunteer.Update(updatedVolunteer);
+            }
+
+            Observers.NotifyItemUpdated(doVolunteer.Id);
+            Observers.NotifyListUpdated();
+        }
+
+        internal static async Task SimulateVolunteerActivity()
+        {
+            Thread.CurrentThread.Name = $"VolunteerSimulatorThread";
+            var callManager = new CallImplementation();
+            List<DO.Volunteer> volunteers;
+            lock (AdminManager.BlMutex)
+            {
+                volunteers = s_dal.Volunteer.ReadAll(v => v.Active == true).ToList(); // קריאה לרשימה סופית
+            }
+
+            List<int> updatedVolunteerIds = new();
+
+            foreach (var doVolunteer in volunteers)
+            {
+                int volunteerId = doVolunteer.Id;
+
+                // בדיקת האם למתנדב יש כרגע קריאה בטיפול
+                DO.Assignment? currentAssignment;
+                lock (AdminManager.BlMutex)
+                {
+                    currentAssignment = s_dal.Assignment.ReadAll()
+                        .FirstOrDefault(a => a.VolunteerId == volunteerId && a.FinishTimeTreatment == null);
+                }
+
+                if (currentAssignment == null)
+                {
+                    // אין טיפול כרגע – ננסה להצטרף לטיפול חדש
+                    if (s_rand.NextDouble() < 0.2) // 20% הסתברות שיצטרף לטיפול
+                    {
+                        List<BO.OpenCallInList> possibleCalls;
+                        lock (AdminManager.BlMutex)
+                        {
+                            possibleCalls = callManager.GetOpenCallsForVolunteer(volunteerId,null,null).ToList();
+                        }
+
+                        if (possibleCalls.Any())
+                        {
+                            var selectedCall = possibleCalls[s_rand.Next(possibleCalls.Count)];
+
+                            lock (AdminManager.BlMutex)
+                            {
+                                callManager.AssignCallToVolunteer(selectedCall.Id, volunteerId);
+                            }
+
+                            updatedVolunteerIds.Add(volunteerId);
+                        }
+                    }
+                }
+                else
+                {
+                    // יש קריאה בטיפול – נבחן האם הגיע הזמן לסיים או לבטל
+
+                    DateTime entryTime = currentAssignment.EntryTimeTreatment;
+                    double distance = 0;
+                   
+                        var volunteerCoords = await Tools.GetCoordinatesFromAddressAsync(doVolunteer.FullAddress); // מחזיר (lat, lon)
+
+                    // נניח שיש פונקציה שמחזירה את הכתובת של הקריאה לפי ה-ID שלה
+                    lock (AdminManager.BlMutex)
+                    {
+                        var call = s_dal.Call.Read(currentAssignment.CallId);
+
+                        if (volunteerCoords is null)
+                        {
+                            return; 
+                        }
+
+                        distance = CallManager.GetDistance(
+                            volunteerCoords.Value.Latitude,
+                            volunteerCoords.Value.Longitude,
+                            call.Latitude,
+                            call.Longitude
+                        );
+                    }
+
+                    // סימולציה: מספיק זמן = מרחק בדקות + עד 2 דקות רנדומלי
+                    TimeSpan requiredDuration = TimeSpan.FromMinutes(distance + s_rand.Next(1, 3));
+                    TimeSpan actualDuration = DateTime.Now - entryTime;
+
+                    if (actualDuration >= requiredDuration)
+                    {
+                        lock (AdminManager.BlMutex)
+                        {
+                            callManager.ReportCallCompletion(volunteerId,currentAssignment.CallId);
+                        }
+
+                        updatedVolunteerIds.Add(volunteerId);
+                    }
+                    else
+                    {
+                        if (s_rand.NextDouble() < 0.1) // 10% הסתברות לביטול
+                        {
+                            lock (AdminManager.BlMutex)
+                            {
+                                callManager.CancelCallHandling(currentAssignment.CallId, volunteerId);
+                            }
+
+                            updatedVolunteerIds.Add(volunteerId);
+                        }
+                    }
+                }
+            }
+
+            // שליחת התראות למשקיפים
+            foreach (int id in updatedVolunteerIds)
+            {
+                Observers.NotifyItemUpdated(id);
+            }
+        }
+
     }
+
 }
 

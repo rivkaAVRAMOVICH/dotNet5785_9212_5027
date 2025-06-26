@@ -20,6 +20,8 @@ namespace BlApi
         // מתודת בקשת טווח זמן סיכון
         public TimeSpan GetRiskTimeRange();
 
+        void StartSimulator(int interval); //stage 7
+        void StopSimulator(); //stage 7
 
         // מתודת הגדרת טווח זמן סיכון
         public void SetRiskTimeRange(TimeSpan riskTimeRange);

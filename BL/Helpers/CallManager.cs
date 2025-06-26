@@ -9,6 +9,7 @@ using BO;
 //using Newtonsoft.Json;
 using DalApi;
 using DO;
+using System.Collections;
 
 /// <summary>
 /// Provides methods to manage calls and assignments within the system.
@@ -27,9 +28,10 @@ internal class CallManager
     internal static BO.Status CallStatus(DO.Call call)
     {
         var currentTime = DateTime.Now;
-
+        DO.Assignment? openAssignment;
         // Check for an open assignment related to the call
-        var openAssignment = _dal.Assignment.ReadAll().FirstOrDefault(item => item.CallId == call.Id && item.FinishTimeTreatment == null);
+        lock (AdminManager.BlMutex) //stage 7
+            openAssignment = _dal.Assignment.ReadAll().FirstOrDefault(item => item.CallId == call.Id && item.FinishTimeTreatment == null);
         if (openAssignment != null)
         {
             if (call.MaxEndCallTime != null && call.StartCallTime.AddHours(1) < currentTime)
@@ -48,7 +50,9 @@ internal class CallManager
             }
         }
         // Check for a closed assignment related to the call
-        var closedAssignment = _dal.Assignment.ReadAll().FirstOrDefault(item => item.CallId == call.Id && item.FinishTimeTreatment != null);
+        DO.Assignment? closedAssignment;
+        lock (AdminManager.BlMutex) //stage 7
+            closedAssignment = _dal.Assignment.ReadAll().FirstOrDefault(item => item.CallId == call.Id && item.FinishTimeTreatment != null);
         if (closedAssignment != null)
         {
             return BO.Status.closed;
@@ -111,43 +115,45 @@ internal class CallManager
     /// </summary>
     public static void UpdateExpiredCalls()
     {
-        var currentTime = AdminManager.Now;
-
-        // Retrieve calls with no assignments whose time has expired
-        var callsWithNoAssignments = _dal.Call.ReadAll()
+        var currentTime = AdminManager.Clock;
+        lock (AdminManager.BlMutex) //stage 7
+        {
+            // Retrieve calls with no assignments whose time has expired
+            var callsWithNoAssignments = _dal.Call.ReadAll()
             .Where(call => call.MaxEndCallTime <= currentTime && CallManager.CallStatus(call) != BO.Status.closed && !_dal.Assignment.ReadAll().Any(a => a.CallId == call.Id));
 
-        // Retrieve calls with existing assignments but no actual end time
-        var callsThatHaveAssignments = _dal.Call.ReadAll()
-            .Where(call => call.MaxEndCallTime <= currentTime && CallManager.CallStatus(call) != BO.Status.closed && _dal.Assignment.ReadAll().Any(a => a.CallId == call.Id && a.FinishTimeTreatment == null));
+            // Retrieve calls with existing assignments but no actual end time
+            var callsThatHaveAssignments = _dal.Call.ReadAll()
+                .Where(call => call.MaxEndCallTime <= currentTime && CallManager.CallStatus(call) != BO.Status.closed && _dal.Assignment.ReadAll().Any(a => a.CallId == call.Id && a.FinishTimeTreatment == null));
 
-        // Handle calls with no assignments
-        foreach (var call in callsWithNoAssignments)
-        {
-            _dal.Assignment.Create(new Assignment
+            // Handle calls with no assignments
+            foreach (var call in callsWithNoAssignments)
             {
-                Id = 0,
-                CallId = call.Id,
-                VolunteerId = 0,
-                EntryTimeTreatment = currentTime,
-                FinishTimeTreatment = currentTime,
-                EndTypeAssignment = DO.EndTypeAssignment.ExpiredCancellation
-            });
-        }
+                _dal.Assignment.Create(new Assignment
+                {
+                    Id = 0,
+                    CallId = call.Id,
+                    VolunteerId = 0,
+                    EntryTimeTreatment = currentTime,
+                    FinishTimeTreatment = currentTime,
+                    EndTypeAssignment = DO.EndTypeAssignment.ExpiredCancellation
+                });
+            }
 
-        // Handle calls with existing assignments
-        foreach (var call in callsThatHaveAssignments)
-        {
-            var tmpAssignment = _dal.Assignment.ReadAll().First(a => a.CallId == call.Id && a.FinishTimeTreatment == null);
-            _dal.Assignment.Update(new Assignment
+            // Handle calls with existing assignments
+            foreach (var call in callsThatHaveAssignments)
             {
-                Id = tmpAssignment.Id,
-                CallId = tmpAssignment.CallId,
-                VolunteerId = tmpAssignment.VolunteerId,
-               EntryTimeTreatment = tmpAssignment.EntryTimeTreatment,
-                FinishTimeTreatment = currentTime,
-                EndTypeAssignment = DO.EndTypeAssignment.ExpiredCancellation
-            });
+                var tmpAssignment = _dal.Assignment.ReadAll().First(a => a.CallId == call.Id && a.FinishTimeTreatment == null);
+                _dal.Assignment.Update(new Assignment
+                {
+                    Id = tmpAssignment.Id,
+                    CallId = tmpAssignment.CallId,
+                    VolunteerId = tmpAssignment.VolunteerId,
+                    EntryTimeTreatment = tmpAssignment.EntryTimeTreatment,
+                    FinishTimeTreatment = currentTime,
+                    EndTypeAssignment = DO.EndTypeAssignment.ExpiredCancellation
+                });
+            }
         }
     }
 
@@ -182,8 +188,10 @@ internal class CallManager
     /// <exception cref="BO.BlInvalidAssignmentException">Thrown when the assignment has already been completed or is no longer active</exception>
     public static void ValidateAssignmentToCancel(int id, DO.Assignment assignment)
     {
+        bool isAuthorized;
         // Authorization check: manager or volunteer assigned to the task
-        bool isAuthorized = (assignment.VolunteerId == id || _dal.Volunteer.Read(id)!.Role == DO.RoleEnum.manager);
+        lock (AdminManager.BlMutex) //stage 7
+            isAuthorized = (assignment.VolunteerId == id || _dal.Volunteer.Read(id)!.Role == DO.RoleEnum.manager);
         if (!isAuthorized)
         {
             throw new BO.BlUnauthorizedActionException("The requester does not have permission to cancel this assignment");
@@ -224,22 +232,26 @@ internal class CallManager
     private static string? GetLastVolunteerName(int callId)
     {
         // שליפת כל השיבוצים של הקריאה הזאת
-        var assignments = _dal.Assignment
+        lock (AdminManager.BlMutex) //stage 7
+        {
+            var assignments = _dal.Assignment
             .ReadAll()
             .Where(a => a.CallId == callId);
 
-        // אם אין שיבוצים - נחזיר null
-        if (!assignments.Any())
-            return null;
+            // אם אין שיבוצים - נחזיר null
+            if (!assignments.Any())
+                return null;
 
-        // נאתר את השיבוץ האחרון - לפי מזהה או לפי זמן (אם יש)
-        var lastAssignment = assignments
-            .OrderByDescending(a => a.Id) // אם יש שדה תאריך כמו AssignedAt עדיף למיין לפי זה
-            .First();
+            // נאתר את השיבוץ האחרון - לפי מזהה או לפי זמן (אם יש)
+            var lastAssignment = assignments
+                .OrderByDescending(a => a.Id) // אם יש שדה תאריך כמו AssignedAt עדיף למיין לפי זה
+                .First();
 
-        // נביא את שם המתנדב
-        var volunteer = _dal.Volunteer.Read(lastAssignment.VolunteerId);
-        return volunteer?.FullName;
+            // נביא את שם המתנדב
+            var volunteer = _dal.Volunteer.Read(lastAssignment.VolunteerId);
+
+            return volunteer?.FullName;
+        }
     }
 
     /// <summary>
@@ -306,9 +318,14 @@ internal class CallManager
     }
     public static BO.Call ConvertToBo(DO.Call doCall)
     {
-        var assignments = _dal.Assignment.ReadAll()
-            .Where(a => a.CallId == doCall.Id)
-            .ToList();
+        IEnumerable<DO.Assignment> assignments;
+        lock (AdminManager.BlMutex)
+        {//stage 7
+            assignments = _dal.Assignment.ReadAll()
+           .Where(a => a.CallId == doCall.Id)
+           .ToList();
+        }
+        
 
         return new BO.Call
         {
@@ -320,14 +337,15 @@ internal class CallManager
             Longitude = doCall.Longitude,
             StartCallTime = doCall.StartCallTime,
             MaxEndCallTime = doCall.MaxEndCallTime,
-            CallAssignList = MapAssignments(assignments)
+            CallAssignList = MapAssignments(assignments.ToList())
         };
     }
     internal static void PeriodicCallUpdates(DateTime oldClock, DateTime newClock)
     {
         bool callUpdated = false;
-
-        var list = _dal.Call.ReadAll().ToList();
+        IEnumerable<DO.Call> list;
+        lock (AdminManager.BlMutex) //stage 7
+            list = _dal.Call.ReadAll().ToList();
         foreach (var doCall in list)
         {
             var boCall = ConvertToBo(doCall); // המרת DO ל־BO

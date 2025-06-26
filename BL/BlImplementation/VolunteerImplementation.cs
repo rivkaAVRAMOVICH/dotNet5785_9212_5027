@@ -19,9 +19,11 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
 
     public BO.Role EnteredSystem(int userId, string password)
     {
+        DO.Volunteer tmpVolunteer;
         try
         {
-            var tmpVolunteer = _dal.Volunteer.ReadAll().Where(item => item.Id == userId).FirstOrDefault();
+            lock (AdminManager.BlMutex) //stage 7
+               tmpVolunteer = _dal.Volunteer.ReadAll().Where(item => item.Id == userId).FirstOrDefault();
 
             // Check name
             if (tmpVolunteer == null)
@@ -44,9 +46,11 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
     }
     public IEnumerable<BO.VolunteerInList> GetVolunteersList(bool? active = null, BO.CallType? sortBy = null)
     {
+        IEnumerable<DO.Volunteer> volunteers;
         try
         {
-            var volunteers = _dal.Volunteer.ReadAll();
+            lock (AdminManager.BlMutex) //stage 7
+                volunteers = _dal.Volunteer.ReadAll().ToList();
             //sort by active volunteer or not
             if (active.HasValue)
             {
@@ -85,8 +89,9 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
     }
     public BO.Volunteer GetVolunteerDetails(int id)
     {
-
-        var tmpVolunteer = _dal.Volunteer.Read(id);
+        DO.Volunteer tmpVolunteer;
+        lock (AdminManager.BlMutex) //stage 7
+            tmpVolunteer = _dal.Volunteer.Read(id);
         //cheeck id
         if (tmpVolunteer == null)
         {
@@ -98,6 +103,7 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
     }
     public void UpdateVolunteerDetails(int id, BO.Volunteer volunteer)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         try
         {
         DO.Volunteer RequesterUpdate = _dal.Volunteer.Read(id);
@@ -124,7 +130,12 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
                 _dal.Volunteer.Update(finalVolunteer);//update the data of volunteers
                VolunteerManager.Observers.NotifyItemUpdated(finalVolunteer.Id);  //stage 5
                VolunteerManager.Observers.NotifyListUpdated();  //stage 5
+                if (addressChanged)
+                {
+                    _ = VolunteerManager.UpdateCoordinatesForVolunteerAsync(finalVolunteer);
+                }
             }
+           
         }
         catch (BO.BlUnexpectedSystemException ex)
         {
@@ -133,6 +144,7 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
     }
     public void DeletingVolunteer(int id)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         var volunteer = GetVolunteerDetails(id);
 
         if (volunteer == null)
@@ -149,7 +161,8 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
         try
         {
             // volunteer removed from data
-            _dal.Volunteer.Delete(id);
+            lock (AdminManager.BlMutex) //stage 7
+                _dal.Volunteer.Delete(id);
            VolunteerManager.Observers.NotifyListUpdated();  //stage 5  
         }
         catch (DO.DalDoesNotExistException ex)
@@ -161,17 +174,22 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
     }
     public void AddingVolunteer(BO.Volunteer volunteer)
     {
+        AdminManager.ThrowOnSimulatorIsRunning();
         try
         {
             var myVolunteer = _dal.Volunteer.Read(volunteer.Id);
-            //var myStatus = (BO.Role)myVolunteer?.Role;
-            if (Helpers.VolunteerManager.IntegrityChecker(volunteer))// help function to check if the volunteer can be create
-            {
-                DO.Volunteer finalVolunteer = Helpers.VolunteerManager.ConvertVolunteersToDo(volunteer); // help function to create the new volunteer
-                _dal.Volunteer.Create(finalVolunteer); //add the new Volunteer
-                VolunteerManager.Observers.NotifyListUpdated(); //stage 5  
-            }
 
+            if (Helpers.VolunteerManager.IntegrityChecker(volunteer)) // בדיקת תקינות
+            {
+                DO.Volunteer finalVolunteer = Helpers.VolunteerManager.ConvertVolunteersToDo(volunteer);
+
+                _dal.Volunteer.Create(finalVolunteer); // יצירה בדאטה
+
+                VolunteerManager.Observers.NotifyListUpdated(); // עדכון ממשק
+
+                // 🆕 שלב 7: חישוב קואורדינטות בצורה אסינכרונית ברקע
+                _ = VolunteerManager.UpdateCoordinatesForVolunteerAsync(finalVolunteer);
+            }
         }
         catch (BO.BlFormatException ex)
         {
@@ -185,7 +203,7 @@ VolunteerManager.Observers.RemoveObserver(id, observer); //stage 5
         {
             throw new BO.BlUnexpectedSystemException("An unexpected error occurred while adding the volunteer", ex);
         }
-
     }
+
 
 }

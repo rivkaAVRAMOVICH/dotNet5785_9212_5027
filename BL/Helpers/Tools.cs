@@ -13,55 +13,39 @@ internal static class Tools
 {
     private const string ApiKey = "pk.be4ce2e76ebfce8455e92137f1e0ebd3";
       private static readonly HttpClient HttpClient = new HttpClient();
-    public static bool TryGetCoordinates(string address, out (double Latitude, double Longitude) coordinates)
-    {
-        try
-        {
-            coordinates = GetCoordinatesFromAddress(address);
-            return true;
-        }
-        catch
-        {
-            coordinates = default;
-            return false;
-        }
-    }
-
     ///<summary>
     /// Converts an address to (latitude, longitude) using maps.co synchronously.
     /// Throws an exception if the address is invalid or not found.
     /// </summary>
     /// <param name="address">The full address as string</param>
     /// <returns>Tuple of (Latitude, Longitude)</returns>
-    public static (double Latitude, double Longitude) GetCoordinatesFromAddress(string address)
+    public static async Task<(double Latitude, double Longitude)?> GetCoordinatesFromAddressAsync(string address)
     {
         if (string.IsNullOrWhiteSpace(address))
-            throw new BlFormatException("Address is empty.");
+            return null;
 
         string url = $"https://us1.locationiq.com/v1/search.php?key={ApiKey}&q={Uri.EscapeDataString(address)}&format=json";
 
         using var client = new HttpClient();
-        string json;
 
         try
         {
-            json = client.GetStringAsync(url).Result; // קריאה סינכרונית
+            string json = await client.GetStringAsync(url); // קריאה אסינכרונית
+            var results = JsonSerializer.Deserialize<List<LocationIqResponse>>(json);
+
+            if (results == null || results.Count == 0)
+                return null;
+
+            if (!double.TryParse(results[0].Lat, out double lat) ||
+                !double.TryParse(results[0].Lon, out double lon))
+                return null;
+
+            return (lat, lon);
         }
-        catch (Exception ex)
+        catch
         {
-            throw new Exception("Failed to contact geolocation service.", ex);
+            return null;
         }
-
-        var results = JsonSerializer.Deserialize<List<LocationIqResponse>>(json);
-
-        if (results == null || results.Count == 0)
-            throw new Exception("Address not found.");
-
-        if (!double.TryParse(results[0].Lat, out double lat) ||
-            !double.TryParse(results[0].Lon, out double lon))
-            throw new Exception("Invalid coordinate format from geolocation service.");
-
-        return (lat, lon);
     }
 
 
