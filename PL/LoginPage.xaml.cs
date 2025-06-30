@@ -31,9 +31,6 @@ namespace PL
             if (int.TryParse(IdTextBox.Text.Trim(), out id))
             {
                 string password = PasswordBox.Password;
-          
-         
-
             try
             {
                 // נניח שהפונקציה זמינה דרך מופע של BL

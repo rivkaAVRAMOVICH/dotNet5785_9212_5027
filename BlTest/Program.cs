@@ -308,11 +308,20 @@ Enter your choice: ");
     /// </summary>
     private static void VolunteerLogin()
     {
-        Console.WriteLine("Enter Volunteer name: ");
-        string? name = Console.ReadLine();
-        Console.WriteLine("Enter your password: ");
+        Console.Write("Enter Volunteer ID: ");
+        string? idStr = Console.ReadLine();
+
+        if (!int.TryParse(idStr, out int id))
+        {
+            Console.WriteLine("Invalid ID. Please enter a numeric ID.");
+            return;
+        }
+
+        Console.Write("Enter your password: ");
         string? myPassword = Console.ReadLine();
-        var myRole = s_bl.Volunteer.EnteredSystem(name, myPassword);
+
+        // נניח שהפונקציה מקבלת ת"ז וסיסמה
+        var myRole = s_bl.Volunteer.EnteredSystem(id, myPassword);
         Console.WriteLine(myRole);
     }
 

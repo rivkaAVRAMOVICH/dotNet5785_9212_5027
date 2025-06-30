@@ -36,34 +36,31 @@ public class NullToBoolInverseConverter : IValueConverter
             throw new NotSupportedException();
         }
     }
-    //public class StatusToCanUnassignConverter : IValueConverter
-    //{
-    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        var call = value as BO.CallInList;
-    //        return (call.Status == Status.inProgress || call.Status == Status.inProgressAtRisk)
-    //            ? Visibility.Visible : Visibility.Collapsed;
-    //    }
 
-    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-    //public class StatusToCanDeleteConverter : IValueConverter
-    //{
-    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        var call = value as BO.CallInList;
-    //        return (call.Status == Status.open && call.AssignSum == 0) ? Visibility.Visible : Visibility.Collapsed;
-    //    }
+    public class BoolToSimulatorButtonContentConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (bool)value ? "Stop Simulator" : "Start Simulator";
+        }
 
-    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class InverseBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return !(bool)value;
+        }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class UnassignVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

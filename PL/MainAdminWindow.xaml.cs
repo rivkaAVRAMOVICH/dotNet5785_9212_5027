@@ -26,8 +26,9 @@ namespace PL
     public partial class MainAdminWindow : Window, INotifyPropertyChanged
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+        private volatile bool _adminClockObserverWorking = false; //stage 7
+        private volatile bool _adminConfigObserverWorking = false; //stage 7
         DispatcherTimer simulatorTimer = new DispatcherTimer();
-        bool isSimulatorRunning = false;
         public event PropertyChangedEventHandler? PropertyChanged;
         private readonly DispatcherTimer clockTimer = new DispatcherTimer();
         protected void OnPropertyChanged(string propertyName) =>
@@ -76,16 +77,16 @@ namespace PL
         // לחצן הפעלה/כיבוי
         private void btnToggleSimulator_Click(object sender, RoutedEventArgs e)
         {
-            if (isSimulatorRunning)
+            if (IsSimulatorRunning)
             {
                 simulatorTimer.Stop();
-                isSimulatorRunning = false;
+                IsSimulatorRunning = false;
                 btnToggleSimulator.Content = "Start Simulator";
             }
             else
             {
                 simulatorTimer.Start();
-                isSimulatorRunning = true;
+                IsSimulatorRunning = true;
                 btnToggleSimulator.Content = "Stop Simulator";
             }
         }
@@ -93,16 +94,17 @@ namespace PL
         // לחצן לשינוי מהירות הסימולטור
         private void btnSetSimulatorSpeed_Click(object sender, RoutedEventArgs e)
         {
-            if (int.TryParse(txtSimulatorSpeed.Text, out int ms) && ms > 0)
+            if (Interval > 0)
             {
-                simulatorTimer.Interval = TimeSpan.FromMilliseconds(ms);
-                MessageBox.Show($"Simulator speed updated to {ms} ms", "Simulator", MessageBoxButton.OK, MessageBoxImage.Information);
+                simulatorTimer.Interval = TimeSpan.FromMilliseconds(Interval);
+                MessageBox.Show($"Simulator speed updated to {Interval} ms", "Simulator", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
                 MessageBox.Show("Please enter a valid positive number (in milliseconds).", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
 
 
         private void btnAddOneMinute_Click(object sender, RoutedEventArgs e)
@@ -160,12 +162,30 @@ namespace PL
 
         private void ClockObserver()
         {
-            CurrentTime = CurrentTime = s_bl.Admin.GetClock().ToString("HH:mm:ss dd/MM/yyyy");
+            if (!_adminClockObserverWorking)
+            {
+                _adminClockObserverWorking = true;
+                _ = Dispatcher.BeginInvoke(() =>
+                {
+                    CurrentTime = CurrentTime = s_bl.Admin.GetClock().ToString("HH:mm:ss dd/MM/yyyy");
+                    _adminClockObserverWorking = false;
+                });
+            }
+          
         }
 
         private void ConfigObserver()
         {
-            MaxYearRange = s_bl.Admin.GetRiskTimeRange();
+            if (!_adminConfigObserverWorking)
+            {
+                _adminConfigObserverWorking = true;
+                _ = Dispatcher.BeginInvoke(() =>
+                {
+                    MaxYearRange = s_bl.Admin.GetRiskTimeRange();
+                    _adminConfigObserverWorking = false;
+                });
+            }
+       
         }
         public ObservableCollection<StatusCount> CallsByStatus { get; set; }
 
@@ -209,9 +229,16 @@ namespace PL
 
         private void MainAdminWindow_Closed(object sender, EventArgs e)
         {
+            if (IsSimulatorRunning)
+            {
+              simulatorTimer.Stop();
+                IsSimulatorRunning = false;
+            }
+
             s_bl.Admin.RemoveClockObserver(ClockObserver);
             s_bl.Admin.RemoveConfigObserver(ConfigObserver);
         }
+
         private void btnAssignment_Click(object sender, RoutedEventArgs e)
         {
             new VolunteersManagementWindow().Show();
@@ -262,7 +289,25 @@ namespace PL
             new CallsManagementWindow().Show();
            
         }
-     
+
+        public int Interval
+        {
+            get { return (int)GetValue(IntervalProperty); }
+            set { SetValue(IntervalProperty, value); }
+        }
+
+        public static readonly DependencyProperty IntervalProperty =
+            DependencyProperty.Register("Interval", typeof(int), typeof(MainAdminWindow), new PropertyMetadata(1));
+
+        public bool IsSimulatorRunning
+        {
+            get { return (bool)GetValue(IsSimulatorRunningProperty); }
+            set { SetValue(IsSimulatorRunningProperty, value); }
+        }
+
+        public static readonly DependencyProperty IsSimulatorRunningProperty =
+            DependencyProperty.Register("IsSimulatorRunning", typeof(bool), typeof(MainAdminWindow), new PropertyMetadata(false));
+
         private void btnResetDB_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show("Are you sure you want to reset the database? This action will reset all data",

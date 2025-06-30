@@ -10,7 +10,7 @@ namespace PL.Volunteer
     public partial class VolunteerWindow : Window
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-
+        private volatile bool _volunteerObserverWorking = false; //stage 7
         public VolunteerWindow(int id = 0)
         {
             InitializeComponent();
@@ -84,9 +84,18 @@ namespace PL.Volunteer
 
         private void VolunteerObserver()
         {
-            int id = Volunteer.Id;
-            Volunteer = null;
-            Volunteer = s_bl.Volunteer.GetVolunteerDetails(id);
+            if (!_volunteerObserverWorking)
+            {
+                _volunteerObserverWorking = true;
+                _ = Dispatcher.BeginInvoke(() =>
+                {
+                    int id = Volunteer.Id;
+                    Volunteer = null;
+                    Volunteer = s_bl.Volunteer.GetVolunteerDetails(id);
+                    _volunteerObserverWorking = false;
+                });
+            }
+           
         }
         public bool IsUpdateMode
         {
@@ -96,8 +105,6 @@ namespace PL.Volunteer
 
         public static readonly DependencyProperty IsUpdateModeProperty =
             DependencyProperty.Register("IsUpdateMode", typeof(bool), typeof(VolunteerWindow));
-
-
         private void btnAddUpdate_Click(object sender, RoutedEventArgs e)
         {
             try

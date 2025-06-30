@@ -21,6 +21,8 @@ namespace PL
     public partial class MainWindow : Window
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+        private volatile bool _clockObserverWorking = false;
+        private volatile bool _configObserverWorking = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -101,12 +103,28 @@ namespace PL
 
         private void ClockObserver()
         {
-            CurrentTime = s_bl.Admin.GetClock();
+            if (!_clockObserverWorking)
+            {
+                _clockObserverWorking = true;
+                _ = Dispatcher.BeginInvoke(() =>
+                {
+                    CurrentTime = s_bl.Admin.GetClock();
+                    _clockObserverWorking = false;
+                });
+            }
         }
 
         private void ConfigObserver()
         {
-            MaxYearRange = s_bl.Admin.GetRiskTimeRange();
+            if (!_configObserverWorking)
+            {
+                _configObserverWorking = true;
+                _ = Dispatcher.BeginInvoke(() =>
+                {
+                    MaxYearRange = s_bl.Admin.GetRiskTimeRange();
+                    _configObserverWorking = false;
+                });
+            }
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -131,7 +149,6 @@ namespace PL
         {
             new CallListWindow().Show();
         }
-
 
         private void btnVolunteer_Click(object sender, RoutedEventArgs e)
         {
@@ -202,25 +219,5 @@ namespace PL
                 }
             }
         }
-
-        //public IEnumerable<BO.CallInList> AssignmentList
-        //{
-        //    get { return (IEnumerable<BO.CallInList>)GetValue(CallListProperty); }
-        //    set { SetValue(CallListProperty, value); }
-        //}
-
-        //public static readonly DependencyProperty CallListProperty =
-        //    DependencyProperty.Register("CallList", typeof(IEnumerable<BO.CallInList>),
-        //                                typeof(CallListWindow), new PropertyMetadata(null));
-
-        //public IEnumerable<BO.VolunteerInList> VolunteerList
-        //{
-        //    get { return (IEnumerable<BO.VolunteerInList>)GetValue(VolunteerListProperty); }
-        //    set { SetValue(VolunteerListProperty, value); }
-        //}
-
-        //public static readonly DependencyProperty VolunteerListProperty =
-        //    DependencyProperty.Register("VolunteerList", typeof(IEnumerable<BO.VolunteerInList>),
-        //                                typeof(VolunteerListWindow), new PropertyMetadata(null));
     }
 }

@@ -26,19 +26,15 @@ namespace PL.Call
             {
                 InitializeComponent();
 
-                // שלב 1 - נביא את כל הקריאות
                 IEnumerable<BO.CallInList> allCalls = s_bl.Call.GetCallsList();
-       
-            // שלב 2 - נסנן אם צריך
+    
             IEnumerable<BO.CallInList> callsToDisplay = allCalls;
 
-         
             if (!string.IsNullOrEmpty(statusName))
                 {
                     callsToDisplay = allCalls.Where(call => call.Status.ToString() == statusName);
                 }
 
-                // שלב 3 - נציג במסך
                 CallsListView.ItemsSource = callsToDisplay;
             }
         }

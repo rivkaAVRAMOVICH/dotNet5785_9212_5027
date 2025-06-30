@@ -8,7 +8,7 @@ namespace PL
     public partial class VolunteerManagementWindow : Window
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-
+        private volatile bool _volunteerObserverWorking = false; //stage 7
         public VolunteerManagementWindow(int volunteerId)
         {
             InitializeComponent();
@@ -63,8 +63,17 @@ namespace PL
 
         private void VolunteerObserver()
         {
-            int id = Volunteer.Id;
-            Volunteer = s_bl.Volunteer.GetVolunteerDetails(id);
+            if (!_volunteerObserverWorking)
+            {
+                _volunteerObserverWorking = true;
+                _ = Dispatcher.BeginInvoke(() =>
+                {
+                    int id = Volunteer.Id;
+                    Volunteer = s_bl.Volunteer.GetVolunteerDetails(id);
+                    _volunteerObserverWorking = false;
+                });
+            }
+           
         }
 
         private void btnAddUpdate_Click(object sender, RoutedEventArgs e)

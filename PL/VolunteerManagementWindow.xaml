@@ -12,8 +12,8 @@
     <Window.Resources>
         <CollectionViewSource x:Key="RolesCollectionKey" />
         <CollectionViewSource x:Key="DistanceTypesCollectionKey" />
-        <conv:NullToBoolInverseConverter x:Key="NullToBoolInverseConverter"/>
-        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <local:NullToBoolInverseConverter x:Key="NullToBoolInverseConverter"/>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
     </Window.Resources>
 
     <Grid Margin="20">

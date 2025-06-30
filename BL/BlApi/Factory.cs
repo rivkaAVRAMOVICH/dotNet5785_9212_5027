@@ -10,6 +10,6 @@ namespace BlApi
     {
         public static IBl Get() => new BlImplementation.Bl();
 
-        AdminManager.StudentManager = new StudentManager();
+        //AdminManager.StudentManager = new StudentManager();
     }
 }

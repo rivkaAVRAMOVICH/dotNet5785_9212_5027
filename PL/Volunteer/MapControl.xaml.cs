@@ -10,7 +10,6 @@ namespace PL.Volunteer
             InitializeComponent();
         }
 
-        // Latitude של המתנדב
         public double Latitude
         {
             get => (double)GetValue(LatitudeProperty);
@@ -20,7 +19,6 @@ namespace PL.Volunteer
         public static readonly DependencyProperty LatitudeProperty =
             DependencyProperty.Register("Latitude", typeof(double), typeof(MapControl), new PropertyMetadata(0.0));
 
-        // Longitude של המתנדב
         public double Longitude
         {
             get => (double)GetValue(LongitudeProperty);
@@ -29,8 +27,6 @@ namespace PL.Volunteer
 
         public static readonly DependencyProperty LongitudeProperty =
             DependencyProperty.Register("Longitude", typeof(double), typeof(MapControl), new PropertyMetadata(0.0));
-
-        // Latitude של הקריאה
         public double CallLatitude
         {
             get => (double)GetValue(CallLatitudeProperty);
@@ -40,7 +36,6 @@ namespace PL.Volunteer
         public static readonly DependencyProperty CallLatitudeProperty =
             DependencyProperty.Register("CallLatitude", typeof(double), typeof(MapControl), new PropertyMetadata(0.0));
 
-        // Longitude של הקריאה
         public double CallLongitude
         {
             get => (double)GetValue(CallLongitudeProperty);
@@ -50,7 +45,6 @@ namespace PL.Volunteer
         public static readonly DependencyProperty CallLongitudeProperty =
             DependencyProperty.Register("CallLongitude", typeof(double), typeof(MapControl), new PropertyMetadata(0.0));
 
-        // האם לצייר קווים אוויריים בין נקודות
         public bool DrawLines
         {
             get => (bool)GetValue(DrawLinesProperty);
@@ -60,7 +54,6 @@ namespace PL.Volunteer
         public static readonly DependencyProperty DrawLinesProperty =
             DependencyProperty.Register("DrawLines", typeof(bool), typeof(MapControl), new PropertyMetadata(false));
 
-        // האם להציג מסלול נסיעה
         public bool DrawRoute
         {
             get => (bool)GetValue(DrawRouteProperty);

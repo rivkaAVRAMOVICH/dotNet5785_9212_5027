@@ -20,6 +20,7 @@ namespace PL.Volunteer
     public partial class VolunteerListWindow : Window
     {
         static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+        private volatile bool _volunteerListObserverWorking = false; //stage 7
         public BO.CallType SelectedVolunteer { get; set; } = BO.CallType.none;
         public BO.VolunteerInList? SelectedVolunteerInList { get; set; }
 
@@ -64,8 +65,6 @@ namespace PL.Volunteer
             }
         }
 
-
-
         public static readonly DependencyProperty VolunteerListProperty =
     DependencyProperty.Register("VolunteerList", typeof(IEnumerable<BO.VolunteerInList>), typeof(VolunteerListWindow), new PropertyMetadata(null));
         public IEnumerable<BO.VolunteerInList> VolunteerList
@@ -86,7 +85,17 @@ namespace PL.Volunteer
   ? s_bl?.Volunteer.GetVolunteersList()!
   : s_bl?.Volunteer.GetVolunteersList(null, SelectedVolunteer)!;
         }
-        private void volunteerListObserver() => queryVolunteerList();
+        private void volunteerListObserver(){
+            if (!_volunteerListObserverWorking)
+            {
+                _volunteerListObserverWorking = true;
+                _ = Dispatcher.BeginInvoke(() =>
+                {
+                    queryVolunteerList();
+                    _volunteerListObserverWorking = false;
+                });
+            }
+        }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             s_bl.Volunteer.AddObserver(volunteerListObserver);

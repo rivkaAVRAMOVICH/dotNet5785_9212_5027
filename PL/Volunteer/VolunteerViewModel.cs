@@ -74,7 +74,6 @@ namespace PL.Volunteer
 
         private void UpdateVolunteer()
         {
-            // לעדכון מתנדב בעתיד (כרגע ריק)
         }
 
         private void ShowCallHistory()

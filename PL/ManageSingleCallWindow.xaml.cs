@@ -24,8 +24,7 @@ namespace PL
         public partial class ManageSingleCallWindow : Window
         {
             static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
-
-            public  BO.Call? CurrentCall { get; private set; }
+        public  BO.Call? CurrentCall { get; private set; }
 
             public ObservableCollection<BO.CallAssignInList> Assignments { get; set; } = new();
         public ManageSingleCallWindow(int callId)
@@ -36,6 +35,7 @@ namespace PL
             this.DataContext = this;
             LoadCall(callId);
         }
+
 
             private void LoadCall(int callId)
             {
