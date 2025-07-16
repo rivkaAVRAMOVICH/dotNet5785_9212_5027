@@ -3,128 +3,175 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:conv="clr-namespace:PL"
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
-        Title="MainAdminWindow" Height="630" Width="800"
-    Loaded="MainAdminWindow_Loaded"
+        Title="Main Admin Panel" Height="700" Width="1000"
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="Manual"
+        Loaded="MainAdminWindow_Loaded"
         Closed="MainAdminWindow_Closed"
-        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+        Background="#FAFBFC">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="SoftPink" Color="#FFE6E6FA"/>
-            <SolidColorBrush x:Key="SoftBlue" Color="#FFDDF3FF"/>
-            <SolidColorBrush x:Key="BorderColor" Color="#FFB0C4DE"/>
-            <Style TargetType="GroupBox">
-                <Setter Property="Background" Value="{StaticResource SoftBlue}" />
-                <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
-                <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="Padding" Value="10"/>
-            </Style>
-            <Style TargetType="Button">
-                <Setter Property="Background" Value="#FFFDEFF3"/>
-                <Setter Property="BorderBrush" Value="#FFB0C4DE"/>
-                <Setter Property="Margin" Value="5"/>
-            </Style>
-            <Style TargetType="TextBox">
-                <Setter Property="Background" Value="White"/>
-                <Setter Property="BorderBrush" Value="#FFB0C4DE"/>
-                <Setter Property="Padding" Value="5"/>
-                <Setter Property="Margin" Value="5,0,5,5"/>
-            </Style>
-        <local:BoolToSimulatorButtonContentConverter x:Key="SimulatorButtonContentConverter" />
-        <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <!-- 🎨 Colors -->
+        <Color x:Key="PrimaryColor">#E94E77</Color>
+        <Color x:Key="SecondaryColor">#F2F6FA</Color>
+        <Color x:Key="AccentColor">#4A90E2</Color>
+        <Color x:Key="DangerColor">#50E3C2</Color>
+
+        <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+        <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource SecondaryColor}" />
+        <SolidColorBrush x:Key="TextBrush" Color="#2C3E50" />
+        <SolidColorBrush x:Key="HoverBrush" Color="#D6EAF8" />
+
+        <!-- 🪄 Animated Button -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="6" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.04" ScaleY="1.04"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 📦 GroupBox as Card -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Border Background="{StaticResource BackgroundBrush}"
+                                CornerRadius="12"
+                                BorderBrush="{StaticResource PrimaryBrush}"
+                                BorderThickness="1"
+                                Padding="10"
+                                SnapsToDevicePixels="True">
+                            <DockPanel>
+                                <TextBlock Text="{TemplateBinding Header}"
+                                           DockPanel.Dock="Top"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryBrush}"
+                                           Margin="0,0,0,10"/>
+                                <ContentPresenter/>
+                            </DockPanel>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 📤 TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="7"/>
+            <Setter Property="Margin" Value="6,0,6,8"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- קונברטרים -->
+        <local:BoolToSimulatorButtonContentConverter x:Key="SimulatorButtonContentConverter"/>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
     </Window.Resources>
 
-        <Grid Background="{StaticResource SoftPink}" Margin="10">
-            <!-- Define two main rows in the main layout -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20">
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <!-- System Clock Section -->
-            <GroupBox Header="System Clock" Grid.Row="0" Margin="0,0,0,10">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
-                    <!-- Label to display the current system time -->
+            <!-- 🕒 System Clock -->
+            <GroupBox Header="🕒 שעון מערכת" Grid.Row="0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Label Content="{Binding CurrentTime}" FontSize="16" FontWeight="Bold" Margin="0,0,20,0"/>
-
-                    <!-- Buttons to advance the time -->
-                <Button Content="Add Minute" Click="btnAddOneMinute_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                <Button Content="Add Hour" Click="btnAddOneHour_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                <Button Content="Add Day" Click="btnAddOneDay_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                <Button Content="Add Month" Click="btnAddOneMonth_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                <Button Content="Add Year" Click="btnAddOneYear_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                <Button Content="Clock initialization" Click="btnClockInitialization_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-            </StackPanel>
+                    <Button Content="הוסף דקה" Click="btnAddOneMinute_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                    <Button Content="הוסף שעה" Click="btnAddOneHour_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                    <Button Content="הוסף יום" Click="btnAddOneDay_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                    <Button Content="הוסף חודש" Click="btnAddOneMonth_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                    <Button Content="הוסף שנה" Click="btnAddOneYear_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                    <Button Content="איפוס שעון" Click="btnClockInitialization_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                </StackPanel>
             </GroupBox>
 
-            <!-- Bottom section: Configuration variables + Navigation buttons -->
-            <Grid Grid.Row="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <!-- Configuration Variables Section -->
-                <GroupBox Header="Configuration Variables" Grid.Row="0" Margin="0,0,0,10">
-                    <StackPanel Margin="10">
-                        <!-- Configuration variable 1 -->
-                        <TextBox Text="{Binding MaxYearRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                        <!-- Button to update the configuration variable in the database -->
-                    <Button Content="Update Max Range" Width="200" Click="btnUpdateMaxRange_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+            <!-- ⚙️ Configuration -->
+            <GroupBox Header="⚙️ משתני תצורה" Grid.Row="0">
+                <StackPanel>
+                    <TextBox Text="{Binding MaxYearRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <Button Content="עדכן טווח מקסימלי" Width="200" Click="btnUpdateMaxRange_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
                 </StackPanel>
-                </GroupBox>
+            </GroupBox>
 
-                <!-- Action Buttons -->
-                <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="10">
-                    <!-- Button to initialize the database with initial data -->
-                <Button x:Name="btnInitializeDB" Content="Initialize Database" Width="200" Click="btnInitializeDB_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                    <!-- Button to reset the database (clear all data) -->
-                <Button x:Name="btnResetDB" Content="Reset Database" Width="200" Click="btnResetDB_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                <Button x:Name="btnResetConfiguration" Content="Reset configuration" Width="200" Click="btnResetConfiguration_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                <!-- Button to open list windows -->
-                <Button Content="Volunteer management" Width="200" Click="btnAssignment_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                <Button Content="Call Management" Width="200" Click="btnShowCallStats_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+            <!-- 🧭 Navigation -->
+            <StackPanel Grid.Row="1" Orientation="Vertical">
+                <Button Content="אתחול מסד נתונים" Width="200" Click="btnInitializeDB_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                <Button Content="איפוס מסד נתונים" Width="200" Click="btnResetDB_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                <Button Content="איפוס תצורה" Width="200" Click="btnResetConfiguration_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                <Button Content="ניהול מתנדבים" Width="200" Click="btnAssignment_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                <Button Content="ניהול קריאות" Width="200" Click="btnShowCallStats_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
             </StackPanel>
-            
-        </Grid>
-        <GroupBox Header="Call Counts by Status" Grid.Row="2" Margin="0,10,0,10">
-            <ItemsControl ItemsSource="{Binding CallsByStatus}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="5">
-                            <TextBlock Text="{Binding Status}" FontWeight="Bold" Margin="0,0,10,0"/>
-                            <Button Content="{Binding Count}" 
-                            Tag="{Binding Status}" 
-                            Click="CallStatusButton_Click"  IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </GroupBox>
-        <GroupBox Header="Simulator Control" Grid.Row="3" Margin="0,10,0,0">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
-                <!-- כפתור Start/Stop -->
-                <Button x:Name="btnToggleSimulator"
+
+            <!-- 📊 Call Status -->
+            <GroupBox Header="📊 קריאות לפי סטטוס" Grid.Row="2">
+                <ItemsControl ItemsSource="{Binding CallsByStatus}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="6">
+                                <TextBlock Text="{Binding Status}" FontWeight="Bold" Margin="0,0,10,0"/>
+                                <Button Content="{Binding Count}"
+                            Tag="{Binding Status}"
+                            Click="CallStatusButton_Click"
+                            IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </GroupBox>
+
+            <!-- 🚀 Simulator Control -->
+            <GroupBox Header="🚀 שליטה על הסימולציה" Grid.Row="3">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="btnToggleSimulator"
                 Width="120"
                 Content="{Binding IsSimulatorRunning, Converter={StaticResource SimulatorButtonContentConverter}}"
                 Click="btnToggleSimulator_Click"/>
-
-                <!-- Textbox ל-Interval -->
-                <TextBlock Text="Interval (minutes):" VerticalAlignment="Center" Margin="20,0,5,0"/>
-                <TextBox Width="60"
+                    <TextBlock Text=":(מרווח (דקות" VerticalAlignment="Center" Margin="20,0,5,0"/>
+                    <TextBox Width="60"
                  Text="{Binding Interval, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}" />
-                <Button Content="Set Speed"
-        Click="btnSetSimulatorSpeed_Click"
-        Margin="10,0,0,0"/>
-            </StackPanel>
-        </GroupBox>
-
-    </Grid>
-    </Window>
-
+                 IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
+                    <Button Content="קבע מהירות" Click="btnSetSimulatorSpeed_Click" Margin="10,0,0,0"/>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+    </ScrollViewer>
+</Window>

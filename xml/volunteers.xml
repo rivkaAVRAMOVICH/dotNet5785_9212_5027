@@ -84,4 +84,18 @@
     <Longitude>34.645104</Longitude>
     <MaxDistance xsi:nil="true" />
   </Volunteer>
+  <Volunteer>
+    <Id>214915027</Id>
+    <FullName>שני</FullName>
+    <PhoneNumber>0548502925</PhoneNumber>
+    <Email>m@gmail.com</Email>
+    <Active>false</Active>
+    <Role>manager</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=</Password>
+    <FullAddress>10 Bialik Street, Tel Aviv, Israel</FullAddress>
+    <Latitude>31.797499</Latitude>
+    <Longitude>34.645104</Longitude>
+    <MaxDistance xsi:nil="true" />
+  </Volunteer>
 </ArrayOfVolunteer>

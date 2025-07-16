@@ -113,4 +113,14 @@
     <CallDescription>we</CallDescription>
     <MaxEndCallTime>2025-06-15T12:55:00</MaxEndCallTime>
   </Call>
+  <Call>
+    <Id>1012</Id>
+    <CallAddress>sss 3</CallAddress>
+    <Latitude>58.7850415</Latitude>
+    <Longitude>9.3217209</Longitude>
+    <StartCallTime>2028-08-13T18:10:29</StartCallTime>
+    <CallType>fixing</CallType>
+    <CallDescription>s</CallDescription>
+    <MaxEndCallTime>2025-02-10T16:58:41</MaxEndCallTime>
+  </Call>
 </ArrayOfCall>
