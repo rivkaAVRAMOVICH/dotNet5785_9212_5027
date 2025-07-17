@@ -39,7 +39,7 @@ namespace PL
                 switch (role)
                 {
                     case BO.Role.volunteer:
-                        new VolunteerWindow().Show();
+                        new MainWindow().Show();
                         break;
 
                     case BO.Role.manager:
@@ -54,7 +54,7 @@ namespace PL
                             new MainAdminWindow().Show();
 
                         else
-                            new VolunteerWindow().Show();
+                            new MainWindow().Show();
 
                         break;
 

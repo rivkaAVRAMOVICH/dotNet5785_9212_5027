@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfVolunteer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Volunteer>
     <Id>319254109</Id>
@@ -71,17 +71,17 @@
     <MaxDistance>59</MaxDistance>
   </Volunteer>
   <Volunteer>
-    <Id>215639212</Id>
-    <FullName>רבקה</FullName>
-    <PhoneNumber>0548502925</PhoneNumber>
-    <Email>m@gmail.com</Email>
+    <Id>215806589</Id>
+    <FullName>d</FullName>
+    <PhoneNumber>0555554455</PhoneNumber>
+    <Email>d@fff.ff</Email>
     <Active>false</Active>
-    <Role>volunteer</Role>
+    <Role>manager</Role>
     <DistanceType>aerialDistance</DistanceType>
     <Password>A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=</Password>
-    <FullAddress>10 Bialik Street, Tel Aviv, Israel</FullAddress>
-    <Latitude>31.797499</Latitude>
-    <Longitude>34.645104</Longitude>
+    <FullAddress>erdf 3</FullAddress>
+    <Latitude>49.9986253</Latitude>
+    <Longitude>6.5709543</Longitude>
     <MaxDistance xsi:nil="true" />
   </Volunteer>
   <Volunteer>
@@ -92,7 +92,7 @@
     <Active>false</Active>
     <Role>manager</Role>
     <DistanceType>aerialDistance</DistanceType>
-    <Password>A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=</Password>
+    <Password>lMJz/CXvucU8+QTqaiR+Am8Bxchu5VSbsIHttrfVN+0=</Password>
     <FullAddress>10 Bialik Street, Tel Aviv, Israel</FullAddress>
     <Latitude>31.797499</Latitude>
     <Longitude>34.645104</Longitude>

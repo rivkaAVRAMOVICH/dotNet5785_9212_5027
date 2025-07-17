@@ -191,7 +191,7 @@ internal class CallManager
         bool isAuthorized;
         // Authorization check: manager or volunteer assigned to the task
         lock (AdminManager.BlMutex) //stage 7
-            isAuthorized = (assignment.VolunteerId == id || _dal.Volunteer.Read(id)!.Role == DO.RoleEnum.manager);
+            isAuthorized = (assignment.Id == id || _dal.Volunteer.Read(id)!.Role == DO.RoleEnum.manager);
         if (!isAuthorized)
         {
             throw new BO.BlUnauthorizedActionException("The requester does not have permission to cancel this assignment");

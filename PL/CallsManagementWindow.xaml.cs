@@ -86,7 +86,7 @@ namespace PL
         {
             if (sender is Button button && button.DataContext is CallInList call)
             {
-                if (call.Status == Status.open && call.AssignSum == 0)
+                if (call.Status != Status.open && call.AssignSum == 0)
                 {
                     MessageBoxResult result = MessageBox.Show("האם אתה בטוח שברצונך למחוק את הקריאה?", "אישור מחיקה", MessageBoxButton.YesNo);
                     if (result == MessageBoxResult.Yes)

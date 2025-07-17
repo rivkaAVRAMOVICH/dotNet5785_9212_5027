@@ -1,15 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfCall xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Call>
-    <Id>1001</Id>
-    <CallAddress>Arlozorov Street 5</CallAddress>
-    <Latitude>-41.560338</Latitude>
-    <Longitude>75.412143</Longitude>
-    <StartCallTime>2025-06-12T12:26:29</StartCallTime>
-    <CallType>none</CallType>
-    <CallDescription>Urgent response required</CallDescription>
-    <MaxEndCallTime>2025-06-12T13:26:29</MaxEndCallTime>
-  </Call>
   <Call>
     <Id>1002</Id>
     <CallAddress>Yehuda Halevi Street 90</CallAddress>
@@ -94,16 +84,6 @@
     <MaxEndCallTime>2025-11-06T17:26:29</MaxEndCallTime>
   </Call>
   <Call>
-    <Id>1010</Id>
-    <CallAddress>hhh 2</CallAddress>
-    <Latitude>35.493794</Latitude>
-    <Longitude>-78.810486</Longitude>
-    <StartCallTime>2026-07-12T14:27:29</StartCallTime>
-    <CallType>none</CallType>
-    <CallDescription>bla</CallDescription>
-    <MaxEndCallTime>2025-06-15T12:22:00</MaxEndCallTime>
-  </Call>
-  <Call>
     <Id>1011</Id>
     <CallAddress>sss 2</CallAddress>
     <Latitude>58.753806</Latitude>
@@ -122,5 +102,15 @@
     <CallType>fixing</CallType>
     <CallDescription>s</CallDescription>
     <MaxEndCallTime>2025-02-10T16:58:41</MaxEndCallTime>
+  </Call>
+  <Call>
+    <Id>1013</Id>
+    <CallAddress>sss 3</CallAddress>
+    <Latitude>58.7850415</Latitude>
+    <Longitude>9.3217209</Longitude>
+    <StartCallTime>2028-08-14T00:59:29</StartCallTime>
+    <CallType>fixing</CallType>
+    <CallDescription>דדד</CallDescription>
+    <MaxEndCallTime>2024-01-10T05:22:33</MaxEndCallTime>
   </Call>
 </ArrayOfCall>

@@ -226,7 +226,7 @@ CallManager.Observers.RemoveObserver(id, observer); //stage 5
                 var tmpAssignments = _dal.Assignment.ReadAll().Where(item => item.CallId == id).ToList();
                 var tmpStatus = CallManager.CallStatus(tmpCall!);
 
-                if (!tmpAssignments.Any() && (tmpStatus == BO.Status.open || tmpStatus == BO.Status.openAtRisk))
+                if (!tmpAssignments.Any() && (tmpStatus != BO.Status.open && tmpStatus != BO.Status.openAtRisk))
                 {
                     _dal.Call.Delete(id);
                 }

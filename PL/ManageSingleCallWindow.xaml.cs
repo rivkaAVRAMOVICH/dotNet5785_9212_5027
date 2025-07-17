@@ -24,6 +24,7 @@ namespace PL
         public partial class ManageSingleCallWindow : Window
         {
             static readonly BlApi.IBl s_bl = BlApi.Factory.Get();
+
         public  BO.Call? CurrentCall { get; private set; }
 
             public ObservableCollection<BO.CallAssignInList> Assignments { get; set; } = new();
@@ -136,7 +137,17 @@ namespace PL
             {
                 this.Close();
             }
+
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+    }
     }
 
 

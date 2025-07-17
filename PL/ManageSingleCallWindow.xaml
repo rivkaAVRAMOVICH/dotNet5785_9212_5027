@@ -5,71 +5,162 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
-        Title="ManageSingleCallWindow" Height="450" Width="800"
-        WindowStartupLocation="CenterScreen">
-    <Window.Resources>
-        <CollectionViewSource x:Key="CallTypeCollectionKey" />
-    </Window.Resources>
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        Title="ניהול קריאה"
+        Height="550" Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#FAFBFC">
 
-        <!-- פרטי קריאה -->
-        <Grid Grid.Row="0" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+    <Window.Resources>
+        <!-- 🎨 Colors -->
+        <Color x:Key="PrimaryColor">#E94E77</Color>
+        <Color x:Key="SecondaryColor">#F2F6FA</Color>
+        <Color x:Key="AccentColor">#4A90E2</Color>
+        <Color x:Key="DangerColor">#50E3C2</Color>
+
+        <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+        <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource SecondaryColor}" />
+        <SolidColorBrush x:Key="TextBrush" Color="#2C3E50" />
+        <SolidColorBrush x:Key="HoverBrush" Color="#D6EAF8" />
+
+        <!-- 🪄 Button Style -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="6" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.04" ScaleY="1.04"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 📦 GroupBox Style -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Border Background="{StaticResource BackgroundBrush}"
+                                CornerRadius="12"
+                                BorderBrush="{StaticResource PrimaryBrush}"
+                                BorderThickness="1"
+                                Padding="10"
+                                SnapsToDevicePixels="True">
+                            <DockPanel>
+                                <TextBlock Text="{TemplateBinding Header}"
+                                           DockPanel.Dock="Top"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryBrush}"
+                                           Margin="0,0,0,10"/>
+                                <ContentPresenter/>
+                            </DockPanel>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 🖊 TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="7"/>
+            <Setter Property="Margin" Value="6,0,6,8"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <CollectionViewSource x:Key="CallTypeCollectionKey"/>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="מספר קריאה:" Grid.Row="0" Grid.Column="0" Margin="0,0,10,5"/>
-            <TextBox  Text="{Binding CurrentCall.Id}" Grid.Row="0" Grid.Column="1" IsReadOnly="True"/>
+            <!-- 📝 פרטי קריאה -->
+            <GroupBox Header="📝 פרטי קריאה" Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-            <TextBlock Text="סוג קריאה:" Grid.Row="1" Grid.Column="0" Margin="0,5,10,5"/>
-            <ComboBox   ItemsSource="{Binding Source={StaticResource CallTypeCollectionKey}}" SelectedItem="{Binding CurrentCall.CallType,  Mode=TwoWay}" Grid.Row="1" Grid.Column="1"/>
+                    <TextBlock Text="מספר קריאה:" Grid.Row="0" Grid.Column="0" Margin="0,0,10,5"/>
+                    <TextBox Text="{Binding CurrentCall.Id}" Grid.Row="0" Grid.Column="1" IsReadOnly="True"/>
 
-            <TextBlock Text="תיאור:" Grid.Row="2" Grid.Column="0" Margin="0,5,10,5"/>
-            <TextBox  Text="{Binding CurrentCall.CallDescription}" Grid.Row="2" Grid.Column="1"/>
+                    <TextBlock Text="סוג קריאה:" Grid.Row="1" Grid.Column="0" Margin="0,5,10,5"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource CallTypeCollectionKey}}"
+                              SelectedItem="{Binding CurrentCall.CallType, Mode=TwoWay}"
+                              Grid.Row="1" Grid.Column="1"/>
 
-            <TextBlock Text="כתובת:" Grid.Row="3" Grid.Column="0" Margin="0,5,10,5"/>
-            <TextBox  Text="{Binding CurrentCall.CallAddress}" Grid.Row="3" Grid.Column="1"/>
+                    <TextBlock Text="תיאור:" Grid.Row="2" Grid.Column="0" Margin="0,5,10,5"/>
+                    <TextBox Text="{Binding CurrentCall.CallDescription}" Grid.Row="2" Grid.Column="1"/>
 
-            <TextBlock Text="זמן התחלה:" Grid.Row="4" Grid.Column="0" Margin="0,5,10,5"/>
-            <TextBox  Text="{Binding CurrentCall.StartCallTime}" Grid.Row="4" Grid.Column="1" IsReadOnly="True"/>
+                    <TextBlock Text="כתובת:" Grid.Row="3" Grid.Column="0" Margin="0,5,10,5"/>
+                    <TextBox Text="{Binding CurrentCall.CallAddress}" Grid.Row="3" Grid.Column="1"/>
 
-            <TextBlock Text="מקס' זמן לסיום:" Grid.Row="5" Grid.Column="0" Margin="0,5,10,5"/>
-            <TextBox x:Name="EndTimePicker" Text="{Binding CurrentCall.MaxEndCallTime}" Grid.Row="5" Grid.Column="1"/>
+                    <TextBlock Text="זמן התחלה:" Grid.Row="4" Grid.Column="0" Margin="0,5,10,5"/>
+                    <TextBox Text="{Binding CurrentCall.StartCallTime}" Grid.Row="4" Grid.Column="1" IsReadOnly="True"/>
 
-            <TextBlock Text="סטטוס:" Grid.Row="6" Grid.Column="0" Margin="0,5,10,0"/>
-            <TextBlock Text="{Binding CurrentCall.Status}" Grid.Row="6" Grid.Column="1"/>
+                    <TextBlock Text="מקס' זמן לסיום:" Grid.Row="5" Grid.Column="0" Margin="0,5,10,5"/>
+                    <TextBox x:Name="EndTimePicker" Text="{Binding CurrentCall.MaxEndCallTime}" Grid.Row="5" Grid.Column="1" TextChanged="TextBox_TextChanged"/>
+
+                    <TextBlock Text="סטטוס:" Grid.Row="6" Grid.Column="0" Margin="0,5,10,0"/>
+                    <TextBlock Text="{Binding CurrentCall.Status}" Grid.Row="6" Grid.Column="1"/>
+                </Grid>
+            </GroupBox>
+
+            <!-- 📜 היסטוריית הקצאות -->
+            <GroupBox Header="📜 היסטוריית הקצאות" Grid.Row="1">
+                <DataGrid ItemsSource="{Binding Assignments}" AutoGenerateColumns="False" IsReadOnly="True" Height="200"
+                          Margin="0,5,0,0" SelectionChanged="DataGrid_SelectionChanged">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="מתנדב" Binding="{Binding VolunteerName}" />
+                        <DataGridTextColumn Header="זמן התחלה" Binding="{Binding EntryCallTime}" />
+                        <DataGridTextColumn Header="FinishType" Binding="{Binding FinishType}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+
+            <!-- 💾 כפתור עדכון -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button x:Name="UpdateButton" Content="עדכן" Width="100" Click="UpdateButton_Click"/>
+            </StackPanel>
         </Grid>
-
-        <!-- רשימת הקצאות -->
-        <StackPanel Grid.Row="1" Margin="0,10,0,0">
-            <TextBlock Text="היסטוריית הקצאות" FontWeight="Bold" FontSize="14" Margin="0,0,0,5"/>
-            <DataGrid ItemsSource="{Binding Assignments}" AutoGenerateColumns="False" IsReadOnly="True" Height="200">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="מתנדב" Binding="{Binding VolunteerName}"/>
-                    <DataGridTextColumn Header="זמן התחלה" Binding="{Binding EntryCallTime}"/>
-                    <DataGridTextColumn Header=" FinishType" Binding="{Binding FinishType}"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </StackPanel>
-
-        <!-- כפתור עדכון -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button x:Name="UpdateButton" Content="עדכן" Width="100" Click="UpdateButton_Click"/>
-        </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </Window>

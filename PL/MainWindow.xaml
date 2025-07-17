@@ -5,87 +5,142 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
-        Title="Main window" Height="500" Width="800"
+        Title="Main window"
+        Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
         Loaded="MainWindow_Loaded"
         Closed="MainWindow_Closed"
-        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+        Background="#FAFBFC">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="SoftPink" Color="#FFE6E6FA"/>
-        <SolidColorBrush x:Key="SoftBlue" Color="#FFDDF3FF"/>
-        <SolidColorBrush x:Key="BorderColor" Color="#FFB0C4DE"/>
-        <Style TargetType="GroupBox">
-            <Setter Property="Background" Value="{StaticResource SoftBlue}" />
-            <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="10"/>
-        </Style>
+        <!-- 🎨 Colors -->
+        <Color x:Key="PrimaryColor">#E94E77</Color>
+        <Color x:Key="SecondaryColor">#F2F6FA</Color>
+        <Color x:Key="AccentColor">#4A90E2</Color>
+        <Color x:Key="DangerColor">#50E3C2</Color>
+
+        <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+        <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource SecondaryColor}" />
+        <SolidColorBrush x:Key="TextBrush" Color="#2C3E50" />
+        <SolidColorBrush x:Key="HoverBrush" Color="#D6EAF8" />
+
+        <!-- 🪄 Button -->
         <Style TargetType="Button">
-            <Setter Property="Background" Value="#FFFDEFF3"/>
-            <Setter Property="BorderBrush" Value="#FFB0C4DE"/>
-            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="6" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.04" ScaleY="1.04"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
         </Style>
+
+        <!-- 📦 GroupBox -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Border Background="{StaticResource BackgroundBrush}"
+                                CornerRadius="12"
+                                BorderBrush="{StaticResource PrimaryBrush}"
+                                BorderThickness="1"
+                                Padding="10"
+                                SnapsToDevicePixels="True">
+                            <DockPanel>
+                                <TextBlock Text="{TemplateBinding Header}"
+                                           DockPanel.Dock="Top"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryBrush}"
+                                           Margin="0,0,0,10"/>
+                                <ContentPresenter/>
+                            </DockPanel>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 🖊 TextBox -->
         <Style TargetType="TextBox">
             <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#FFB0C4DE"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="Margin" Value="5,0,5,5"/>
+            <Setter Property="Padding" Value="7"/>
+            <Setter Property="Margin" Value="6,0,6,8"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
         </Style>
     </Window.Resources>
 
-    <Grid Background="{StaticResource SoftPink}" Margin="10">
-        <!-- Define two main rows in the main layout -->
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- System Clock Section -->
-        <GroupBox Header="System Clock" Grid.Row="0" Margin="0,0,0,10">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
-                <!-- Label to display the current system time -->
-                <Label Content="{Binding CurrentTime}" FontSize="16" FontWeight="Bold" Margin="0,0,20,0"/>
-
-                <!-- Buttons to advance the time -->
-                <Button Content="Add Minute" Click="btnAddOneMinute_Click"/>
-                <Button Content="Add Hour" Click="btnAddOneHour_Click"/>
-                <Button Content="Add Day" Click="btnAddOneDay_Click"/>
-                <Button Content="Add Month" Click="btnAddOneMonth_Click"/>
-                <Button Content="Add Year" Click="btnAddOneYear_Click"/>
-            </StackPanel>
-        </GroupBox>
-
-        <!-- Bottom section: Configuration variables + Navigation buttons -->
-        <Grid Grid.Row="1">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Configuration Variables Section -->
-            <GroupBox Header="Configuration Variables" Grid.Row="0" Margin="0,0,0,10">
-                <StackPanel Margin="10">
-                    <!-- Configuration variable 1 -->
-                    <TextBox Text="{Binding MaxYearRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                    <!-- Button to update the configuration variable in the database -->
-                    <Button Content="Update Max Range" Width="200" Click="btnUpdateMaxRange_Click"/>
-                    <Button Content="Update Configuration" Width="200"/>
+            <!-- 🕒 System Clock -->
+            <GroupBox Header="🕒 שעון מערכת" Grid.Row="0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Label Content="{Binding CurrentTime}" FontSize="16" FontWeight="Bold" Margin="0,0,20,0"/>
+                    <Button Content="הוסף דקה" Click="btnAddOneMinute_Click"/>
+                    <Button Content="הוסף שעה" Click="btnAddOneHour_Click"/>
+                    <Button Content="הוסף יום" Click="btnAddOneDay_Click"/>
+                    <Button Content="הוסף חודש" Click="btnAddOneMonth_Click"/>
+                    <Button Content="הוסף שנה" Click="btnAddOneYear_Click"/>
                 </StackPanel>
             </GroupBox>
 
-            <!-- Action Buttons -->
-            <StackPanel Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="10">
-                <!-- Button to initialize the database with initial data -->
-                <Button x:Name="btnInitializeDB" Content="Initialize Database" Width="200" Click="btnInitializeDB_Click"/>
-                <!-- Button to reset the database (clear all data) -->
-                <Button x:Name="btnResetDB" Content="Reset Database" Width="200" Click="btnResetDB_Click"/>
+            <!-- ⚙️ Configuration & Actions -->
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <!-- Button to open list windows -->
-                <Button Content="Show Assignment List" Width="200" Click="btnAssignment_Click"/>
-                <Button Content="Show Call List" Width="200" Click="btnCall_Click"/>
-                <Button Content="Show Volunteer List" Width="200" Click="btnVolunteer_Click"/>
-            </StackPanel>
+                <!-- ⚙️ Config -->
+                <GroupBox Header="⚙️ משתני תצורה" Grid.Row="0">
+                    <StackPanel>
+                        <TextBox Text="{Binding MaxYearRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Content="עדכן טווח מקסימלי" Width="200" Click="btnUpdateMaxRange_Click"/>
+                        <Button Content="עדכן תצורה" Width="200"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- 🧭 Actions -->
+                <StackPanel Grid.Row="1" Orientation="Vertical">
+                    <Button Content="אתחול מסד נתונים" Width="200" Click="btnInitializeDB_Click"/>
+                    <Button Content="איפוס מסד נתונים" Width="200" Click="btnResetDB_Click"/>
+                    <Button Content="רשימת שיוכים" Width="200" Click="btnAssignment_Click"/>
+                    <Button Content="רשימת קריאות" Width="200" Click="btnCall_Click"/>
+                    <Button Content="רשימת מתנדבים" Width="200" Click="btnVolunteer_Click"/>
+                </StackPanel>
+            </Grid>
         </Grid>
-    </Grid>
+    </ScrollViewer>
 </Window>

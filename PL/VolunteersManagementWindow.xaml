@@ -5,101 +5,137 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
-        Title="VolunteersManagementWindow" Height="450" Width="800"
-        
-         Loaded="Window_Loaded"
+        Title="ניהול מתנדבים"
+        Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded"
+        Background="#FAFBFC"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 
     <Window.Resources>
+        <!-- 🎨 צבעים וסגנונות אחידים -->
+        <Color x:Key="PrimaryColor">#E94E77</Color>
+        <Color x:Key="AccentColor">#4A90E2</Color>
+        <Color x:Key="BackgroundColor">#F2F6FA</Color>
+
+        <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+        <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
+        <SolidColorBrush x:Key="TextBrush" Color="#2C3E50" />
+
         <CollectionViewSource x:Key="VolunteerCollectionKey" Source="{Binding VolunteerCollection}"/>
 
-        <SolidColorBrush x:Key="SoftPink" Color="#FFE6E6FA"/>
-        <SolidColorBrush x:Key="SoftBlue" Color="#FFDDF3FF"/>
-        <SolidColorBrush x:Key="BorderColor" Color="#FFB0C4DE"/>
+        <!-- Label -->
         <Style TargetType="Label">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
         </Style>
+
+        <!-- ComboBox -->
         <Style TargetType="ComboBox">
-            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="FontSize" Value="14"/>
         </Style>
+
+        <!-- Button -->
         <Style TargetType="Button">
-            <Setter Property="Background" Value="#FFFDEFF3"/>
-            <Setter Property="BorderBrush" Value="#FFB0C4DE"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="Margin" Value="6" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.04" ScaleY="1.04"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <!-- External Grid -->
-    <Grid Background="{StaticResource SoftBlue}">
+    <Grid Background="{StaticResource BackgroundBrush}" Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="40*"/>
-            <RowDefinition Height="500*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Internal Upper Grid -->
-        <Grid HorizontalAlignment="Stretch" Height="auto" Grid.Row="0" VerticalAlignment="Stretch" Width="auto">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Label Content="Select Volunteer:" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="-400,0,0,0"/>
-            <ComboBox Grid.Column="1"
+        <!-- 🔹 בחר מתנדב -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Right">
+            <Label Content="בחר מתנדב:" VerticalAlignment="Center"/>
+            <ComboBox Width="200"
                       ItemsSource="{Binding Source={StaticResource VolunteerCollectionKey}}"
-                      SelectionChanged="VolunteerComboBox_SelectionChanged"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch" Width="150"
-                      SelectedValue="{Binding SelectedVolunteer, Mode=TwoWay}"/>
-        </Grid>
+                      SelectedValue="{Binding SelectedVolunteer, Mode=TwoWay}"
+                      SelectionChanged="VolunteerComboBox_SelectionChanged"/>
+        </StackPanel>
 
-        <!-- Volunteer List -->
-        <ListView Grid.Row="1"
-                  ItemsSource="{Binding Path=VolunteerList}"
-                  SelectedItem="{Binding SelectedVolunteerInList}"
-                  MouseDoubleClick="lsvVolunteersList_MouseDoubleClick">
-            <ListView.View>
-                <GridView>
-                    <!-- Regular text columns -->
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Id}"/>
-                    <GridViewColumn Header="Id call in progress" DisplayMemberBinding="{Binding IdCallInProgress}"/>
-                    <GridViewColumn Header="Sum of expired calls" DisplayMemberBinding="{Binding SumOfExpiredCalls}"/>
-                    <GridViewColumn Header="Sum canceled calls" DisplayMemberBinding="{Binding SumCanceledCalls}"/>
-                    <GridViewColumn Header="Sum of handle calls" DisplayMemberBinding="{Binding SumOfHandleCalls}"/>
+        <!-- 📋 רשימת מתנדבים -->
+        <Border Grid.Row="1" Background="White" CornerRadius="8" BorderBrush="#DDD" BorderThickness="1" Padding="10">
+            <ListView ItemsSource="{Binding Path=VolunteerList}"
+                      SelectedItem="{Binding SelectedVolunteerInList}"
+                      MouseDoubleClick="lsvVolunteersList_MouseDoubleClick">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="שם" DisplayMemberBinding="{Binding Name}" Width="120"/>
+                        <GridViewColumn Header="ת.ז" DisplayMemberBinding="{Binding Id}" Width="100"/>
+                        <GridViewColumn Header="קריאה פעילה" DisplayMemberBinding="{Binding IdCallInProgress}" Width="120"/>
+                        <GridViewColumn Header="קריאות שפגו" DisplayMemberBinding="{Binding SumOfExpiredCalls}" Width="120"/>
+                        <GridViewColumn Header="קריאות שבוטלו" DisplayMemberBinding="{Binding SumCanceledCalls}" Width="130"/>
+                        <GridViewColumn Header="קריאות שטופלו" DisplayMemberBinding="{Binding SumOfHandleCalls}" Width="130"/>
 
-                    <!-- Colored text column -->
-                    <GridViewColumn Header="Type call in progress">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding TypeCallInProgress}" Foreground="DarkBlue" FontWeight="Bold"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                        <!-- טור עם צבע -->
+                        <GridViewColumn Header="סוג קריאה">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding TypeCallInProgress}" Foreground="DarkBlue" FontWeight="Bold"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-                    <!-- Boolean column with CheckBox -->
-                    <GridViewColumn Header="Active">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsActive}" IsEnabled="False"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                        <!-- פעיל -->
+                        <GridViewColumn Header="פעיל">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsActive}" IsEnabled="False"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-                    <!-- Delete action column -->
-                    <GridViewColumn Header="Actions">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="Delete" Click="DeleteButton_Click" Tag="{Binding Id}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+                        <!-- כפתור מחיקה -->
+                        <GridViewColumn Header="מחיקה">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="🗑" ToolTip="מחק"
+                                            Click="DeleteButton_Click"
+                                            Width="40" Height="26"
+                                            Tag="{Binding Id}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Border>
 
-        <!-- Add Button -->
-        <Button Content="Add" Grid.Row="2" HorizontalAlignment="Center" Height="50" Width="100" Click="btnAdd_Click"/>
+        <!-- ➕ כפתור הוספה -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+            <Button Content="הוסף מתנדב" Width="120" Height="40" Click="btnAdd_Click"/>
+        </StackPanel>
     </Grid>
 </Window>

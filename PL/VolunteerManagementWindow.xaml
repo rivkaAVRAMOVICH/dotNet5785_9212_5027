@@ -6,131 +6,197 @@
         xmlns:conv="clr-namespace:PL"
         xmlns:local="clr-namespace:PL"
         mc:Ignorable="d"
-        Title="VolunteerManagementWindow" Height="600" Width="800"
+        Title="ניהול מתנדב"
+        Height="600" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Background="#FAFBFC"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
 
     <Window.Resources>
-        <CollectionViewSource x:Key="RolesCollectionKey" />
-        <CollectionViewSource x:Key="DistanceTypesCollectionKey" />
+        <!-- 🎨 צבעים וסגנונות כלליים -->
+        <Color x:Key="PrimaryColor">#E94E77</Color>
+        <Color x:Key="AccentColor">#4A90E2</Color>
+        <Color x:Key="BackgroundColor">#F2F6FA</Color>
+
+        <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}" />
+        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+        <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}" />
+        <SolidColorBrush x:Key="TextBrush" Color="#2C3E50" />
+
+        <!-- כפתור -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="Margin" Value="6" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.04" ScaleY="1.04"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- GroupBox -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Border Background="{StaticResource BackgroundBrush}"
+                                CornerRadius="12"
+                                BorderBrush="{StaticResource PrimaryBrush}"
+                                BorderThickness="1"
+                                Padding="10">
+                            <DockPanel>
+                                <TextBlock Text="{TemplateBinding Header}"
+                                           DockPanel.Dock="Top"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryBrush}"
+                                           Margin="0,0,0,10"/>
+                                <ContentPresenter/>
+                            </DockPanel>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="7"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="BorderBrush" Value="#D0D3D4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- ComboBox -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Label -->
+        <Style TargetType="Label">
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        </Style>
+
+        <CollectionViewSource x:Key="RolesCollectionKey"/>
+        <CollectionViewSource x:Key="DistanceTypesCollectionKey"/>
         <local:NullToBoolInverseConverter x:Key="NullToBoolInverseConverter"/>
         <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
     </Window.Resources>
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- ID -->
-            <RowDefinition Height="Auto"/>
-            <!-- Name + IsActive -->
-            <RowDefinition Height="Auto"/>
-            <!-- Phone -->
-            <RowDefinition Height="Auto"/>
-            <!-- Email -->
-            <RowDefinition Height="Auto"/>
-            <!-- Address -->
-            <RowDefinition Height="Auto"/>
-            <!-- Role -->
-            <RowDefinition Height="Auto"/>
-            <!-- Distance Type -->
-            <RowDefinition Height="Auto"/>
-            <!-- Max Distance -->
-            <RowDefinition Height="Auto"/>
-            <!-- Call Info -->
-            <RowDefinition Height="Auto"/>
-            <!-- Buttons -->
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- ID (ReadOnly) -->
-        <Label Content="ID:" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Margin="5"
-                 Text="{Binding Volunteer.Id}" IsReadOnly="True"/>
+            <!-- 🔹 טופס פרטי מתנדב -->
+            <GroupBox Header="🧍 פרטי מתנדב" Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-        <!-- Name -->
-        <Label Content="Name:" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
-        <TextBox Grid.Row="1" Grid.Column="1" Margin="5"
-                 Text="{Binding Volunteer.Name, Mode=TwoWay}"/>
+                    <!-- ID -->
+                    <Label Content="תעודת זהות:" Grid.Row="0" Grid.Column="0"/>
+                    <TextBox Text="{Binding Volunteer.Id}" Grid.Row="0" Grid.Column="1" IsReadOnly="True"/>
 
-        <!-- Is Active (on same row as Name, right-aligned) -->
-        <CheckBox Content="Is Active" HorizontalAlignment="Right" Margin="5"
-                  Grid.Row="1" Grid.Column="1" VerticalAlignment="Center"
-                  IsChecked="{Binding Volunteer.IsActive}"
-                  IsEnabled="{Binding Volunteer.CallInVolunteerHandle, Converter={StaticResource NullToBoolInverseConverter}}"/>
+                    <!-- Name -->
+                    <Label Content="שם:" Grid.Row="1" Grid.Column="0"/>
+                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                        <TextBox Text="{Binding Volunteer.Name, Mode=TwoWay}" Width="200"/>
+                        <CheckBox Content="פעיל" Margin="10,0,0,0"
+                                  IsChecked="{Binding Volunteer.IsActive}"
+                                  IsEnabled="{Binding Volunteer.CallInVolunteerHandle, Converter={StaticResource NullToBoolInverseConverter}}"/>
+                    </StackPanel>
 
-        <!-- Phone -->
-        <Label Content="Phone:" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
-        <TextBox Grid.Row="2" Grid.Column="1" Margin="5"
-                 Text="{Binding Volunteer.Phone, Mode=TwoWay}"/>
+                    <!-- Phone -->
+                    <Label Content="טלפון:" Grid.Row="2" Grid.Column="0"/>
+                    <TextBox Text="{Binding Volunteer.Phone, Mode=TwoWay}" Grid.Row="2" Grid.Column="1"/>
 
-        <!-- Email -->
-        <Label Content="Email:" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
-        <TextBox Grid.Row="3" Grid.Column="1" Margin="5"
-                 Text="{Binding Volunteer.Email, Mode=TwoWay}"/>
+                    <!-- Email -->
+                    <Label Content="אימייל:" Grid.Row="3" Grid.Column="0"/>
+                    <TextBox Text="{Binding Volunteer.Email, Mode=TwoWay}" Grid.Row="3" Grid.Column="1"/>
 
-        <!-- Address -->
-        <Label Content="Address:" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
-        <TextBox Grid.Row="4" Grid.Column="1" Margin="5"
-                 Text="{Binding Volunteer.Address, Mode=TwoWay}"/>
+                    <!-- Address -->
+                    <Label Content="כתובת:" Grid.Row="4" Grid.Column="0"/>
+                    <TextBox Text="{Binding Volunteer.Address, Mode=TwoWay}" Grid.Row="4" Grid.Column="1"/>
 
-        <!-- Role -->
-        <Label Content="Role:" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
-        <ComboBox Grid.Row="5" Grid.Column="1" Margin="5"
-                  ItemsSource="{Binding Source={StaticResource RolesCollectionKey}}"
-                  SelectedItem="{Binding Volunteer.Role, Mode=TwoWay}"/>
+                    <!-- Role -->
+                    <Label Content="תפקיד:" Grid.Row="5" Grid.Column="0"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource RolesCollectionKey}}"
+                              SelectedItem="{Binding Volunteer.Role, Mode=TwoWay}"
+                              Grid.Row="5" Grid.Column="1"/>
 
-        <!-- Distance Type -->
-        <Label Content="Distance Type:" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
-        <ComboBox Grid.Row="6" Grid.Column="1" Margin="5"
-                  ItemsSource="{Binding Source={StaticResource DistanceTypesCollectionKey}}"
-                  SelectedItem="{Binding Volunteer.TypeOfDistance, Mode=TwoWay}"/>
+                    <!-- Distance Type -->
+                    <Label Content="סוג מרחק:" Grid.Row="6" Grid.Column="0"/>
+                    <ComboBox ItemsSource="{Binding Source={StaticResource DistanceTypesCollectionKey}}"
+                              SelectedItem="{Binding Volunteer.TypeOfDistance, Mode=TwoWay}"
+                              Grid.Row="6" Grid.Column="1"/>
 
-        <!-- Max Distance -->
-        <Label Content="Max Distance:" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" Margin="5"/>
-        <TextBox Grid.Row="7" Grid.Column="1" Margin="5"
-                 Text="{Binding Volunteer.MaxDistance, Mode=TwoWay}"/>
+                    <!-- Max Distance -->
+                    <Label Content="מרחק מקסימלי:" Grid.Row="7" Grid.Column="0"/>
+                    <TextBox Text="{Binding Volunteer.MaxDistance, Mode=TwoWay}" Grid.Row="7" Grid.Column="1"/>
+                </Grid>
+            </GroupBox>
 
-        <!-- Call In Progress Info -->
-        <GroupBox Header="Call In Progress" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="5"
-                  Visibility="{Binding Volunteer.CallInVolunteerHandle, Converter={StaticResource NullToVisibilityConverter}}">
-            <StackPanel Margin="5">
-                <TextBlock>
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="Call ID: {0}">
-                            <Binding Path="Volunteer.CallInVolunteerHandle.CallId"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-                <TextBlock>
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="Call Address: {0}">
-                            <Binding Path="Volunteer.CallInVolunteerHandle.CallAddress"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-                <TextBlock>
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="Time Call Made: {0}">
-                            <Binding Path="Volunteer.CallInVolunteerHandle.TimeCallMade"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-                <TextBlock>
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="Distance from Volunteer: {0} km">
-                            <Binding Path="Volunteer.CallInVolunteerHandle.DistanceCallFromVolunteer"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
+            <!-- 📞 קריאה פעילה -->
+            <GroupBox Header="📞 קריאה פעילה" Grid.Row="0" Margin="10,250,10,10"
+                      Visibility="{Binding Volunteer.CallInVolunteerHandle, Converter={StaticResource NullToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="{Binding Volunteer.CallInVolunteerHandle.CallId, StringFormat=מספר קריאה: {0}}"/>
+                    <TextBlock Text="{Binding Volunteer.CallInVolunteerHandle.CallAddress, StringFormat=כתובת: {0}}"/>
+                    <TextBlock Text="{Binding Volunteer.CallInVolunteerHandle.TimeCallMade, StringFormat=שעת קריאה: {0}}"/>
+                    <TextBlock Text="{Binding Volunteer.CallInVolunteerHandle.DistanceCallFromVolunteer, StringFormat=מרחק: {0} קמ}"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- 💾 כפתור -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                <Button Content="עדכן" Width="100" Click="btnAddUpdate_Click"/>
             </StackPanel>
-        </GroupBox>
-
-        <!-- Buttons -->
-        <StackPanel Orientation="Horizontal" Grid.Row="9" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="10">
-            <Button Content="Update" Width="100" Margin="10,5" Click="btnAddUpdate_Click"/>
-        </StackPanel>
-    </Grid>
+        </Grid>
+    </ScrollViewer>
 </Window>
-
