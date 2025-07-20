@@ -44,14 +44,14 @@ namespace PL
                 {
                     CurrentCall = s_bl.Call.GetCallsDetails(callId);
 
-                    // עדכון שדות במסך לפי הקריאה
-                    //CallTypeComboBox.ItemsSource = Enum.GetValues(typeof(CallType));
-                    //CallTypeComboBox.SelectedItem = CurrentCall.CallType;
+                // עדכון שדות במסך לפי הקריאה
+                //CallTypeComboBox.ItemsSource = Enum.GetValues(typeof(CallType));
+                //CallTypeComboBox.SelectedItem = CurrentCall.CallType;
 
-                    //DescriptionTextBox.Text = CurrentCall.CallDescription;
-                    //AddressTextBox.Text = CurrentCall.CallAddress;
+                //DescriptionTextBox.Text = CurrentCall.CallDescription;
+                //AddressTextBox.Text = CurrentCall.CallAddress;
                 //UrgencyTextBox.Text = CurrentCall.Urgency.ToString();
-                EndTimePicker.Text = (CurrentCall.MaxEndCallTime ?? DateTime.Now.Date).ToString("HH:mm");
+                EndTimeTextBox.Text = (CurrentCall.MaxEndCallTime ?? DateTime.Now.Date).ToString("HH:mm");
 
 
                 //StatusTextBlock.Text = CurrentCall.Status.ToString();
@@ -77,12 +77,12 @@ namespace PL
                 var editableAll = CurrentCall.Status == BO.Status.open || CurrentCall.Status ==BO.Status.openAtRisk;
                 var editableEndTimeOnly = CurrentCall.Status == BO.Status.inProgress || CurrentCall.Status ==BO. Status.inProgressAtRisk;
 
-                //DescriptionTextBox.IsReadOnly = !editableAll;
-                //AddressTextBox.IsReadOnly = !editableAll;
-                //UrgencyTextBox.IsReadOnly = !editableAll;
-                //CallTypeComboBox.IsEnabled = editableAll;
+            //DescriptionTextBox.IsReadOnly = !editableAll;
+            //AddressTextBox.IsReadOnly = !editableAll;
+            //UrgencyTextBox.IsReadOnly = !editableAll;
+            //CallTypeComboBox.IsEnabled = editableAll;
 
-                EndTimePicker.IsEnabled = editableAll || editableEndTimeOnly;
+            EndTimeTextBox.IsEnabled = editableAll || editableEndTimeOnly;
 
                 UpdateButton.IsEnabled = editableAll || editableEndTimeOnly;
             }
@@ -110,18 +110,18 @@ namespace PL
                     //    return;
                     //}
 
-                    if (EndTimePicker.Text is null)
+                    if (EndTimeTextBox.Text is null)
                     {
                         MessageBox.Show("יש לבחור זמן לסיום.");
                         return;
                     }
 
-                    // עדכון הקריאה
-                    //CurrentCall.CallDescription = DescriptionTextBox.Text;
-                    //CurrentCall.CallAddress = AddressTextBox.Text;
-                    //CurrentCall.MaxEndCallTime = urgency;
-                    //CurrentCall.CallType = (CallType)CallTypeComboBox.SelectedItem;
-                CurrentCall.MaxEndCallTime = DateTime.Parse(EndTimePicker.Text);
+                // עדכון הקריאה
+                //CurrentCall.CallDescription = DescriptionTextBox.Text;
+                //CurrentCall.CallAddress = AddressTextBox.Text;
+                //CurrentCall.MaxEndCallTime = urgency;
+                //CurrentCall.CallType = (CallType)CallTypeComboBox.SelectedItem;
+                CurrentCall.MaxEndCallTime = DateTime.Parse(EndTimeTextBox.Text);
 
                 s_bl.Call.UpdateCallDetails(CurrentCall);
                     MessageBox.Show("הקריאה עודכנה בהצלחה.");

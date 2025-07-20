@@ -145,7 +145,7 @@ namespace PL
         }
 
         public static readonly DependencyProperty MaxYearRangeProperty =
-            DependencyProperty.Register("MaxYearRange", typeof(TimeSpan), typeof(MainWindow));
+            DependencyProperty.Register("MaxYearRange", typeof(TimeSpan), typeof(MainAdminWindow));
 
         private void btnUpdateMaxRange_Click(object sender, RoutedEventArgs e)
         {

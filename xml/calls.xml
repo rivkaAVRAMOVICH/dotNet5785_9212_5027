@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfCall xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Call>
     <Id>1002</Id>
@@ -17,24 +17,6 @@
     <StartCallTime>2025-06-10T20:26:29</StartCallTime>
     <CallType>none</CallType>
     <MaxEndCallTime>2025-06-10T23:26:29</MaxEndCallTime>
-  </Call>
-  <Call>
-    <Id>1004</Id>
-    <CallAddress>Hashmonaim Street 80</CallAddress>
-    <Latitude>-52.5751</Latitude>
-    <Longitude>-7.242246</Longitude>
-    <StartCallTime>2025-06-11T05:26:29</StartCallTime>
-    <CallType>none</CallType>
-    <MaxEndCallTime>2025-06-11T09:26:29</MaxEndCallTime>
-  </Call>
-  <Call>
-    <Id>1005</Id>
-    <CallAddress>Allenby Street 120</CallAddress>
-    <Latitude>93.837952</Latitude>
-    <Longitude>66.567039</Longitude>
-    <StartCallTime>2025-06-11T09:26:29</StartCallTime>
-    <CallType>none</CallType>
-    <MaxEndCallTime>2025-06-11T12:26:29</MaxEndCallTime>
   </Call>
   <Call>
     <Id>1006</Id>
@@ -112,5 +94,24 @@
     <CallType>fixing</CallType>
     <CallDescription>דדד</CallDescription>
     <MaxEndCallTime>2024-01-10T05:22:33</MaxEndCallTime>
+  </Call>
+  <Call>
+    <Id>1014</Id>
+    <CallAddress>ddd 3</CallAddress>
+    <Latitude>37.1904658</Latitude>
+    <Longitude>50.1616039</Longitude>
+    <StartCallTime>2033-12-24T13:19:29</StartCallTime>
+    <CallType>cooking</CallType>
+    <CallDescription>ייחייעכיע</CallDescription>
+    <MaxEndCallTime>2022-02-03T02:05:33</MaxEndCallTime>
+  </Call>
+  <Call>
+    <Id>1004</Id>
+    <CallAddress>hhhh Street 80</CallAddress>
+    <Latitude>47.502743</Latitude>
+    <Longitude>8.728097</Longitude>
+    <StartCallTime>2025-06-11T05:26:29</StartCallTime>
+    <CallType>none</CallType>
+    <MaxEndCallTime>2025-11-06T09:26:29</MaxEndCallTime>
   </Call>
 </ArrayOfCall>

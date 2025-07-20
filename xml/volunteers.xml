@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ArrayOfVolunteer xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Volunteer>
     <Id>319254109</Id>
@@ -43,20 +43,6 @@
     <MaxDistance>26</MaxDistance>
   </Volunteer>
   <Volunteer>
-    <Id>225415469</Id>
-    <FullName>Ariela Levin</FullName>
-    <PhoneNumber>0524660488</PhoneNumber>
-    <Email>0524660488@gmail.com</Email>
-    <Active>false</Active>
-    <Role>volunteer</Role>
-    <DistanceType>aerialDistance</DistanceType>
-    <Password>Arie2254(</Password>
-    <FullAddress>Allenby Street 100</FullAddress>
-    <Latitude>32.0858</Latitude>
-    <Longitude>34.7832</Longitude>
-    <MaxDistance>51</MaxDistance>
-  </Volunteer>
-  <Volunteer>
     <Id>250831183</Id>
     <FullName>Shira Israelof</FullName>
     <PhoneNumber>0585587839</PhoneNumber>
@@ -85,17 +71,45 @@
     <MaxDistance xsi:nil="true" />
   </Volunteer>
   <Volunteer>
-    <Id>214915027</Id>
-    <FullName>שני</FullName>
-    <PhoneNumber>0548502925</PhoneNumber>
-    <Email>m@gmail.com</Email>
+    <Id>215639212</Id>
+    <FullName>Rivka</FullName>
+    <PhoneNumber>055550000</PhoneNumber>
+    <Email>sddd@s.com</Email>
     <Active>false</Active>
-    <Role>manager</Role>
+    <Role>volunteer</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>FSvvlsL/ZjRy2Ir60263Cvh4dGbSMDtFQIipHJAPwv8=</Password>
+    <FullAddress>sss 3</FullAddress>
+    <Latitude>58.7850415</Latitude>
+    <Longitude>9.3217209</Longitude>
+    <MaxDistance xsi:nil="true" />
+  </Volunteer>
+  <Volunteer>
+    <Id>214364960</Id>
+    <FullName>fff</FullName>
+    <PhoneNumber>055555555</PhoneNumber>
+    <Email>s@dd.com</Email>
+    <Active>false</Active>
+    <Role>volunteer</Role>
+    <DistanceType>aerialDistance</DistanceType>
+    <Password>A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=</Password>
+    <FullAddress>dd 3</FullAddress>
+    <Latitude>34.0810028</Latitude>
+    <Longitude>49.6842229</Longitude>
+    <MaxDistance xsi:nil="true" />
+  </Volunteer>
+  <Volunteer>
+    <Id>214915027</Id>
+    <FullName>d</FullName>
+    <PhoneNumber>0555554455</PhoneNumber>
+    <Email>dd@fjff.ff</Email>
+    <Active>false</Active>
+    <Role>volunteer</Role>
     <DistanceType>aerialDistance</DistanceType>
     <Password>lMJz/CXvucU8+QTqaiR+Am8Bxchu5VSbsIHttrfVN+0=</Password>
-    <FullAddress>10 Bialik Street, Tel Aviv, Israel</FullAddress>
-    <Latitude>31.797499</Latitude>
-    <Longitude>34.645104</Longitude>
+    <FullAddress>kkkkkkk 3</FullAddress>
+    <Latitude>48.540646</Latitude>
+    <Longitude>9.282526</Longitude>
     <MaxDistance xsi:nil="true" />
   </Volunteer>
 </ArrayOfVolunteer>

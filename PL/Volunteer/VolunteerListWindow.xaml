@@ -81,15 +81,6 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-
-                    <!-- Delete action column -->
-                    <GridViewColumn Header="Actions">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="Delete" Click="DeleteButton_Click" Tag="{Binding Id}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>

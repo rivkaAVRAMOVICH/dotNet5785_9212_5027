@@ -138,7 +138,9 @@
                     <TextBox Text="{Binding CurrentCall.StartCallTime}" Grid.Row="4" Grid.Column="1" IsReadOnly="True"/>
 
                     <TextBlock Text="מקס' זמן לסיום:" Grid.Row="5" Grid.Column="0" Margin="0,5,10,5"/>
-                    <TextBox x:Name="EndTimePicker" Text="{Binding CurrentCall.MaxEndCallTime}" Grid.Row="5" Grid.Column="1" TextChanged="TextBox_TextChanged"/>
+                    <TextBox x:Name="EndTimeTextBox"
+                        Text="{Binding CurrentCall.MaxEndCallTime}"
+                        Grid.Row="5" Grid.Column="1"/>
 
                     <TextBlock Text="סטטוס:" Grid.Row="6" Grid.Column="0" Margin="0,5,10,0"/>
                     <TextBlock Text="{Binding CurrentCall.Status}" Grid.Row="6" Grid.Column="1"/>

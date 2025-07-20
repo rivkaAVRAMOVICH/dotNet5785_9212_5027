@@ -109,6 +109,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <!-- 🕒 System Clock -->
@@ -125,7 +126,7 @@
             </GroupBox>
 
             <!-- ⚙️ Configuration -->
-            <GroupBox Header="⚙️ משתני תצורה" Grid.Row="0">
+            <GroupBox Header="⚙️ משתני תצורה" Grid.Row="1">
                 <StackPanel>
                     <TextBox Text="{Binding MaxYearRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <Button Content="עדכן טווח מקסימלי" Width="200" Click="btnUpdateMaxRange_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
@@ -133,7 +134,7 @@
             </GroupBox>
 
             <!-- 🧭 Navigation -->
-            <StackPanel Grid.Row="1" Orientation="Vertical">
+            <StackPanel Grid.Row="2" Orientation="Vertical">
                 <Button Content="אתחול מסד נתונים" Width="200" Click="btnInitializeDB_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
                 <Button Content="איפוס מסד נתונים" Width="200" Click="btnResetDB_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
                 <Button Content="איפוס תצורה" Width="200" Click="btnResetConfiguration_Click" IsEnabled="{Binding IsSimulatorRunning, Converter={StaticResource InverseBooleanConverter}}"/>
@@ -142,7 +143,7 @@
             </StackPanel>
 
             <!-- 📊 Call Status -->
-            <GroupBox Header="📊 קריאות לפי סטטוס" Grid.Row="2">
+            <GroupBox Header="📊 קריאות לפי סטטוס" Grid.Row="3">
                 <ItemsControl ItemsSource="{Binding CallsByStatus}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -159,7 +160,7 @@
             </GroupBox>
 
             <!-- 🚀 Simulator Control -->
-            <GroupBox Header="🚀 שליטה על הסימולציה" Grid.Row="3">
+            <GroupBox Header="🚀 שליטה על הסימולציה" Grid.Row="4">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Button x:Name="btnToggleSimulator"
                 Width="120"
